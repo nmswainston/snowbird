@@ -1,98 +1,77 @@
-import datetime
-import os
-from openai import OpenAI
+    import streamlit as st
+    import datetime
+    import openai
+    import os
 
-# Load your OpenAI API key (ensure it's set in your environment variables or Replit secrets)
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+    # Load your OpenAI API key from Streamlit secrets
+    openai.api_key = st.secrets.get("OPENAI_API_KEY", "")
 
-# Initial setup
-states = {"Arizona": 0, "Minnesota": 0}
-home_budgets = {
-    "Arizona": {"utilities": 200, "insurance": 150, "HOA": 100},
-    "Minnesota": {"utilities": 250, "insurance": 170, "HOA": 90}
-}
-seasonal_cash_flow = {
-    "Travel": 300,
-    "Healthcare": 400,
-    "Supplemental Insurance": 200
-}
-TAX_THRESHOLD_DAYS = 183  # Common threshold for state tax residency
+    # State data
+    states = {"Arizona": 0, "Minnesota": 0}
+    home_budgets = {
+        "Arizona": {"Utilities": 200, "Insurance": 150, "HOA": 100},
+        "Minnesota": {"Utilities": 250, "Insurance": 170, "HOA": 90}
+    }
+    seasonal_cash_flow = {
+        "Travel": 300,
+        "Healthcare": 400,
+        "Supplemental Insurance": 200
+    }
+    TAX_THRESHOLD_DAYS = 183
 
-def count_days(location):
-    today = datetime.date.today()
-    print(f"\nRecording today's date ({today}) as a day spent in {location}.")
-    states[location] += 1
+    # Session state init
+    if "states" not in st.session_state:
+        st.session_state.states = states
+    if "chat_response" not in st.session_state:
+        st.session_state.chat_response = ""
 
-def print_budget(location):
-    print(f"\n--- {location} Home Budget ---")
-    for k, v in home_budgets[location].items():
-        print(f"{k}: ${v}/month")
+    # Streamlit UI
+    st.title("❄️ Snowbird AI Financial Assistant 🏖️")
+    st.write("Helping you fly between seasons with your finances in check.")
 
-def print_cash_flow():
-    print("\n--- Seasonal Cash Flow Estimates ---")
+    # Log location
+    st.header("🏡 Log Your Location")
+    location = st.radio("Where are you today?", ("Arizona", "Minnesota"))
+    if st.button(f"Log a day in {location}"):
+        st.session_state.states[location] += 1
+        st.success(f"Logged a day in {location}!")
+
+    # Show budgets
+    st.header("📊 Home Maintenance Budget")
+    budget_home = st.selectbox("Select a home to view budget:", ["Arizona", "Minnesota"])
+    budget = home_budgets[budget_home]
+    st.subheader(f"{budget_home} Budget")
+    for k, v in budget.items():
+        st.write(f"- {k}: ${v}/month")
+
+    # Seasonal cash flow
+    st.header("💸 Seasonal Cash Flow Plan")
     for k, v in seasonal_cash_flow.items():
-        print(f"{k}: ${v}/month")
+        st.write(f"- {k}: ${v}/month")
 
-def check_tax_residency():
-    print("\n--- Tax Residency Status ---")
-    for state, days in states.items():
-        print(f"{state}: {days} days")
+    # Residency tracker
+    st.header("📅 Tax Residency Tracker")
+    for state, days in st.session_state.states.items():
+        st.write(f"{state}: {days} days")
         if days >= TAX_THRESHOLD_DAYS:
-            print(f"⚠️ You may now be considered a tax resident of {state}.")
+            st.warning(f"You may now be considered a tax resident of {state}!")
 
-def ask_ai(question):
-    try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a friendly AI financial assistant for seasonal residents (snowbirds)."},
-                {"role": "user", "content": question}
-            ]
-        )
-        return response.choices[0].message.content
-    except Exception as e:
-        return f"Error: {e}"
+    # Ask the AI
+    st.header("🤖 Ask Snowbird AI")
+    question = st.text_input("Ask a financial question:")
+    if st.button("Get AI Advice"):
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are a friendly AI financial assistant for seasonal residents (snowbirds)."},
+                    {"role": "user", "content": question}
+                ]
+            )
+            st.session_state.chat_response = response['choices'][0]['message']['content']
+        except Exception as e:
+            st.session_state.chat_response = f"Error: {e}"
 
-def main():
-    print("❄️ Welcome to Snowbird AI Financial Assistant 🏖️")
-    name = input("What’s your name? ")
-    print(f"Hi {name}, let's make sure your seasonal lifestyle stays stress-free and tax-smart!")
-
-    while True:
-        print("\nMenu:")
-        print("1. Log a day in Arizona")
-        print("2. Log a day in Minnesota")
-        print("3. View home maintenance budget")
-        print("4. View seasonal cash flow plan")
-        print("5. Check tax residency alerts")
-        print("6. Ask a financial question")
-        print("7. Exit")
-
-        choice = input("Choose an option (1-7): ")
-
-        if choice == "1":
-            count_days("Arizona")
-        elif choice == "2":
-            count_days("Minnesota")
-        elif choice == "3":
-            loc = input("View budget for which home? (Arizona/Minnesota): ")
-            if loc in home_budgets:
-                print_budget(loc)
-            else:
-                print("Invalid location.")
-        elif choice == "4":
-            print_cash_flow()
-        elif choice == "5":
-            check_tax_residency()
-        elif choice == "6":
-            q = input("Ask your financial question: ")
-            print("\nAI Response:")
-            print(ask_ai(q))
-        elif choice == "7":
-            print("Stay warm (or cool), and travel safe, Snowbird!")
-            break
-        else:
-            print("Invalid choice. Try again.")
-
-if __name__ == "__main__":
-    main()
+    if st.session_state.chat_response:
+        st.markdown("**AI Response:**")
+        st.write(st.session_state.chat_response)
