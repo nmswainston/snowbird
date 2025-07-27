@@ -3,18 +3,27 @@ import streamlit as st
 import datetime
 import os
 
+# Configure Streamlit for deployment
+st.set_page_config(page_title="Snowbird AI Financial Assistant")
+
 # Try to load OpenAI, handle if not available or no API key
 try:
     from openai import OpenAI
     # Load your OpenAI API key from environment variables (Replit Secrets)
     api_key = os.getenv("OPENAI_API_KEY", "")
-    if api_key:
-        client = OpenAI(api_key=api_key)
-        openai_available = True
+    if api_key and api_key.strip():
+        try:
+            client = OpenAI(api_key=api_key)
+            openai_available = True
+        except Exception:
+            openai_available = False
+            st.warning("OpenAI API key configured but invalid. AI features disabled.")
     else:
         openai_available = False
+        st.info("OpenAI API key not found. AI chat features will be disabled.")
 except ImportError:
     openai_available = False
+    st.info("OpenAI library not available. AI chat features will be disabled.")
 
 # Default values
 default_states = {"Arizona": 0, "Minnesota": 0}
