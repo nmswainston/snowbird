@@ -43,7 +43,7 @@ def check_tax_residency():
 def ask_ai(question):
     try:
         response = client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a friendly AI financial assistant for seasonal residents (snowbirds)."},
                 {"role": "user", "content": question}
