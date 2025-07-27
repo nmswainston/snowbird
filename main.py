@@ -1,9 +1,9 @@
 import datetime
-import openai
 import os
+from openai import OpenAI
 
 # Load your OpenAI API key (ensure it's set in your environment variables or Replit secrets)
-openai.api_key = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 # Initial setup
 states = {"Arizona": 0, "Minnesota": 0}
@@ -42,14 +42,14 @@ def check_tax_residency():
 
 def ask_ai(question):
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a friendly AI financial assistant for seasonal residents (snowbirds)."},
                 {"role": "user", "content": question}
             ]
         )
-        return response['choices'][0]['message']['content']
+        return response.choices[0].message.content
     except Exception as e:
         return f"Error: {e}"
 
@@ -96,18 +96,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-import os
-from openai import OpenAI
-
-client = OpenAI(
-    # This is the default and can be omitted
-    api_key=os.environ.get("OPENAI_API_KEY"),
-)
-
-response = client.responses.create(
-    model="gpt-4o",
-    instructions="You are a coding assistant that talks like a pirate.",
-    input="How do I check if a Python object is an instance of a class?",
-)
-
-print(response.output_text)
