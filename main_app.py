@@ -708,11 +708,19 @@ def render_settings_tab():
             )
         
         with add_col2:
-            # State selector with common snowbird states
+            # All 50 US states plus DC and territories
             available_states = [
-                "Arizona", "Florida", "California", "Texas", "Nevada",
-                "Minnesota", "Wisconsin", "Michigan", "Illinois", "New York",
-                "North Dakota", "South Dakota", "Montana", "Colorado", "Other"
+                "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", 
+                "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", 
+                "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", 
+                "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", 
+                "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", 
+                "New Hampshire", "New Jersey", "New Mexico", "New York", 
+                "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", 
+                "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", 
+                "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", 
+                "West Virginia", "Wisconsin", "Wyoming", "Washington DC", 
+                "Puerto Rico", "US Virgin Islands", "Guam", "Other"
             ]
             new_prop_state = st.selectbox(
                 "State",
@@ -723,8 +731,8 @@ def render_settings_tab():
             # If "Other" is selected, show text input
             if new_prop_state == "Other":
                 new_prop_state = st.text_input(
-                    "Enter State Name",
-                    placeholder="Enter state name",
+                    "Enter State/Territory Name",
+                    placeholder="Enter state or territory name",
                     key="custom_state_name"
                 )
         
