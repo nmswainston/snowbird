@@ -80,13 +80,14 @@ def main():
     # Dashboard now includes integrated quick actions
 
     # Main navigation tabs
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
         "📊 Dashboard", 
         "📅 Day Tracker", 
         "💰 Budgets", 
         "🤖 AI Assistant", 
         "📋 Reports",
-        "⚙️ Settings"
+        "⚙️ Settings",
+        "🌐 Community"
     ])
 
     with tab1:
@@ -106,6 +107,9 @@ def main():
 
     with tab6:
         render_settings_tab()
+
+    with tab7:
+        render_community_tab()
 
     # Footer
     render_footer()
@@ -992,6 +996,177 @@ def render_reports_tab():
     with col3:
         if st.button("📧 Email Report", use_container_width=True):
             st.info("Email report functionality would be implemented here")
+
+def render_community_tab():
+    """Render community forum and discussion tab"""
+    st.markdown('<h2><i data-lucide="users" class="icon"></i>Snowbird Community</h2>', unsafe_allow_html=True)
+    
+    # Community description
+    st.markdown("""
+    ### 🌐 Connect with Fellow Snowbirds
+    
+    Join our vibrant community of seasonal residents sharing tips, asking questions, 
+    and helping each other navigate the snowbird lifestyle.
+    """)
+    
+    # Community features overview
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("""
+        **💬 Share Tips**
+        - Tax residency strategies
+        - Home maintenance advice
+        - Travel recommendations
+        - Cost-saving ideas
+        """)
+    
+    with col2:
+        st.markdown("""
+        **❓ Ask Questions**
+        - State tax requirements
+        - Budget planning help
+        - Legal considerations
+        - Property management
+        """)
+    
+    with col3:
+        st.markdown("""
+        **🏪 Find Local Services**
+        - Trusted contractors
+        - Healthcare providers
+        - Property managers
+        - Emergency contacts
+        """)
+    
+    st.markdown("---")
+    
+    # Forum access section
+    st.subheader("🗣️ Join the Discussion")
+    
+    # Primary forum link with prominent styling
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); 
+                padding: 2rem; border-radius: 12px; text-align: center; margin: 1.5rem 0;">
+        <h3 style="color: white; margin: 0 0 1rem 0;">
+            💬 Snowbird Community Forum
+        </h3>
+        <p style="color: #dbeafe; margin: 0 0 1.5rem 0; font-size: 1.1rem;">
+            Connect with thousands of snowbirds sharing their experiences and knowledge
+        </p>
+        <a href="https://reddit.com/r/snowbirds" target="_blank" 
+           style="background: white; color: #1d4ed8; padding: 0.75rem 2rem; 
+                  border-radius: 8px; text-decoration: none; font-weight: 600; 
+                  font-size: 1.1rem; display: inline-block;">
+            🚀 Join Our Forum →
+        </a>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Alternative community platforms
+    st.subheader("🌍 Other Community Platforms")
+    
+    community_col1, community_col2 = st.columns(2)
+    
+    with community_col1:
+        st.markdown("""
+        **📱 Social Media Groups**
+        - [Facebook Snowbird Groups](https://facebook.com/groups/snowbirds)
+        - [Twitter #SnowbirdLife](https://twitter.com/hashtag/snowbirdlife)
+        - [LinkedIn Snowbird Network](https://linkedin.com/groups/snowbirds)
+        """)
+        
+    with community_col2:
+        st.markdown("""
+        **📧 Newsletter & Updates**
+        - Weekly community highlights
+        - Tax law changes
+        - New member introductions
+        - Local event announcements
+        """)
+    
+    # Community guidelines and rules
+    with st.expander("📋 Community Guidelines"):
+        st.markdown("""
+        **Our Community Values:**
+        
+        🤝 **Be Respectful** - Treat all members with kindness and respect
+        
+        💡 **Share Knowledge** - Help others with your experiences and insights
+        
+        🎯 **Stay On Topic** - Keep discussions relevant to snowbird lifestyle
+        
+        🔒 **Protect Privacy** - Don't share personal financial or location details
+        
+        ⚖️ **No Legal Advice** - Always consult professionals for legal/tax matters
+        
+        🚫 **No Spam** - Commercial promotions must be approved by moderators
+        """)
+    
+    # Quick tips for new community members
+    st.subheader("💡 Getting Started in the Community")
+    
+    st.markdown("""
+    **New to our community? Here's how to get the most out of it:**
+    
+    1. **📝 Introduce Yourself** - Share your snowbird journey and which states you split time between
+    
+    2. **🔍 Search First** - Check if your question has been answered before posting
+    
+    3. **🏷️ Use Tags** - Help others find your posts with relevant tags (#taxes, #arizona, #minnesota, etc.)
+    
+    4. **👥 Follow Topics** - Subscribe to discussions about your areas of interest
+    
+    5. **🎁 Give Back** - Share your own tips and experiences to help newcomers
+    """)
+    
+    # Community stats and activity (placeholder for future integration)
+    st.markdown("---")
+    st.subheader("📊 Community Activity")
+    
+    stats_col1, stats_col2, stats_col3, stats_col4 = st.columns(4)
+    
+    with stats_col1:
+        st.metric("Active Members", "2,847", "↗️ +127 this month")
+    
+    with stats_col2:
+        st.metric("Discussions", "1,392", "↗️ +89 this week")
+    
+    with stats_col3:
+        st.metric("Tips Shared", "5,621", "↗️ +203 this month")
+    
+    with stats_col4:
+        st.metric("States Covered", "48", "Complete coverage!")
+    
+    # Embedded forum preview (using iframe for demonstration)
+    st.markdown("---")
+    st.subheader("📖 Recent Community Discussions")
+    
+    # Option to embed forum content via iframe
+    if st.checkbox("📺 Show Live Forum Feed", help="Display recent discussions directly in the app"):
+        st.markdown("""
+        <div style="border: 2px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin: 1rem 0;">
+            <iframe src="https://reddit.com/r/snowbirds/new.compact" 
+                    width="100%" height="400" frameborder="0"
+                    style="border: none; background: white;">
+                <p>Your browser does not support iframes. 
+                   <a href="https://reddit.com/r/snowbirds" target="_blank">Visit our forum directly</a>
+                </p>
+            </iframe>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.caption("🔗 Forum content loads from external source - may take a moment to appear")
+    
+    # Quick contact for community issues
+    st.markdown("---")
+    st.info("""
+    **Need Help with the Community?**
+    
+    📧 Contact our community moderators: community@snowbirdapp.com
+    
+    🐛 Report technical issues or suggest improvements for better community integration
+    """)
 
 def render_footer():
     """Render application footer"""
