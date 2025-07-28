@@ -103,18 +103,31 @@ def render_dashboard():
         st.markdown("</div>", unsafe_allow_html=True)
 
     with col3:
-        # Days remaining metric with warning emoji
+        # Tax threshold progress visualization with progress bar
         st.markdown("""
         <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); 
                     padding: 1rem; border-radius: 12px; margin-bottom: 1rem; border: 1px solid #e2e8f0;">
         """, unsafe_allow_html=True)
-        delta_color = "normal" if days_remaining > 30 else "inverse"
-        st.metric(
-            label="⚠️ Days Until Tax Threshold",
-            value=days_remaining,
-            delta=f"Primary state: {primary_state}",
-            delta_color=delta_color
-        )
+        
+        # Calculate percentage of 183-day allowance used
+        pct = min(primary_days / 183, 1.0)
+        percentage_used = pct * 100
+        
+        # Display the progress section with label
+        st.markdown("**⚠️ Tax Threshold Progress**")
+        
+        # Add tooltip with the raw number for reference
+        with st.container():
+            # Progress bar showing percentage toward 183-day threshold
+            st.progress(pct, text=f"Days logged: {primary_days}/183")
+            
+            # Small label showing percentage used
+            st.caption(f"You've used {percentage_used:.1f}% of your 183-day allowance")
+            
+            # Tooltip showing the exact days remaining (hidden behind hover)
+            if st.button("ℹ️", key="threshold_tooltip", help=f"Days remaining: {days_remaining} | Primary state: {primary_state}"):
+                st.info(f"Exact details: {days_remaining} days remaining until threshold in {primary_state}")
+        
         st.markdown("</div>", unsafe_allow_html=True)
 
     # Add spacing between sections
