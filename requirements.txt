@@ -31,3 +31,4 @@ pyrebase4
 streamlit-authenticator
 schedule
 smtplib2
+requests>=2.31.0

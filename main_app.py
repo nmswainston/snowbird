@@ -126,6 +126,59 @@ def render_settings_tab():
             )
             st.session_state.fiscal_year_start = fiscal_year_start
 
+        st.divider()
+        st.subheader("Currency & Financial Settings")
+
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            # Currency selector
+            from utils.currency import SUPPORTED_CURRENCIES
+            currency_options = list(SUPPORTED_CURRENCIES.keys())
+            currency_names = [f"{code} - {SUPPORTED_CURRENCIES[code]['name']}" for code in currency_options]
+            
+            selected_currency_index = st.selectbox(
+                "Primary Currency",
+                options=range(len(currency_options)),
+                format_func=lambda x: currency_names[x],
+                index=currency_options.index(st.session_state.get('primary_currency', 'USD')),
+                help="Your preferred currency for all financial calculations"
+            )
+            st.session_state.primary_currency = currency_options[selected_currency_index]
+
+        with col2:
+            # Inflation adjustment toggle
+            inflation_enabled = st.checkbox(
+                "Enable Inflation Adjustment",
+                value=st.session_state.get('inflation_enabled', False),
+                help="Adjust financial values for inflation over time"
+            )
+            st.session_state.inflation_enabled = inflation_enabled
+
+        with col3:
+            # Inflation rate setting (only show if inflation is enabled)
+            if inflation_enabled:
+                inflation_rate = st.number_input(
+                    "Annual Inflation Rate (%)",
+                    value=st.session_state.get('inflation_rate', 3.0),
+                    min_value=0.0,
+                    max_value=20.0,
+                    step=0.1,
+                    help="Expected annual inflation rate for adjustments"
+                )
+                st.session_state.inflation_rate = inflation_rate / 100.0  # Convert to decimal
+            else:
+                st.session_state.inflation_rate = 0.03  # Default 3%
+
+        # Show current exchange rate info
+        if st.session_state.get('primary_currency', 'USD') != 'USD':
+            from utils.currency import get_currency_conversion_info
+            try:
+                rate, rate_info = get_currency_conversion_info('USD', st.session_state.primary_currency)
+                st.info(f"💱 Current exchange rate: {rate_info}")
+            except Exception as e:
+                st.warning("⚠️ Unable to fetch current exchange rates. Using fallback rates.")
+
         st.subheader("Location Settings")
         primary_residence = st.selectbox(
             "Primary Residence State",

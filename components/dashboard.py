@@ -1,6 +1,12 @@
+from datetime import datetime, date, timedelta
+from typing import Tuple
 import streamlit as st
-import datetime
+from utils import data_models
 from utils.data_models import SnowbirdData
+from utils.currency import (
+    convert_currency, apply_inflation_adjustment, format_currency, 
+    get_exchange_rates, get_current_year_progress
+)
 
 def render_dashboard():
     """Render the main dashboard with all widgets"""
@@ -527,6 +533,7 @@ def render_dashboard():
     # Widget: State-by-State Breakdown - render only if enabled
     if st.session_state.widgets.get("state_breakdown", True):
         st.markdown('<h3><i data-lucide="map-pin" class="icon"></i>🗺️ State-by-State Breakdown</h3>', unsafe_allow_html=True)
+        ```python
         st.markdown("<br>", unsafe_allow_html=True)
 
     for state, days in st.session_state.states.items():
@@ -647,6 +654,191 @@ def render_dashboard():
 
         # Add final spacing for financial summary
         st.markdown("<br><br>", unsafe_allow_html=True)
+
+    # Initialize session state with fallback defaults if needed
+    if 'states' not in st.session_state:
+        st.session_state.states = data_models.DEFAULT_STATES.copy()
+
+    if 'home_budgets' not in st.session_state:
+        st.session_state.home_budgets = data_models.DEFAULT_HOME_BUDGETS.copy()
+
+    if 'seasonal_cash_flow' not in st.session_state:
+        st.session_state.seasonal_cash_flow = data_models.DEFAULT_SEASONAL_CASH_FLOW.copy()
+
+    if 'tax_threshold' not in st.session_state:
+        st.session_state.tax_threshold = 183
+
+    if 'widgets' not in st.session_state:
+        st.session_state.widgets = {
+            "quick_location_logger": True,
+            "tax_status_overview": True,
+            "financial_overview": True,
+            "state_breakdown": True,
+            "budget_breakdown": True,
+            "upcoming_bills": True
+        }
+
+    # Initialize currency and inflation settings
+    if 'primary_currency' not in st.session_state:
+        st.session_state.primary_currency = 'USD'
+    if 'inflation_enabled' not in st.session_state:
+        st.session_state.inflation_enabled = False
+    if 'inflation_rate' not in st.session_state:
+        st.session_state.inflation_rate = 0.03
+
+    # Helper function for currency conversion and inflation adjustment
+    def convert_and_adjust_currency(amount: float) -> Tuple[float, str]:
+        """Convert currency and apply inflation adjustment"""
+        # Get settings
+        primary_currency = st.session_state.get('primary_currency', 'USD')
+        inflation_enabled = st.session_state.get('inflation_enabled', False)
+        inflation_rate = st.session_state.get('inflation_rate', 0.03)
+
+        converted_amount = amount
+
+        # Convert from USD to primary currency
+        if primary_currency != 'USD':
+            try:
+                exchange_rates = get_exchange_rates('USD')
+                converted_amount = convert_currency(amount, 'USD', primary_currency, exchange_rates)
+            except Exception:
+                # Use fallback rates
+                fallback_rates = {'USD': 1.0, 'CAD': 1.35, 'EUR': 0.85}
+                rate = fallback_rates.get(primary_currency, 1.0)
+                converted_amount = amount * rate
+
+        # Apply inflation adjustment
+        if inflation_enabled:
+            year_progress = get_current_year_progress()
+            inflation_factor = 1 + (inflation_rate * year_progress)
+            converted_amount = converted_amount * inflation_factor
+
+        # Format with currency symbol
+        formatted = format_currency(converted_amount, primary_currency)
+        return converted_amount, formatted
+
+    # Seasonal Financial Summary with Currency & Inflation Support
+    with st.container():
+        st.markdown('<h3><i data-lucide="dollar-sign" class="icon"></i>💰 Financial Overview</h3>', unsafe_allow_html=True)
+
+        # Get currency and inflation settings
+        primary_currency = st.session_state.get('primary_currency', 'USD')
+        inflation_enabled = st.session_state.get('inflation_enabled', False)
+        inflation_rate = st.session_state.get('inflation_rate', 0.03)
+
+        # Get exchange rates if needed
+        exchange_rates = None
+        if primary_currency != 'USD':
+            try:
+                exchange_rates = get_exchange_rates('USD')
+            except Exception:
+                st.warning("⚠️ Using fallback exchange rates")
+                exchange_rates = {'USD': 1.0, 'CAD': 1.35, 'EUR': 0.85}
+
+        # Calculate inflation adjustment factor if enabled
+        inflation_factor = 1.0
+        if inflation_enabled:
+            # Apply partial year inflation based on current date
+            year_progress = get_current_year_progress()
+            inflation_factor = 1 + (inflation_rate * year_progress)
+
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            az_total = sum(st.session_state.home_budgets['Arizona'].values())
+            _, az_formatted = convert_and_adjust_currency(az_total)
+            render_metric_card(
+                "AZ Home Budget", 
+                az_formatted,
+                "Monthly total",
+                "home"
+            )
+
+        with col2:
+            mn_total = sum(st.session_state.home_budgets['Minnesota'].values())
+            _, mn_formatted = convert_and_adjust_currency(mn_total)
+            render_metric_card(
+                "MN Home Budget", 
+                mn_formatted,
+                "Monthly total",
+                "home"
+            )
+
+        with col3:
+            seasonal_total = sum(st.session_state.seasonal_cash_flow.values())
+            _, seasonal_formatted = convert_and_adjust_currency(seasonal_total)
+            render_metric_card(
+                "Seasonal Cash Flow", 
+                seasonal_formatted,
+                "Monthly budget",
+                "trending-up"
+            )
+
+        with col4:
+            total_monthly = az_total + mn_total + seasonal_total
+            _, total_formatted = convert_and_adjust_currency(total_monthly)
+            render_metric_card(
+                "Total Monthly", 
+                total_formatted,
+                "Combined budgets",
+                "calculator"
+            )
+
+        # Show currency and inflation info
+        info_items = []
+        if primary_currency != 'USD':
+            info_items.append(f"💱 Displayed in {primary_currency}")
+        if inflation_enabled:
+            info_items.append(f"📈 Inflation adjusted ({inflation_rate*100:.1f}% annually)")
+
+        if info_items:
+            st.info(" • ".join(info_items))
+
+    # Budget Breakdown Section with Enhanced Styling and Currency Support
+    with st.container():
+        st.markdown('<h3><i data-lucide="pie-chart" class="icon"></i>📊 Budget Breakdown</h3>', unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+
+        budget_tabs = st.tabs(["🏠 Arizona Home", "🏠 Minnesota Home", "✈️ Seasonal Cash Flow"])
+
+        with budget_tabs[0]:
+            st.markdown("**Arizona Home Budget**", unsafe_allow_html=True)
+
+            for category, amount in st.session_state.home_budgets["Arizona"].items():
+                # Apply currency conversion and inflation adjustment
+                converted_amount, formatted_amount = convert_and_adjust_currency(amount)
+
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    st.markdown(f"• **{category}**")
+                with col2:
+                    st.markdown(f"**{formatted_amount}**")
+
+        with budget_tabs[1]:
+            st.markdown("**Minnesota Home Budget**", unsafe_allow_html=True)
+
+            for category, amount in st.session_state.home_budgets["Minnesota"].items():
+                # Apply currency conversion and inflation adjustment
+                converted_amount, formatted_amount = convert_and_adjust_currency(amount)
+
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    st.markdown(f"• **{category}**")
+                with col2:
+                    st.markdown(f"**{formatted_amount}**")
+
+        with budget_tabs[2]:
+            st.markdown("**Seasonal Cash Flow Budget**", unsafe_allow_html=True)
+
+            for category, amount in st.session_state.seasonal_cash_flow.items():
+                # Apply currency conversion and inflation adjustment
+                converted_amount, formatted_amount = convert_and_adjust_currency(amount)
+
+                col1, col2 = st.columns([3, 1])
+                with col1:
+                    st.markdown(f"• **{category}**")
+                with col2:
+                    st.markdown(f"**{formatted_amount}**")
 
 def render_metric_card(title, value, delta, icon):
     """Helper function to render a metric card with sleek styling"""
