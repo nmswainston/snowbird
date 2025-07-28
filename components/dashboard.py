@@ -291,6 +291,7 @@ def render_dashboard():
     st.progress(progress_percentage, text=f"{primary_days}/{threshold} days in {primary_state}")
 
     # Add spacing after tax progress widget
+    if st.session_state.widgets.get("tax_progress", True):
         st.markdown("<br><br>", unsafe_allow_html=True)
         st.markdown("---")
 
