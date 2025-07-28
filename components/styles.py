@@ -11,6 +11,9 @@ def load_custom_css():
     initialize_theme_system()
     ThemeManager.apply_theme_css()
 
+    # Apply Pro user custom branding if available
+    apply_pro_branding()
+
     # Apply light/dark theme toggle if needed
     apply_theme_toggle()
 
@@ -124,7 +127,23 @@ def render_theme_toggle():
             st.rerun()
 
 def render_main_header():
-    """Render the enhanced application header"""
+    """Render the enhanced application header with Pro branding support"""
+    try:
+        from utils.branding_manager import BrandingManager
+        
+        # Use custom header if Pro user with branding
+        if BrandingManager.is_pro_user():
+            BrandingManager.render_custom_header()
+            return
+            
+    except ImportError:
+        # Branding manager not available, use standard header
+        pass
+    except Exception:
+        # Any error, fall back to standard header
+        pass
+    
+    # Standard header for non-Pro users or fallback
     st.markdown("""
     <div class="main-header fade-in">
         <h1 class="main-title">
@@ -166,6 +185,23 @@ def render_icon(name: str, size: str = "16", color: str = None):
     color_style = f'color: {color};' if color else ''
     # Use span instead of i to avoid React conflicts
     st.markdown(f'<span class="lucide-icon" data-icon="{name}" style="width: {size}px; height: {size}px; {color_style}; display: inline-block;"></span>', unsafe_allow_html=True)
+
+def apply_pro_branding():
+    """Apply Pro user custom branding if available"""
+    try:
+        from utils.branding_manager import BrandingManager
+        
+        # Apply custom branding CSS for Pro users
+        custom_css = BrandingManager.apply_custom_branding_css()
+        if custom_css:
+            st.markdown(custom_css, unsafe_allow_html=True)
+            
+    except ImportError:
+        # Branding manager not available, skip custom branding
+        pass
+    except Exception:
+        # Any other error, fail silently to not break the app
+        pass
 
 def apply_basic_styles():
     """Basic styling for Snowbird app"""

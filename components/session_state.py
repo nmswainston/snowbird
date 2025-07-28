@@ -68,6 +68,22 @@ def initialize_session_state():
     if 'theme_animations_enabled' not in st.session_state:
         st.session_state.theme_animations_enabled = True
 
+    # Pro User Features and Branding
+    if 'is_pro_user' not in st.session_state:
+        st.session_state.is_pro_user = False  # Default: not a Pro user
+    
+    if 'custom_logo_base64' not in st.session_state:
+        st.session_state.custom_logo_base64 = None  # No custom logo by default
+    
+    if 'custom_primary_color' not in st.session_state:
+        st.session_state.custom_primary_color = '#0EA5E9'  # Default primary color
+    
+    if 'custom_accent_color' not in st.session_state:
+        st.session_state.custom_accent_color = '#38BDF8'  # Default accent color
+    
+    if 'custom_secondary_color' not in st.session_state:
+        st.session_state.custom_secondary_color = '#0284C7'  # Default secondary color
+
     # Onboarding tracking
     if 'onboarded' not in st.session_state:
         st.session_state.onboarded = False
@@ -83,27 +99,6 @@ def initialize_session_state():
 
     if 'ai_question_asked' not in st.session_state:
         st.session_state.ai_question_asked = False
-
-    # User properties management
-    if 'user_properties' not in st.session_state:
-        st.session_state.user_properties = {
-            "Arizona Home": {
-                "state": "Arizona",
-                "address": "",
-                "property_type": "Primary",
-                "notes": ""
-            },
-            "Minnesota Home": {
-                "state": "Minnesota", 
-                "address": "",
-                "property_type": "Secondary",
-                "notes": ""
-            }
-        }
-
-    # Track if properties were recently changed
-    if 'recent_property_changes' not in st.session_state:
-        st.session_state.recent_property_changes = False
 
 def reset_session_state():
     """Reset session state to defaults"""
