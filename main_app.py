@@ -56,8 +56,7 @@ def main():
     # Render main header
     render_main_header()
 
-    # Quick actions section
-    render_quick_actions()
+    # Dashboard now includes integrated quick actionsactions()
 
     # Main navigation tabs
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
@@ -108,34 +107,7 @@ def render_settings_tab():
     st.subheader("Account Settings")
     st.info("Manage account settings here")
 
-def render_quick_actions():
-    """Render quick action buttons"""
-    st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-    st.markdown('**<i data-lucide="zap" class="icon"></i>Quick Actions**', unsafe_allow_html=True)
-
-    quick_col1, quick_col2, quick_col3, quick_col4 = st.columns(4)
-
-    with quick_col1:
-        if st.button("📍 Log Today", type="primary", use_container_width=True):
-            st.session_state.quick_log = True
-
-    with quick_col2:
-        remaining_days = {}
-        for state, days in st.session_state.states.items():
-            remaining_days[state] = max(0, st.session_state.tax_threshold - days)
-        safest_state = min(remaining_days.keys(), key=lambda x: remaining_days[x])
-        st.metric("Safest Location", safest_state, f"{remaining_days[safest_state]} days left")
-
-    with quick_col3:
-        total_monthly_budget = sum(sum(budget.values()) for budget in st.session_state.home_budgets.values())
-        st.metric("Monthly Budget", f"${total_monthly_budget:,}")
-
-    with quick_col4:
-        days_until_risk = min(remaining_days.values())
-        risk_color = "🟢" if days_until_risk > 30 else "🟡" if days_until_risk > 14 else "🔴"
-        st.metric("Risk Level", f"{risk_color} {days_until_risk} days")
-
-    st.markdown('</div>', unsafe_allow_html=True)
+rkdown('</div>', unsafe_allow_html=True)
 
 def render_budgets_tab():
     """Render budgets management tab"""

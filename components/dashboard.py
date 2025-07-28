@@ -17,6 +17,48 @@ def render_dashboard():
     </div>
     """, unsafe_allow_html=True)
 
+    # Combined Quick Location Logging Card
+    with st.container():
+        # Add light-blue border styling to the container
+        st.markdown("""
+        <div style="border: 2px solid #e3f2fd; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; background: linear-gradient(135deg, #f8fdff 0%, #e3f2fd 100%);">
+        """, unsafe_allow_html=True)
+        
+        # Mini-label above the controls
+        st.markdown("**Log your location quickly:**")
+        st.write("")  # Add small spacing
+        
+        # Create horizontal layout for location picker and button
+        # On mobile, these will stack vertically due to Streamlit's responsive design
+        location_col, button_col = st.columns([2, 1])
+        
+        with location_col:
+            # Location dropdown picker
+            current_location = st.selectbox(
+                "Select your current location:", 
+                list(st.session_state.states.keys()),
+                key="quick_location_picker",
+                label_visibility="collapsed"  # Hide label since we have the mini-label above
+            )
+        
+        with button_col:
+            # Log Today button - matches the current quick action functionality
+            if st.button("📍 Log Today", type="primary", use_container_width=True, key="quick_log_button"):
+                # Import the data model for logging functionality
+                from utils.data_models import SnowbirdData
+                snowbird_data = SnowbirdData()
+                # Log the selected location for today's date
+                import datetime
+                success, message = snowbird_data.add_day_log(current_location, datetime.date.today().isoformat())
+                if success:
+                    st.success(message)
+                    st.rerun()
+                else:
+                    st.warning(message)
+        
+        # Close the styled container div
+        st.markdown("</div>", unsafe_allow_html=True)
+
     # Enhanced key metrics section with st.metric components
     st.markdown("### 📊 Key Metrics Overview")
     st.write("")  # Add spacing
