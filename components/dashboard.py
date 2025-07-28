@@ -8,8 +8,8 @@ def render_dashboard():
 
     # Premium header section
     st.markdown("""
-    <div style="text-align: center; margin-bottom: 2rem; padding: 1.5rem; background: var(--surface-gradient); border-radius: 16px; border: 1px solid var(--border-light);">
-        <h2 style="color: var(--primary); font-weight: 700; font-size: 1.5rem; margin-bottom: 0.5rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+    <div style="text-align: center; margin-bottom: 2.5rem; padding: 2rem; background: var(--surface-gradient); border-radius: 16px; border: 1px solid var(--border-light);">
+        <h2 style="color: var(--primary); font-weight: 700; font-size: 1.5rem; margin-bottom: 0.75rem; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
             <i data-lucide="dashboard" class="icon-large"></i>
             Financial Command Center
         </h2>
@@ -21,12 +21,12 @@ def render_dashboard():
     with st.container():
         # Add light-blue border styling to the container
         st.markdown("""
-        <div style="border: 2px solid #e3f2fd; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; background: linear-gradient(135deg, #f8fdff 0%, #e3f2fd 100%);">
+        <div style="border: 2px solid #e3f2fd; border-radius: 12px; padding: 2rem; margin-bottom: 2.5rem; background: linear-gradient(135deg, #f8fdff 0%, #e3f2fd 100%);">
         """, unsafe_allow_html=True)
         
         # Mini-label above the controls
         st.markdown("**Log your location quickly:**")
-        st.write("")  # Add small spacing
+        st.markdown("<br>", unsafe_allow_html=True)
         
         # Create horizontal layout for location picker and button
         # On mobile, these will stack vertically due to Streamlit's responsive design
@@ -61,15 +61,15 @@ def render_dashboard():
 
     # Enhanced key metrics section with premium styling
     st.markdown("""
-    <div style="margin: 2.5rem 0 2rem 0;">
+    <div style="margin: 3rem 0 2.5rem 0;">
         <h3 style="
             color: var(--primary, #0891B2);
             font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
         ">
             📊 Key Metrics Overview
         </h3>
@@ -204,13 +204,13 @@ def render_dashboard():
         st.markdown("</div>", unsafe_allow_html=True)
 
     # Add spacing between sections
-    st.write("")
+    st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown("---")
-    st.write("")
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
     # Tax residency progress section
     st.markdown("### 📈 Tax Residency Progress")
-    st.write("")
+    st.markdown("<br>", unsafe_allow_html=True)
 
     # Calculate progress percentage for primary state
     progress_percentage = min(primary_days / threshold, 1.0) if threshold > 0 else 0
@@ -244,20 +244,20 @@ def render_dashboard():
     st.progress(progress_percentage, text=f"{primary_days}/{threshold} days in {primary_state}")
 
     # Add spacing
-    st.write("")
+    st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown("---")
 
     # Enhanced insights section with premium styling
     st.markdown("""
-    <div style="margin: 3rem 0 2.5rem 0;">
+    <div style="margin: 3.5rem 0 2.5rem 0;">
         <h3 style="
             color: var(--primary, #0891B2);
             font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
         ">
             ✨ Quick Insights
         </h3>
@@ -386,13 +386,13 @@ def render_dashboard():
     snowbird_data = SnowbirdData()
 
     # Add more spacing
-    st.write("")
+    st.markdown("<br><br>", unsafe_allow_html=True)
     st.markdown("---")
-    st.write("")
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
     # Enhanced status overview section
     st.markdown('<h3><i data-lucide="bar-chart-3" class="icon"></i>📋 Detailed Status Overview</h3>', unsafe_allow_html=True)
-    st.write("")
+    st.markdown("<br>", unsafe_allow_html=True)
 
     # Create metrics in a responsive grid
     status_col1, status_col2, status_col3 = st.columns(3)
@@ -426,15 +426,15 @@ def render_dashboard():
         st.metric("⚠️ Tax Risk Level", risk_level, delta=f"{closest_to_threshold} days in primary state")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    st.write("")  # Add spacing after metrics
+    st.markdown("<br>", unsafe_allow_html=True)  # Add spacing after metrics
 
     # Add spacing
     st.markdown("---")
-    st.write("")
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
     # Enhanced state residency status section
     st.markdown('<h3><i data-lucide="map-pin" class="icon"></i>🗺️ State-by-State Breakdown</h3>', unsafe_allow_html=True)
-    st.write("")
+    st.markdown("<br>", unsafe_allow_html=True)
 
     for state, days in st.session_state.states.items():
         status_text, status_class = snowbird_data.get_tax_status(days, st.session_state.tax_threshold)
@@ -480,15 +480,15 @@ def render_dashboard():
                 delta_color=delta_color
             )
 
-        st.write("")  # Add spacing between states
+        st.markdown("<br>", unsafe_allow_html=True)  # Add spacing between states
 
     # Add spacing
     st.markdown("---")
-    st.write("")
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
     # Enhanced financial overview section
     st.markdown('<h3><i data-lucide="dollar-sign" class="icon"></i>💰 Financial Summary</h3>', unsafe_allow_html=True)
-    st.write("")
+    st.markdown("<br>", unsafe_allow_html=True)
 
     # Financial metrics in responsive grid
     fin_col1, fin_col2 = st.columns(2)
@@ -552,7 +552,7 @@ def render_dashboard():
         st.markdown("</div>", unsafe_allow_html=True)
 
     # Add final spacing
-    st.write("")
+    st.markdown("<br><br>", unsafe_allow_html=True)
 def render_metric_card(title, value, delta, icon):
     """Helper function to render a metric card with sleek styling"""
     st.markdown(f"""
