@@ -238,18 +238,19 @@ def render_onboarding_carousel():
     }
     
     .onboarding-nav .stButton > button {
-        min-width: 130px !important;
-        padding: 0.8rem 1.75rem !important;
-        font-size: 1rem !important;
+        min-width: 150px !important;
+        width: auto !important;
+        padding: 0.9rem 2rem !important;
+        font-size: 0.95rem !important;
         font-weight: 600 !important;
         border-radius: 12px !important;
         white-space: nowrap !important;
         text-overflow: clip !important;
         overflow: visible !important;
-        line-height: 1.2 !important;
-        letter-spacing: 0.02em !important;
+        line-height: 1.1 !important;
+        letter-spacing: 0.01em !important;
         height: auto !important;
-        min-height: 48px !important;
+        min-height: 50px !important;
         border: 2px solid transparent !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         position: relative !important;
@@ -257,6 +258,8 @@ def render_onboarding_carousel():
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+        box-sizing: border-box !important;
+        word-break: keep-all !important;
     }
     
     /* Previous button - secondary styling */
@@ -366,10 +369,12 @@ def render_onboarding_carousel():
         
         .onboarding-nav .stButton > button {
             width: 100% !important;
-            min-width: unset !important;
-            font-size: 0.95rem !important;
-            padding: 0.9rem 1.25rem !important;
-            min-height: 50px !important;
+            min-width: 140px !important;
+            font-size: 0.9rem !important;
+            padding: 1rem 1.5rem !important;
+            min-height: 52px !important;
+            word-break: keep-all !important;
+            overflow: visible !important;
         }
         
         .onboarding-modal {
