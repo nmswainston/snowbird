@@ -95,17 +95,40 @@ def main():
 
     # Dashboard now includes integrated quick actions
 
-    # Main navigation tabs
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
-        "📊 Dashboard", 
-        "📅 Day Tracker", 
-        "💰 Budgets", 
-        "🏠 Properties",
-        "🤖 AI Assistant", 
-        "📋 Reports",
-        "⚙️ Settings",
-        "🌐 Community"
-    ])
+    # Mobile-optimized navigation with shortened labels
+    if st.session_state.get('mobile_view', False):
+        # Shorter labels for mobile
+        tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+            "📊 Home", 
+            "📅 Track", 
+            "💰 Budget", 
+            "🏠 Props",
+            "🤖 AI", 
+            "📋 Reports",
+            "⚙️ Settings",
+            "🌐 Community"
+        ])
+    else:
+        # Full labels for desktop
+        tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+            "📊 Dashboard", 
+            "📅 Day Tracker", 
+            "💰 Budgets", 
+            "🏠 Properties",
+            "🤖 AI Assistant", 
+            "📋 Reports",
+            "⚙️ Settings",
+            "🌐 Community"
+        ])
+        
+    # Auto-detect mobile view
+    st.markdown("""
+    <script>
+    if (window.innerWidth < 768) {
+        window.parent.postMessage({type: 'mobile_detected', mobile: true}, '*');
+    }
+    </script>
+    """, unsafe_allow_html=True)
 
     with tab1:
         render_dashboard()

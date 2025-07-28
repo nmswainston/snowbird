@@ -5,6 +5,29 @@ from utils.data_models import SnowbirdData
 def render_dashboard():
     """Render the enhanced premium dashboard with responsive metrics grid"""
     
+    # Show loading skeleton while data loads
+    if 'dashboard_loaded' not in st.session_state:
+        st.markdown("### 🌊 Loading your dashboard...")
+        
+        # Skeleton loading animation
+        st.markdown("""
+        <div style="animation: pulse 1.5s ease-in-out infinite alternate;">
+            <div style="background: #f1f5f9; height: 120px; border-radius: 8px; margin: 1rem 0;"></div>
+            <div style="background: #f1f5f9; height: 80px; border-radius: 8px; margin: 1rem 0;"></div>
+            <div style="background: #f1f5f9; height: 60px; border-radius: 8px; margin: 1rem 0;"></div>
+        </div>
+        <style>
+        @keyframes pulse {
+            0% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        
+        time.sleep(0.5)  # Brief loading simulation
+        st.session_state.dashboard_loaded = True
+        st.rerun()
+    
     # Main dashboard header with larger font and better spacing
     st.markdown("""
     <div style="text-align: center; margin-bottom: 2rem;">
@@ -19,6 +42,12 @@ def render_dashboard():
     
     # Add spacing
     st.write("")
+    
+    # Smart notifications banner
+    from components.smart_notifications import render_smart_notifications
+    render_smart_notifications()
+    
+    st.markdown("---")
     
     # === PRIMARY METRICS SECTION ===
     # Responsive grid: 3 columns on desktop, 1 on mobile using st.columns
@@ -177,6 +206,13 @@ def render_dashboard():
         )
     
     # Add section separator
+    st.markdown("---")
+    
+    # === TRENDS ANALYSIS SECTION ===
+    with st.expander("📈 View Detailed Trends & Insights", expanded=False):
+        from components.trends_analyzer import render_trends_analysis
+        render_trends_analysis()
+    
     st.markdown("---")
     
     # === INSIGHTS SECTION ===
