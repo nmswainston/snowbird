@@ -68,17 +68,20 @@ def start_streamlit():
     """Start Streamlit with optimized settings"""
     cmd = [
         sys.executable, '-m', 'streamlit', 'run', 'main.py',
-        '--server.port', '8501',
+        '--server.port', '5000',  # Use Replit's recommended port
         '--server.address', '0.0.0.0',
         '--server.headless', 'true',
-        '--server.enableCORS', 'false',
+        '--server.enableCORS', 'true',  # Enable CORS for better compatibility
         '--server.enableWebsocketCompression', 'false',
         '--server.fileWatcherType', 'none',
         '--browser.gatherUsageStats', 'false',
-        '--logger.level', 'warning',
+        '--logger.level', 'info',  # More verbose logging for debugging
         '--server.maxMessageSize', '200',
         '--server.enableStaticServing', 'true',
-        '--server.runOnSave', 'false'
+        '--server.runOnSave', 'false',
+        '--server.enableXsrfProtection', 'false',  # Disable for development
+        '--server.baseUrlPath', '',
+        '--global.developmentMode', 'false'
     ]
     
     print("Starting Streamlit server...")

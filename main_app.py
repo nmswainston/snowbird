@@ -16,12 +16,24 @@ st.set_page_config(
 
 def main():
     """Main application function"""
+    try:
+        # Initialize session state
+        initialize_session_state()
 
-    # Initialize session state
-    initialize_session_state()
-
-    # Load custom CSS
-    load_custom_css()
+        # Load custom CSS
+        load_custom_css()
+        
+        # Start health monitoring
+        from utils.health_monitor import health_monitor
+        health_monitor.start_monitoring()
+        
+    except Exception as e:
+        st.error("🚨 Application initialization failed")
+        st.exception(e)
+        
+        if st.button("🔄 Restart Application"):
+            st.rerun()
+        return
 
     # Check integrations
     openai_available, openai_client = check_openai_availability()

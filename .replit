@@ -16,7 +16,7 @@ run = ["sh", "-c", "streamlit run main.py --server.port $PORT --server.address 0
 deploymentTarget = "cloudrun"
 
 [workflows]
-runButton = "Snowbird App (Robust)"
+runButton = "Snowbird Production"
 
 [[workflows.workflow]]
 name = "Run Streamlit App"
@@ -454,6 +454,15 @@ args = "python -m streamlit run main.py --server.port 8501 --server.address 0.0.
 
 [[workflows.workflow]]
 name = "Snowbird App (Robust)"
+author = 45618204
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python start_app.py"
+
+[[workflows.workflow]]
+name = "Snowbird Production"
 author = 45618204
 mode = "sequential"
 
