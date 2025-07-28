@@ -301,14 +301,14 @@ class ThemeManager:
             /* Premium header with glass effect */
             .main-header {{
                 text-align: center;
-                padding: 3rem 2rem;
+                padding: 2rem 1.5rem;
                 background: var(--overlay-light);
-                backdrop-filter: blur(20px);
-                -webkit-backdrop-filter: blur(20px);
-                border-radius: 24px;
-                margin-bottom: 2rem;
-                box-shadow: var(--shadow-primary);
-                border: 1px solid var(--border-light);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border-radius: 12px;
+                margin-bottom: 1.5rem;
+                box-shadow: var(--shadow-light);
+                border: 0.5px solid var(--border-light);
                 position: relative;
                 overflow: hidden;
             }}
@@ -351,11 +351,11 @@ class ThemeManager:
                 background: var(--overlay-light);
                 backdrop-filter: blur(20px);
                 -webkit-backdrop-filter: blur(20px);
-                padding: 2rem;
-                border-radius: 20px;
-                box-shadow: var(--shadow-secondary);
-                border: 1px solid var(--border-light);
-                margin: 1.5rem 0;
+                padding: 1.5rem;
+                border-radius: 12px;
+                box-shadow: var(--shadow-light);
+                border: 0.5px solid var(--border-light);
+                margin: 1rem 0;
                 transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                 position: relative;
                 overflow: hidden;
@@ -367,7 +367,7 @@ class ThemeManager:
                 top: 0;
                 left: 0;
                 right: 0;
-                height: 2px;
+                height: 1px;
                 background: var(--accent-gradient);
                 opacity: 0;
                 transition: opacity 0.3s ease;
@@ -462,24 +462,24 @@ class ThemeManager:
             
             /* Sleek tabs with floating effect */
             .stTabs [data-baseweb="tab-list"] {{
-                gap: 12px;
-                background: var(--overlay-light);
-                backdrop-filter: blur(20px);
-                padding: 0.75rem;
-                border-radius: 16px;
-                border: 1px solid var(--border-light);
-                box-shadow: var(--shadow-light);
+                gap: 8px;
+                background: transparent;
+                backdrop-filter: none;
+                padding: 0.25rem;
+                border-radius: 8px;
+                border: none;
+                box-shadow: none;
             }}
             
             .stTabs [data-baseweb="tab"] {{
-                height: 56px;
-                padding: 0 2rem;
+                height: 40px;
+                padding: 0 1.5rem;
                 background: transparent;
-                border-radius: 12px;
+                border-radius: 8px;
                 color: var(--text-secondary);
-                border: none;
-                font-weight: 600;
-                font-size: 0.95rem;
+                border: 0.5px solid var(--border-light);
+                font-weight: 500;
+                font-size: 0.9rem;
                 transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                 position: relative;
             }}
@@ -494,11 +494,11 @@ class ThemeManager:
             /* Premium metric cards */
             .metric-card {{
                 background: var(--overlay-light);
-                backdrop-filter: blur(20px);
-                padding: 2rem;
-                border-radius: 20px;
+                backdrop-filter: blur(10px);
+                padding: 1.25rem;
+                border-radius: 10px;
                 box-shadow: var(--shadow-light);
-                border: 1px solid var(--border-light);
+                border: 0.5px solid var(--border-light);
                 text-align: center;
                 transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                 position: relative;
@@ -538,26 +538,26 @@ class ThemeManager:
             /* Sleek input styling */
             .stTextInput > div > div > input {{
                 background: var(--overlay-light) !important;
-                border: 2px solid var(--border-light) !important;
-                border-radius: 12px !important;
+                border: 0.5px solid var(--border-light) !important;
+                border-radius: 8px !important;
                 color: var(--text-primary) !important;
                 font-weight: 500 !important;
-                padding: 0.75rem 1rem !important;
+                padding: 0.5rem 0.75rem !important;
                 transition: all 0.3s ease !important;
-                backdrop-filter: blur(10px) !important;
+                backdrop-filter: blur(5px) !important;
             }}
             
             .stTextInput > div > div > input:focus {{
                 border-color: var(--primary) !important;
-                box-shadow: var(--glow-primary) !important;
-                transform: scale(1.02) !important;
+                box-shadow: 0 0 0 1px var(--primary) !important;
+                transform: none !important;
             }}
             
             .stSelectbox > div > div {{
                 background: var(--overlay-light) !important;
-                border: 2px solid var(--border-light) !important;
-                border-radius: 12px !important;
-                backdrop-filter: blur(10px) !important;
+                border: 0.5px solid var(--border-light) !important;
+                border-radius: 8px !important;
+                backdrop-filter: blur(5px) !important;
                 transition: all 0.3s ease !important;
             }}
             
@@ -576,9 +576,9 @@ class ThemeManager:
             /* Sleek expanders */
             .streamlit-expanderHeader {{
                 background: var(--overlay-light) !important;
-                border-radius: 14px !important;
-                border: 1px solid var(--border-light) !important;
-                backdrop-filter: blur(10px) !important;
+                border-radius: 8px !important;
+                border: 0.5px solid var(--border-light) !important;
+                backdrop-filter: blur(5px) !important;
                 transition: all 0.3s ease !important;
             }}
             
