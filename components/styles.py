@@ -55,7 +55,7 @@ def apply_theme_toggle():
             border-color: #444444 !important;
             color: #eeeeee !important;
         }
-        
+
         .stButton>button:hover {
             background-color: #555555 !important;
             border-color: #555555 !important;
@@ -64,13 +64,13 @@ def apply_theme_toggle():
         .stTabs [data-baseweb="tab-list"] {
             background-color: #2d2d2d !important;
         }
-        
+
         .stTabs [data-baseweb="tab"] {
             background-color: #1e1e1e !important;
             border-color: #444444 !important;
             color: #eeeeee !important;
         }
-        
+
         .stTabs [aria-selected="true"] {
             background-color: #444444 !important;
             color: #eeeeee !important;
@@ -79,7 +79,7 @@ def apply_theme_toggle():
         .stProgress > div > div {
             background-color: #333333 !important;
         }
-        
+
         /* Metric cards */
         [data-testid="metric-container"] {
             background-color: #1e1e1e !important;
@@ -90,17 +90,17 @@ def apply_theme_toggle():
             background-color: #1a4a1a !important;
             color: #90ee90 !important;
         }
-        
+
         .stWarning {
             background-color: #4a4a1a !important;
             color: #ffff90 !important;
         }
-        
+
         .stError {
             background-color: #4a1a1a !important;
             color: #ff9090 !important;
         }
-        
+
         .stInfo {
             background-color: #1a1a4a !important;
             color: #9090ff !important;
@@ -178,19 +178,19 @@ def apply_basic_styles():
         color: #1E293B !important;
         font-weight: 600 !important;
     }
-    
+
     .stButton>button:hover {
         background-color: #8FD0F0 !important;
         border-color: #8FD0F0 !important;
         transform: translateY(-1px) !important;
         box-shadow: 0 4px 8px rgba(174, 223, 247, 0.3) !important;
     }
-    
+
     .stButton>button:active {
         background-color: #6FC1E8 !important;
         transform: translateY(0) !important;
     }
-    
+
     .winter-card {
         background: #f8fafc;
         padding: 1.5rem;
@@ -199,74 +199,85 @@ def apply_basic_styles():
         margin: 1rem 0;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
-    
+
     .status-safe { color: #059669; font-weight: bold; }
     .status-warning { color: #d97706; font-weight: bold; }
     .status-danger { color: #dc2626; font-weight: bold; }
-    
+
     .icon {
         display: inline-block;
         width: 16px;
         height: 16px;
         margin-right: 8px;
     }
-    
+
     .lucide-icon {
         display: inline-block;
         margin-right: 8px;
     }
-    
+
     /* Prevent React conflicts with icons */
     [data-lucide]:not([data-rendered]) {
         opacity: 0;
     }
-    
+
     [data-lucide][data-rendered] {
         opacity: 1;
         transition: opacity 0.2s ease;
     }
-    
+
     /* PWA-specific styles */
     .pwa-standalone {
         padding-top: env(safe-area-inset-top);
         padding-bottom: env(safe-area-inset-bottom);
     }
-    
+
     @media (display-mode: standalone) {
         body {
             -webkit-user-select: none;
             -webkit-touch-callout: none;
             -webkit-tap-highlight-color: transparent;
         }
-        
+
         /* Hide Streamlit's hamburger menu in standalone mode */
         .css-1rs6os .css-17ziqus {
             display: none;
         }
     }
-    
+
     /* Install button styling */
     #pwa-install-btn {
         animation: pulse 2s infinite;
     }
-    
+
     @keyframes pulse {
         0% { transform: scale(1); }
         50% { transform: scale(1.05); }
         100% { transform: scale(1); }
     }
-    
+
     /* Mobile-first responsive design */
     @media (max-width: 768px) {
         .winter-card {
             margin: 0.5rem 0;
             padding: 1rem;
         }
-        
+
         .main-title {
             font-size: 1.5rem;
         }
     }
+}
+
+            .status-danger { 
+                color: var(--error);
+                font-weight: 700;
+                padding: 0.5rem 1rem;
+                background: color-mix(in srgb, var(--error) 15%, transparent);
+                border-radius: 12px;
+                border: 2px solid color-mix(in srgb, var(--error) 30%, transparent);
+                box-shadow: 0 0 20px color-mix(in srgb, var(--error) 20%, transparent);
+                backdrop-filter: blur(10px);
+            }
     </style>
     """, unsafe_allow_html=True)
-```
