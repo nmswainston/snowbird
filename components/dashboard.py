@@ -532,7 +532,7 @@ def render_dashboard():
 
     # Widget: State-by-State Breakdown - render only if enabled
     if st.session_state.widgets.get("state_breakdown", True):
-        st.markdown('<h3><i data-lucide="map-pin" class="icon"></i>🗺️ State-by-State Breakdown</h3>', unsafe_allow_html=True>
+        st.markdown('<h3><i data-lucide="map-pin" class="icon"></i>🗺️ State-by-State Breakdown</h3>', unsafe_allow_html=True)
         ```python
         st.markdown("<br>", unsafe_allow_html=True)
 
