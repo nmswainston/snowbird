@@ -164,11 +164,50 @@ View workflow status: [![CI](https://github.com/yourusername/snowbird-app/workfl
 
 ## 📱 Progressive Web App (PWA)
 
-Snowbird is configured as a PWA for mobile-first usage:
+Snowbird is fully configured as a Progressive Web App, providing a native app-like experience:
 
-1. **Install on mobile**: Open in browser → Share → "Add to Home Screen"
-2. **Offline capability**: Core features work without internet
-3. **Native feel**: Full-screen experience with app-like navigation
+### 🚀 **Installation**
+- **Mobile (iOS/Android)**: Open in browser → Menu → "Add to Home Screen" or "Install App"
+- **Desktop (Chrome/Edge)**: Click the install icon in the address bar or browser menu
+- **Automatic prompts**: The app will suggest installation when criteria are met
+
+### 💾 **Offline Capabilities**
+- **Core Features**: Day tracking, budget viewing, and reports work offline
+- **Smart Caching**: Frequently used data is cached automatically
+- **Offline Indicator**: Visual feedback when connection is lost
+- **Auto-Sync**: Data syncs when connection is restored
+
+### 🎨 **Native Experience**
+- **Full-Screen Mode**: No browser UI when installed
+- **Custom Splash Screen**: Branded loading experience
+- **Theme Integration**: Matches your system theme
+- **Hardware Integration**: Uses device capabilities where available
+
+### 🔧 **Technical Implementation**
+```
+/static/
+├── manifest.json        # PWA configuration & metadata
+├── sw.js               # Service worker for caching
+├── pwa-utils.js        # Installation utilities
+├── icon-192.png        # App icon (192x192)
+├── icon-512.png        # App icon (512x512)
+├── offline.html        # Offline fallback page
+└── browserconfig.xml   # Windows tile configuration
+```
+
+### 📊 **PWA Features**
+- ✅ **Web App Manifest**: Defines app name, icons, and theme
+- ✅ **Service Worker**: Caches assets for offline use
+- ✅ **Responsive Design**: Optimized for all screen sizes
+- ✅ **Install Prompts**: Smart installation suggestions
+- ✅ **Update Notifications**: Seamless app updates
+- ✅ **Offline Fallbacks**: Graceful offline experience
+
+### 🔍 **Usage Tips**
+- **First Load**: May take a moment to cache assets
+- **Updates**: Refresh the app to get new features
+- **Storage**: App data is stored locally and synced to cloud
+- **Performance**: Installed apps typically load faster than web versions
 
 ## 🎨 Architecture & Technology Stack
 

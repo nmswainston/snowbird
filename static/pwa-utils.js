@@ -61,14 +61,29 @@ function installPWA() {
   }
 }
 
-// Register service worker
+// Register service worker with better error handling
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('/static/sw.js')
       .then(function(registration) {
-        console.log('ServiceWorker registration successful');
-      }, function(err) {
-        console.log('ServiceWorker registration failed: ', err);
+        console.log('[PWA] ServiceWorker registration successful', registration.scope);
+        
+        // Listen for updates
+        registration.addEventListener('updatefound', function() {
+          const newWorker = registration.installing;
+          newWorker.addEventListener('statechange', function() {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New content is available
+              if (confirm('New version available! Reload to update?')) {
+                newWorker.postMessage({ type: 'SKIP_WAITING' });
+                window.location.reload();
+              }
+            }
+          });
+        });
+      })
+      .catch(function(err) {
+        console.log('[PWA] ServiceWorker registration failed:', err);
       });
   });
 }

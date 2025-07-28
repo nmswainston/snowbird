@@ -20,18 +20,36 @@ st.set_page_config(
 st.markdown("""
 <script>
 // Prevent React onClick handler conflicts
-window.addEventListener('error', function(e) {
-    if (e.error && e.error.message && e.error.message.includes('Minified React error')) {
-        console.log('React error caught and handled:', e.error.message);
-        e.preventDefault();
-        return true;
-    }
-});
+(function() {
+    const originalError = window.onerror;
+    window.onerror = function(msg, url, line, col, error) {
+        if (msg && msg.includes('Minified React error')) {
+            console.warn('React error intercepted and handled');
+            return true; // Prevent default error handling
+        }
+        if (originalError) {
+            return originalError.apply(this, arguments);
+        }
+        return false;
+    };
+    
+    // Handle unhandled promise rejections
+    window.addEventListener('unhandledrejection', function(event) {
+        if (event.reason && event.reason.message && event.reason.message.includes('React')) {
+            console.warn('React promise rejection handled');
+            event.preventDefault();
+        }
+    });
+})();
 
-// Fix WebSocket reconnection issues
+// Fix WebSocket reconnection issues with better cleanup
 window.addEventListener('beforeunload', function() {
-    if (window.streamlitConnection) {
-        window.streamlitConnection.close();
+    try {
+        if (window.streamlitConnection && window.streamlitConnection.readyState === 1) {
+            window.streamlitConnection.close(1000, 'Page unload');
+        }
+    } catch (e) {
+        console.log('WebSocket cleanup handled');
     }
 });
 </script>
@@ -147,7 +165,7 @@ def main():
     # Render styled header
     render_main_header()
 
-    # Add PWA meta tags
+    # Add PWA meta tags and status
     st.markdown("""
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -173,6 +191,24 @@ def main():
 
         <!-- Load PWA utilities -->
         <script src="/static/pwa-utils.js" defer></script>
+        
+        <!-- PWA Status Indicator -->
+        <script>
+        window.addEventListener('load', function() {
+            // Check if running as PWA
+            const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+                         window.navigator.standalone === true;
+            
+            if (isPWA) {
+                console.log('[PWA] Running in standalone mode');
+                document.body.classList.add('pwa-standalone');
+            }
+            
+            // Show connection status
+            window.addEventListener('online', () => console.log('[PWA] Back online'));
+            window.addEventListener('offline', () => console.log('[PWA] Gone offline'));
+        });
+        </script>
     </head>
     """, unsafe_allow_html=True)
 
