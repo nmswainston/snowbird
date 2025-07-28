@@ -16,7 +16,6 @@ from components.day_tracker import render_day_tracker
 from utils.auth import check_openai_availability
 from utils.data_models import SnowbirdData
 from utils.onboarding import render_onboarding_carousel, should_show_onboarding, render_onboarding_trigger
-from utils.hawaiian_features import enable_hawaiian_mode, render_hawaiian_greeting, HawaiianFeatures
 
 # Configure Streamlit
 st.set_page_config(
@@ -86,14 +85,20 @@ def main():
     </head>
     """, unsafe_allow_html=True)
 
-    # Render main header
+    # Render main header with Hawaiian vibes
     render_main_header()
     
-    # Enable Hawaiian/Island vibes mode
-    enable_hawaiian_mode()
-    
-    # Show Hawaiian greeting if enabled
-    render_hawaiian_greeting()
+    # Add Hawaiian greeting banner
+    from utils.hawaii_expressions import da_kine_time_vibe
+    if not st.session_state.get('onboarded', False):
+        st.markdown(f"""
+        <div style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); 
+                    padding: 1rem; border-radius: 8px; text-align: center; margin-bottom: 1rem;">
+            <p style="color: white; margin: 0; font-size: 1.1rem;">
+                🌺 {da_kine_time_vibe()} Welcome to your Snowbird ohana! 🏄‍♂️
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
 
     # Show onboarding tour for first-time users
     if should_show_onboarding():
@@ -102,40 +107,74 @@ def main():
 
     # Dashboard now includes integrated quick actions
 
-    # Mobile-optimized navigation with shortened labels
-    if st.session_state.get('mobile_view', False):
-        # Shorter labels for mobile
-        tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
-            "📊 Home", 
-            "📅 Track", 
-            "💰 Budget", 
-            "🏠 Props",
-            "🤖 AI", 
-            "📋 Reports",
-            "⚙️ Settings",
-            "🌐 Community"
-        ])
-    else:
-        # Full labels for desktop
-        tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
-            "📊 Dashboard", 
-            "📅 Day Tracker", 
-            "💰 Budgets", 
-            "🏠 Properties",
-            "🤖 AI Assistant", 
-            "📋 Reports",
-            "⚙️ Settings",
-            "🌐 Community"
-        ])
-        
-    # Auto-detect mobile view
-    st.markdown("""
+    # Mobile-optimized navigation with Hawaiian expressions
+    import streamlit.components.v1 as components
+    
+    # Auto-detect mobile with better method
+    components.html("""
     <script>
     if (window.innerWidth < 768) {
         window.parent.postMessage({type: 'mobile_detected', mobile: true}, '*');
     }
     </script>
+    """, height=0)
+    
+    # Detect mobile view
+    mobile_view = st.session_state.get('mobile_view', False) or st.session_state.get('force_mobile_tabs', False)
+    
+    if mobile_view:
+        # Shorter labels for mobile with Hawaiian flair
+        tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+            "🏠 Hale", 
+            "📅 Log", 
+            "💰 Money", 
+            "🏡 Props",
+            "🤖 AI", 
+            "📊 Report",
+            "⚙️ Setup",
+            "🌺 Ohana"
+        ])
+    else:
+        # Full labels for desktop with island vibes
+        tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+            "🏠 Dashboard", 
+            "📅 Day Tracker", 
+            "💰 Budget Tracker", 
+            "🏡 Properties",
+            "🤖 AI Kokua", 
+            "📊 Reports",
+            "⚙️ Settings",
+            "🌺 Community"
+        ])
+        
+    # Enhanced mobile detection with settings override
+    st.markdown("""
+    <script>
+    function detectMobile() {
+        const isMobile = window.innerWidth < 768 || 
+                        /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        if (isMobile) {
+            window.parent.postMessage({type: 'mobile_detected', mobile: true}, '*');
+            // Add mobile-specific styling
+            document.body.classList.add('mobile-device');
+        }
+    }
+    
+    detectMobile();
+    window.addEventListener('resize', detectMobile);
+    </script>
+    <style>
+    .mobile-device .main .block-container {
+        padding: 0.5rem !important;
+        max-width: 100% !important;
+    }
+    </style>
     """, unsafe_allow_html=True)
+    
+    # Allow manual mobile mode toggle in settings
+    if st.session_state.get('force_mobile_view', False):
+        st.session_state.mobile_view = True
 
     with tab1:
         render_dashboard()
@@ -416,6 +455,16 @@ def render_settings_tab():
 
         st.divider()
         st.subheader("Display Preferences")
+
+        # Mobile view toggle
+        force_mobile = st.checkbox(
+            "Force Mobile View",
+            value=st.session_state.get('force_mobile_view', False),
+            help="Use mobile-optimized layout even on desktop"
+        )
+        st.session_state.force_mobile_view = force_mobile
+        if force_mobile:
+            st.session_state.mobile_view = True
 
         # Date format
         date_format = st.selectbox(
@@ -740,13 +789,6 @@ def render_settings_tab():
         )
         st.session_state.cache_enabled = cache_enabled
 
-        # Hawaiian/Pidgin Features
-        st.subheader("🌺 Island Features")
-        
-        if st.session_state.get('hawaiian_mode', False):
-            from utils.hawaiian_features import HawaiianFeatures
-            HawaiianFeatures.render_pidgin_translator()
-        
         # Feature flags
         st.subheader("Feature Flags")
 
@@ -1567,12 +1609,13 @@ def render_community_tab():
     """)
 
 def render_footer():
-    """Render application footer"""
+    """Render application footer with Hawaiian vibes"""
+    from utils.hawaii_expressions import da_kine_success
     st.markdown("---")
-    st.markdown("""
+    st.markdown(f"""
     <div style="text-align: center; color: #64748B; font-size: 0.9rem; padding: 1.5rem;">
         <div style="margin-bottom: 1rem;">
-            <strong style="color: #12BDF2;">❄️ Snowbird Financial Assistant ❄️</strong>
+            <strong style="color: #12BDF2;">🌺 Snowbird Financial Assistant 🌺</strong>
         </div>
         <div style="margin-bottom: 1rem;">
             <span style="margin: 0 1rem;">📍 Multi-State Tax Planning</span>
@@ -1580,8 +1623,11 @@ def render_footer():
             <span style="margin: 0 1rem;">🤖 AI-Powered Insights</span>
         </div>
         <div style="font-size: 0.8rem; color: #94A3B8;">
-            Built with ❤️ and ❄️ for seasonal residents everywhere<br>
-            <em>Helping snowbirds fly south (and north) with confidence</em>
+            Built with aloha spirit ❤️ and island vibes 🌊 for seasonal residents everywhere<br>
+            <em>Helping snowbirds navigate da kine with confidence and style! 🤙</em><br>
+            <small style="color: #0ea5e9; font-style: italic;">
+                Mahalo for choosing our ohana! 🌺
+            </small>
         </div>
     </div>
     """, unsafe_allow_html=True)

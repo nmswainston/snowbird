@@ -79,29 +79,55 @@ def render_floating_actions():
     """, unsafe_allow_html=True)
 
 def render_quick_action_panel():
-    """Render quick action panel at top of dashboard"""
+    """Render quick action panel at top of dashboard with Hawaiian vibes"""
     
-    st.markdown("### ⚡ Quick Actions")
+    from utils.hawaii_expressions import da_kine_greeting
+    st.markdown(f"### ⚡ Quick Actions - {da_kine_greeting()}")
     
-    col1, col2, col3, col4 = st.columns(4)
+    # Make it mobile-responsive
+    is_mobile = st.session_state.get('mobile_view', False)
     
-    with col1:
-        if st.button("📅 Log Today", use_container_width=True, type="primary"):
-            # Auto-switch to day tracker
-            st.session_state.quick_action = "log_day"
-            st.switch_page("📅 Day Tracker")
-    
-    with col2:
-        if st.button("💰 Check Budget", use_container_width=True):
-            st.session_state.quick_action = "check_budget"
-            st.switch_page("💰 Budgets")
-    
-    with col3:
-        if st.button("🤖 Ask AI", use_container_width=True):
-            st.session_state.quick_action = "ask_ai"
-            st.switch_page("🤖 AI Assistant")
-    
-    with col4:
-        if st.button("📊 Full Report", use_container_width=True):
-            st.session_state.quick_action = "view_report"
-            st.switch_page("📋 Reports")
+    if is_mobile:
+        # Stack buttons vertically on mobile
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("📅 Log Da Kine", use_container_width=True, type="primary"):
+                st.session_state.quick_action = "log_day"
+                st.switch_page("📅 Day Tracker")
+            
+            if st.button("🤖 Ask Bruddah AI", use_container_width=True):
+                st.session_state.quick_action = "ask_ai"
+                st.switch_page("🤖 AI Assistant")
+        
+        with col2:
+            if st.button("💰 Check Money", use_container_width=True):
+                st.session_state.quick_action = "check_budget"
+                st.switch_page("💰 Budgets")
+            
+            if st.button("📊 Full Report", use_container_width=True):
+                st.session_state.quick_action = "view_report"
+                st.switch_page("📋 Reports")
+    else:
+        # Desktop layout - 4 columns
+        col1, col2, col3, col4 = st.columns(4)
+        
+        with col1:
+            if st.button("📅 Log Today", use_container_width=True, type="primary"):
+                st.session_state.quick_action = "log_day"
+                st.switch_page("📅 Day Tracker")
+        
+        with col2:
+            if st.button("💰 Check Budget", use_container_width=True):
+                st.session_state.quick_action = "check_budget"
+                st.switch_page("💰 Budgets")
+        
+        with col3:
+            if st.button("🤖 Ask AI Kokua", use_container_width=True):
+                st.session_state.quick_action = "ask_ai"
+                st.switch_page("🤖 AI Assistant")
+        
+        with col4:
+            if st.button("📊 Full Report", use_container_width=True):
+                st.session_state.quick_action = "view_report"
+                st.switch_page("📋 Reports")

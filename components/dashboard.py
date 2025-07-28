@@ -5,9 +5,10 @@ from utils.data_models import SnowbirdData
 def render_dashboard():
     """Render the enhanced premium dashboard with responsive metrics grid"""
     
-    # Show loading skeleton while data loads
+    # Show loading skeleton while data loads with Hawaiian vibes
     if 'dashboard_loaded' not in st.session_state:
-        st.markdown("### 🌊 Loading your dashboard...")
+        from utils.hawaii_expressions import da_kine_loading
+        st.markdown(f"### 🌊 {da_kine_loading()}")
         
         # Skeleton loading animation
         st.markdown("""
@@ -28,31 +29,23 @@ def render_dashboard():
         st.session_state.dashboard_loaded = True
         st.rerun()
     
-    # Main dashboard header with Hawaiian flavor if enabled
-    if st.session_state.get('hawaiian_mode', False):
-        from utils.hawaiian_features import HawaiianFeatures
-        HawaiianFeatures.render_island_vibes_banner()
-        st.markdown("""
-        <div style="text-align: center; margin-bottom: 2rem;">
-            <h1 style="color: #ff6b35; font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem;">
-                🏄‍♂️ Snowbird Da Kine Dashboard 🌺
-            </h1>
-            <p style="color: #64748b; font-size: 1.2rem; margin-bottom: 0;">
-                Your complete island-style seasonal overview, bruddah!
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown("""
-        <div style="text-align: center; margin-bottom: 2rem;">
-            <h1 style="color: #1e3a8a; font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem;">
-                🏠 Snowbird Financial Dashboard
-            </h1>
-            <p style="color: #64748b; font-size: 1.2rem; margin-bottom: 0;">
-                Your complete seasonal residence overview
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
+    # Main dashboard header with larger font and better spacing
+    # Import Hawaiian expressions for da kine vibes
+    from utils.hawaii_expressions import da_kine_time_vibe, da_kine_greeting
+    
+    st.markdown(f"""
+    <div style="text-align: center; margin-bottom: 2rem;">
+        <h1 style="color: #1e3a8a; font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem;">
+            🏠 Snowbird Financial Dashboard
+        </h1>
+        <p style="color: #64748b; font-size: 1.2rem; margin-bottom: 0.5rem;">
+            Your complete seasonal residence overview
+        </p>
+        <p style="color: #0ea5e9; font-size: 1rem; font-style: italic;">
+            {da_kine_time_vibe()} Ready to track da kine! 🤙
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
     
     # Add spacing
     st.write("")
@@ -60,11 +53,6 @@ def render_dashboard():
     # Smart notifications banner
     from components.smart_notifications import render_smart_notifications
     render_smart_notifications()
-    
-    # Island weather widget if Hawaiian mode enabled
-    if st.session_state.get('hawaiian_mode', False):
-        from components.island_weather import render_island_widgets
-        render_island_widgets()
     
     st.markdown("---")
     

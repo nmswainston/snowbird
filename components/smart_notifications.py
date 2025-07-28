@@ -61,8 +61,9 @@ class SmartNotificationSystem:
         alerts = SmartNotificationSystem.get_priority_alerts()
         
         if not alerts:
-            # Show positive message when no alerts
-            st.success("🌊 All systems looking good! You're staying compliant and on budget.")
+            # Show positive message when no alerts with Hawaiian vibes
+            from utils.hawaii_expressions import da_kine_success
+            st.success(f"🌊 {da_kine_success()} You're staying compliant and on budget, bruddah!")
             return
         
         # Show alerts in compact banner

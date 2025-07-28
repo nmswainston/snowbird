@@ -130,19 +130,19 @@ def render_main_header():
     """Render the enhanced application header with Pro branding support"""
     try:
         from utils.branding_manager import BrandingManager
-        
+
         # Use custom header if Pro user with branding
         if BrandingManager.is_pro_user():
             BrandingManager.render_custom_header()
             return
-            
+
     except ImportError:
         # Branding manager not available, use standard header
         pass
     except Exception:
         # Any error, fall back to standard header
         pass
-    
+
     # Standard header for non-Pro users or fallback
     st.markdown("""
     <div class="main-header fade-in">
@@ -190,12 +190,12 @@ def apply_pro_branding():
     """Apply Pro user custom branding if available"""
     try:
         from utils.branding_manager import BrandingManager
-        
+
         # Apply custom branding CSS for Pro users
         custom_css = BrandingManager.apply_custom_branding_css()
         if custom_css:
             st.markdown(custom_css, unsafe_allow_html=True)
-            
+
     except ImportError:
         # Branding manager not available, skip custom branding
         pass
@@ -313,6 +313,143 @@ def apply_basic_styles():
         border: 2px solid color-mix(in srgb, var(--error) 30%, transparent);
         box-shadow: 0 0 20px color-mix(in srgb, var(--error) 20%, transparent);
         backdrop-filter: blur(10px);
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Add mobile optimizations with Hawaiian flair
+    st.markdown("""
+    <style>
+    /* Mobile-first responsive design with island vibes */
+    @media (max-width: 768px) {
+        .main .block-container {
+            padding-top: 0.5rem;
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+            padding-bottom: 1rem;
+            max-width: 100%;
+        }
+
+        /* Stack columns on mobile */
+        .row-widget.stHorizontal > div {
+            flex-direction: column !important;
+            width: 100% !important;
+        }
+
+        /* Improve button sizes for touch */
+        .stButton > button {
+            min-height: 48px;
+            font-size: 16px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        /* Better tab sizing for mobile */
+        .stTabs [data-baseweb="tab-list"] {
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .stTabs [data-baseweb="tab-list"] button {
+            font-size: 13px;
+            padding: 6px 8px;
+            border-radius: 8px;
+            min-width: auto;
+            flex: 1;
+        }
+
+        /* Better metric display on mobile */
+        .metric-container {
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        /* Improve form inputs on mobile */
+        .stSelectbox > div > div {
+            font-size: 16px; /* Prevents zoom on iOS */
+        }
+
+        .stTextInput > div > div > input {
+            font-size: 16px; /* Prevents zoom on iOS */
+        }
+
+        /* Better spacing for mobile cards */
+        .dashboard-card {
+            margin-bottom: 1rem;
+            padding: 1.25rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Improve header on mobile */
+        h1 {
+            font-size: 1.75rem !important;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 1.5rem !important;
+            line-height: 1.3;
+        }
+
+        /* Better progress bars on mobile */
+        .stProgress > div > div > div {
+            border-radius: 8px;
+            height: 12px;
+        }
+
+        /* Improve expander styling on mobile */
+        .streamlit-expanderHeader {
+            font-size: 16px;
+            padding: 12px;
+        }
+    }
+
+    /* Tablet optimizations */
+    @media (max-width: 1024px) and (min-width: 769px) {
+        .main .block-container {
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        .stTabs [data-baseweb="tab-list"] button {
+            font-size: 14px;
+            padding: 10px 16px;
+        }
+    }
+
+    /* Hawaiian-themed colors and animations */
+    .hawaii-card {
+        background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
+        border: 1px solid #0ea5e9;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .hawaii-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+    }
+
+    /* Improved loading animations */
+    .loading-wave {
+        animation: wave 2s ease-in-out infinite;
+    }
+
+    @keyframes wave {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+    }
+
+    /* Better touch targets */
+    .touch-friendly {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 12px;
     }
     </style>
     """, unsafe_allow_html=True)
