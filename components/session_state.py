@@ -84,6 +84,27 @@ def initialize_session_state():
     if 'ai_question_asked' not in st.session_state:
         st.session_state.ai_question_asked = False
 
+    # User properties management
+    if 'user_properties' not in st.session_state:
+        st.session_state.user_properties = {
+            "Arizona Home": {
+                "state": "Arizona",
+                "address": "",
+                "property_type": "Primary",
+                "notes": ""
+            },
+            "Minnesota Home": {
+                "state": "Minnesota", 
+                "address": "",
+                "property_type": "Secondary",
+                "notes": ""
+            }
+        }
+
+    # Track if properties were recently changed
+    if 'recent_property_changes' not in st.session_state:
+        st.session_state.recent_property_changes = False
+
 def reset_session_state():
     """Reset session state to defaults"""
     for key in list(st.session_state.keys()):
