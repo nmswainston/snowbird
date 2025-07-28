@@ -1,3 +1,4 @@
+
 import streamlit as st
 import datetime
 import os
@@ -8,17 +9,18 @@ import pandas as pd
 
 # Configure Streamlit for deployment with winter theme
 st.set_page_config(
-    page_title="❄️ Snowbird: Your Seasonal Financial Assistant", 
+    page_title="Snowbird: Your Seasonal Financial Assistant", 
     layout="wide",
-    page_icon="❄️",
+    page_icon="🏠",
     initial_sidebar_state="expanded"
 )
 
-# Winter-themed CSS
+# Winter-themed CSS with Lucide icons
 st.markdown("""
 <style>
-    /* Import Google Fonts */
+    /* Import Google Fonts and Lucide Icons */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js');
 
     /* Root variables for winter theme */
     :root {
@@ -61,6 +63,21 @@ st.markdown("""
         color: var(--text-light);
         font-size: 1.2rem;
         font-weight: 400;
+    }
+
+    /* Icon styling */
+    .icon {
+        width: 16px;
+        height: 16px;
+        display: inline-block;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+
+    .icon-large {
+        width: 24px;
+        height: 24px;
+        margin-right: 12px;
     }
 
     /* Card styling */
@@ -176,6 +193,14 @@ st.markdown("""
         margin: 1rem 0;
     }
 </style>
+
+<!-- Lucide Icons Script -->
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        lucide.createIcons();
+    });
+</script>
 """, unsafe_allow_html=True)
 
 # Try to load OpenAI, handle if not available or no API key
@@ -191,7 +216,7 @@ try:
             st.warning("OpenAI API key configured but invalid. AI features disabled.")
     else:
         openai_available = False
-        st.info("💡 To enable AI features, add your OPENAI_API_KEY to Replit Secrets.")
+        st.info("To enable AI features, add your OPENAI_API_KEY to Replit Secrets.")
 except ImportError:
     openai_available = False
     st.info("OpenAI library not available. AI chat features will be disabled.")
@@ -254,13 +279,13 @@ def get_tax_status(days, threshold):
     """Get tax residency status for a state"""
     percentage = (days / threshold) * 100
     if days >= threshold:
-        return "🔴 TAX RESIDENT", "status-danger"
+        return "TAX RESIDENT", "status-danger"
     elif days >= threshold * 0.9:
-        return "🟠 CRITICAL", "status-warning"
+        return "CRITICAL", "status-warning"
     elif days >= threshold * 0.75:
-        return "🟡 CAUTION", "status-warning"
+        return "CAUTION", "status-warning"
     else:
-        return "✅ SAFE", "status-safe"
+        return "SAFE", "status-safe"
 
 def add_day_log(state, date_str=None):
     """Add a day to the log"""
@@ -311,26 +336,29 @@ def generate_report_data():
 # Main header
 st.markdown("""
 <div class="main-header">
-    <h1 class="main-title">❄️ Snowbird: Your Seasonal Financial Assistant 🏖️</h1>
+    <h1 class="main-title">
+        <i data-lucide="home" class="icon-large"></i>
+        Snowbird: Your Seasonal Financial Assistant
+    </h1>
     <p class="subtitle">Manage your multi-state lifestyle with confidence</p>
 </div>
 """, unsafe_allow_html=True)
 
 # Navigation tabs
 tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
-    "🏠 Dashboard", 
-    "📅 Day Tracker", 
-    "💰 Budgets", 
-    "🤖 AI Assistant", 
-    "📊 Reports", 
-    "✅ Migration Checklist",
-    "💳 Bill Tracker"
+    "Dashboard", 
+    "Day Tracker", 
+    "Budgets", 
+    "AI Assistant", 
+    "Reports", 
+    "Migration Checklist",
+    "Bill Tracker"
 ])
 
 # Tab 1: Dashboard
 with tab1:
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-    st.subheader("📊 Current Status Overview")
+    st.markdown('<h3><i data-lucide="bar-chart-3" class="icon"></i>Current Status Overview</h3>', unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
 
@@ -352,7 +380,7 @@ with tab1:
 
     # State residency status
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-    st.subheader("🏛️ State Residency Status")
+    st.markdown('<h3><i data-lucide="map-pin" class="icon"></i>State Residency Status</h3>', unsafe_allow_html=True)
 
     for state, days in st.session_state.states.items():
         status_text, status_class = get_tax_status(days, st.session_state.tax_threshold)
@@ -365,24 +393,24 @@ with tab1:
         with col2:
             st.metric("Days", days)
         with col3:
-            st.markdown(f'<span class="{status_class}">{status_text}</span>', unsafe_allow_html=True)
+            st.markdown(f'<span class="{status_class}"><i data-lucide="alert-circle" class="icon"></i>{status_text}</span>', unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
     # Quick financial overview
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-    st.subheader("💰 Financial Overview")
+    st.markdown('<h3><i data-lucide="dollar-sign" class="icon"></i>Financial Overview</h3>', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.write("**Monthly Home Budgets**")
+        st.markdown('**<i data-lucide="home" class="icon"></i>Monthly Home Budgets**', unsafe_allow_html=True)
         for state, budget in st.session_state.home_budgets.items():
             total_budget = sum(budget.values())
             st.write(f"• {state}: ${total_budget:,}")
 
     with col2:
-        st.write("**Seasonal Expenses**")
+        st.markdown('**<i data-lucide="calendar" class="icon"></i>Seasonal Expenses**', unsafe_allow_html=True)
         total_seasonal = sum(st.session_state.seasonal_cash_flow.values())
         st.write(f"• Total Monthly: ${total_seasonal:,}")
         for category, amount in st.session_state.seasonal_cash_flow.items():
@@ -392,11 +420,11 @@ with tab1:
 
 # Tab 2: Day Tracker
 with tab2:
-    st.subheader("📅 Residency Day Tracker")
+    st.markdown('<h2><i data-lucide="calendar-days" class="icon"></i>Residency Day Tracker</h2>', unsafe_allow_html=True)
 
     # Current location logging
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-    st.write("**Log Your Current Location**")
+    st.markdown('**<i data-lucide="map-pin" class="icon"></i>Log Your Current Location**', unsafe_allow_html=True)
 
     col1, col2 = st.columns([2, 1])
 
@@ -405,7 +433,7 @@ with tab2:
         custom_date = st.date_input("Select date:", value=datetime.date.today())
 
     with col2:
-        if st.button("📍 Log Day", type="primary"):
+        if st.button("Log Day", type="primary"):
             success, message = add_day_log(current_location, custom_date.isoformat())
             if success:
                 st.success(message)
@@ -417,13 +445,13 @@ with tab2:
 
     # Recent activity
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-    st.write("**Recent Activity**")
+    st.markdown('**<i data-lucide="activity" class="icon"></i>Recent Activity**', unsafe_allow_html=True)
 
     if st.session_state.day_log:
         recent_logs = sorted(st.session_state.day_log, key=lambda x: x['date'], reverse=True)[:10]
         for log in recent_logs:
             date_obj = datetime.datetime.fromisoformat(log['date']).date()
-            st.write(f"📅 {date_obj.strftime('%b %d, %Y')} - **{log['state']}**")
+            st.markdown(f'<i data-lucide="calendar" class="icon"></i>{date_obj.strftime("%b %d, %Y")} - **{log["state"]}**', unsafe_allow_html=True)
     else:
         st.write("No activity logged yet. Start by logging your current location!")
 
@@ -431,7 +459,7 @@ with tab2:
 
     # Bulk operations
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-    st.write("**Bulk Operations**")
+    st.markdown('**<i data-lucide="settings" class="icon"></i>Bulk Operations**', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
 
@@ -445,7 +473,7 @@ with tab2:
             st.rerun()
 
     with col2:
-        if st.button("🗑️ Clear All Logs", type="secondary"):
+        if st.button("Clear All Logs", type="secondary"):
             st.session_state.day_log = []
             st.session_state.states = {state: 0 for state in st.session_state.states.keys()}
             st.success("All logs cleared!")
@@ -455,11 +483,11 @@ with tab2:
 
 # Tab 3: Budgets
 with tab3:
-    st.subheader("Budget Management")
+    st.markdown('<h2><i data-lucide="wallet" class="icon"></i>Budget Management</h2>', unsafe_allow_html=True)
 
     # Home budgets
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-    st.write("**Home Budgets**")
+    st.markdown('**<i data-lucide="home" class="icon"></i>Home Budgets**', unsafe_allow_html=True)
 
     budget_state = st.selectbox("Select home to edit:", list(st.session_state.home_budgets.keys()))
 
@@ -502,7 +530,7 @@ with tab3:
 
     # Seasonal cash flow
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-    st.write("**Seasonal Cash Flow Planning**")
+    st.markdown('**<i data-lucide="trending-up" class="icon"></i>Seasonal Cash Flow Planning**', unsafe_allow_html=True)
 
     col1, col2 = st.columns(2)
 
@@ -544,14 +572,14 @@ with tab3:
 
 # Tab 4: AI Assistant
 with tab4:
-    st.subheader("🤖 AI Financial Assistant")
+    st.markdown('<h2><i data-lucide="bot" class="icon"></i>AI Financial Assistant</h2>', unsafe_allow_html=True)
 
     if not openai_available:
-        st.warning("🔒 AI features require an OpenAI API key. Add your OPENAI_API_KEY to Replit Secrets to enable this feature.")
+        st.warning("AI features require an OpenAI API key. Add your OPENAI_API_KEY to Replit Secrets to enable this feature.")
 
         # Show example functionality
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-        st.write("**Example AI Features (when enabled):**")
+        st.markdown('**<i data-lucide="lightbulb" class="icon"></i>Example AI Features (when enabled):**', unsafe_allow_html=True)
         st.write("• Ask about tax residency implications")
         st.write("• Get budget optimization suggestions")
         st.write("• Receive travel timing recommendations")
@@ -564,7 +592,7 @@ with tab4:
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
 
         # Quick questions
-        st.write("**Quick Questions:**")
+        st.markdown('**<i data-lucide="help-circle" class="icon"></i>Quick Questions:**', unsafe_allow_html=True)
         quick_questions = [
             "How many more days can I safely stay in Arizona this year?",
             "What are the tax implications of my current residency status?",
@@ -584,8 +612,8 @@ with tab4:
                                      value=getattr(st.session_state, 'current_question', ''),
                                      height=100)
 
-        if st.button("💬 Ask AI", type="primary") and custom_question:
-            with st.spinner("🤖 Thinking..."):
+        if st.button("Ask AI", type="primary") and custom_question:
+            with st.spinner("Thinking..."):
                 try:
                     # Prepare context
                     context = f"""
@@ -615,20 +643,20 @@ with tab4:
                         "timestamp": datetime.datetime.now().isoformat()
                     })
 
-                    st.success("✅ Response generated!")
+                    st.success("Response generated!")
 
                 except Exception as e:
-                    st.error(f"❌ Error: {str(e)}")
+                    st.error(f"Error: {str(e)}")
 
         st.markdown('</div>', unsafe_allow_html=True)
 
         # Display chat history
         if st.session_state.chat_history:
             st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-            st.write("**Recent AI Conversations:**")
+            st.markdown('**<i data-lucide="message-circle" class="icon"></i>Recent AI Conversations:**', unsafe_allow_html=True)
 
             for i, chat in enumerate(reversed(st.session_state.chat_history[-5:])):
-                with st.expander(f"💬 {chat['question'][:60]}..."):
+                with st.expander(f"{chat['question'][:60]}..."):
                     st.write("**Question:**", chat['question'])
                     st.write("**AI Response:**", chat['response'])
                     st.caption(f"Asked on {datetime.datetime.fromisoformat(chat['timestamp']).strftime('%B %d, %Y at %I:%M %p')}")
@@ -637,18 +665,18 @@ with tab4:
 
 # Tab 5: Reports
 with tab5:
-    st.subheader("Tax Residency Reports")
+    st.markdown('<h2><i data-lucide="file-text" class="icon"></i>Tax Residency Reports</h2>', unsafe_allow_html=True)
 
     # Generate report
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-    st.write("**Tax Residency Summary Report**")
+    st.markdown('**<i data-lucide="clipboard" class="icon"></i>Tax Residency Summary Report**', unsafe_allow_html=True)
 
     report_data = generate_report_data()
 
     col1, col2 = st.columns(2)
 
     with col1:
-        st.write("**Current Year Status:**")
+        st.markdown('**<i data-lucide="calendar-check" class="icon"></i>Current Year Status:**', unsafe_allow_html=True)
         for state, days in report_data['total_days'].items():
             status_text, status_class = get_tax_status(days, report_data['threshold'])
             st.write(f"• **{state}**: {days} days - {status_text}")
@@ -659,7 +687,7 @@ with tab5:
     with col2:
         # Monthly breakdown
         if report_data['monthly_breakdown']:
-            st.write("**Monthly Breakdown:**")
+            st.markdown('**<i data-lucide="bar-chart" class="icon"></i>Monthly Breakdown:**', unsafe_allow_html=True)
             monthly_df_data = []
             for month, states in report_data['monthly_breakdown'].items():
                 month_name = datetime.datetime.strptime(month, '%Y-%m').strftime('%b %Y')
@@ -678,13 +706,13 @@ with tab5:
 
     # Export options
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-    st.write("**Export Options**")
+    st.markdown('**<i data-lucide="download" class="icon"></i>Export Options**', unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
         # CSV Export
-        if st.button("📄 Export as CSV"):
+        if st.button("Export as CSV"):
             # Prepare CSV data
             csv_buffer = StringIO()
             csv_writer = csv.writer(csv_buffer)
@@ -701,7 +729,7 @@ with tab5:
                 csv_writer.writerow([date_str, state, current_days, status])
 
             st.download_button(
-                label="💾 Download CSV Report",
+                label="Download CSV Report",
                 data=csv_buffer.getvalue(),
                 file_name=f"snowbird_tax_report_{datetime.date.today().isoformat()}.csv",
                 mime="text/csv"
@@ -709,7 +737,7 @@ with tab5:
 
     with col2:
         # JSON Export
-        if st.button("📋 Export as JSON"):
+        if st.button("Export as JSON"):
             json_data = {
                 "report_metadata": {
                     "generated_date": datetime.date.today().isoformat(),
@@ -724,7 +752,7 @@ with tab5:
             }
 
             st.download_button(
-                label="💾 Download JSON Report",
+                label="Download JSON Report",
                 data=json.dumps(json_data, indent=2),
                 file_name=f"snowbird_complete_report_{datetime.date.today().isoformat()}.json",
                 mime="application/json"
@@ -732,16 +760,16 @@ with tab5:
 
     with col3:
         # TODO: PDF Export
-        st.button("📑 Export as PDF", disabled=True, help="PDF export coming soon!")
+        st.button("Export as PDF", disabled=True, help="PDF export coming soon!")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
 # Tab 6: Migration Checklist
 with tab6:
-    st.subheader("✅ Seasonal Migration Checklist")
+    st.markdown('<h2><i data-lucide="list-checks" class="icon"></i>Seasonal Migration Checklist</h2>', unsafe_allow_html=True)
 
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-    st.write("**Pre-Travel Checklist**")
+    st.markdown('**<i data-lucide="clipboard-list" class="icon"></i>Pre-Travel Checklist**', unsafe_allow_html=True)
     st.caption("Complete these tasks before leaving for your seasonal home")
 
     # Organize checklist by category
@@ -772,7 +800,7 @@ with tab6:
                 st.session_state.migration_checklist[main_index]['completed'] = completed
 
             with col2:
-                if st.button("🗑️", key=f"delete_{main_index}", help="Delete this item"):
+                if st.button("Delete", key=f"delete_{main_index}", help="Delete this item"):
                     st.session_state.migration_checklist.pop(main_index)
                     st.rerun()
 
@@ -780,7 +808,7 @@ with tab6:
 
     # Add new checklist item
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-    st.write("**Add New Checklist Item**")
+    st.markdown('**<i data-lucide="plus" class="icon"></i>Add New Checklist Item**', unsafe_allow_html=True)
 
     col1, col2, col3 = st.columns(3)
 
@@ -792,7 +820,7 @@ with tab6:
                                   ["HVAC", "Kitchen", "Mail", "Utilities", "Security", "Exterior", "Personal", "Other"])
 
     with col3:
-        if st.button("➕ Add Task") and new_task:
+        if st.button("Add Task") and new_task:
             st.session_state.migration_checklist.append({
                 "task": new_task,
                 "category": new_category,
@@ -810,19 +838,19 @@ with tab6:
 
     if progress == 1.0 and total_count > 0:
         st.balloons()
-        st.success("🎉 Congratulations! All checklist items completed. Have a safe trip!")
+        st.success("Congratulations! All checklist items completed. Have a safe trip!")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
 # Tab 7: Bill Tracker
 with tab7:
-    st.subheader("💳 Bill Reminder System")
+    st.markdown('<h2><i data-lucide="credit-card" class="icon"></i>Bill Reminder System</h2>', unsafe_allow_html=True)
 
     # Select state for bill management
     bill_state = st.selectbox("Select home for bill management:", list(st.session_state.bills.keys()))
 
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-    st.write(f"**{bill_state} Bills**")
+    st.markdown(f'**<i data-lucide="receipt" class="icon"></i>{bill_state} Bills**', unsafe_allow_html=True)
 
     # Display current bills
     current_month = datetime.date.today().month
@@ -844,17 +872,17 @@ with tab7:
             # Check if overdue
             today = datetime.date.today()
             if today > due_date:
-                st.markdown('<span class="status-danger">OVERDUE</span>', unsafe_allow_html=True)
+                st.markdown('<span class="status-danger"><i data-lucide="alert-triangle" class="icon"></i>OVERDUE</span>', unsafe_allow_html=True)
             elif (due_date - today).days <= 3:
-                st.markdown('<span class="status-warning">DUE SOON</span>', unsafe_allow_html=True)
+                st.markdown('<span class="status-warning"><i data-lucide="clock" class="icon"></i>DUE SOON</span>', unsafe_allow_html=True)
             else:
-                st.markdown('<span class="status-safe">CURRENT</span>', unsafe_allow_html=True)
+                st.markdown('<span class="status-safe"><i data-lucide="check-circle" class="icon"></i>CURRENT</span>', unsafe_allow_html=True)
 
         with col4:
             st.write(f"Due: {bill['due_date']}")
 
         with col5:
-            if st.button("🗑️", key=f"delete_bill_{bill_state}_{i}", help="Delete bill"):
+            if st.button("Delete", key=f"delete_bill_{bill_state}_{i}", help="Delete bill"):
                 st.session_state.bills[bill_state].pop(i)
                 st.rerun()
 
@@ -862,7 +890,7 @@ with tab7:
 
     # Add new bill
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-    st.write("**Add New Bill**")
+    st.markdown('**<i data-lucide="plus-circle" class="icon"></i>Add New Bill**', unsafe_allow_html=True)
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -878,7 +906,7 @@ with tab7:
     with col4:
         new_bill_freq = st.selectbox("Frequency:", ["monthly", "quarterly", "annually"])
 
-    if st.button("➕ Add Bill") and new_bill_name:
+    if st.button("Add Bill") and new_bill_name:
         st.session_state.bills[bill_state].append({
             "name": new_bill_name,
             "amount": new_bill_amount,
@@ -889,7 +917,7 @@ with tab7:
         st.rerun()
 
     # Upcoming bills summary
-    st.write("**Upcoming Bills (Next 7 Days)**")
+    st.markdown('**<i data-lucide="calendar-clock" class="icon"></i>Upcoming Bills (Next 7 Days)**', unsafe_allow_html=True)
     upcoming_bills = []
     today = datetime.date.today()
 
@@ -916,13 +944,13 @@ with tab7:
         upcoming_bills.sort(key=lambda x: x['days_until_due'])
         for bill in upcoming_bills:
             if bill['days_until_due'] < 0:
-                st.error(f"🚨 OVERDUE: {bill['state']} - {bill['name']} (${bill['amount']}) - Due {abs(bill['days_until_due'])} days ago")
+                st.error(f"OVERDUE: {bill['state']} - {bill['name']} (${bill['amount']}) - Due {abs(bill['days_until_due'])} days ago")
             elif bill['days_until_due'] <= 3:
-                st.warning(f"⚠️ DUE SOON: {bill['state']} - {bill['name']} (${bill['amount']}) - Due in {bill['days_until_due']} days")
+                st.warning(f"DUE SOON: {bill['state']} - {bill['name']} (${bill['amount']}) - Due in {bill['days_until_due']} days")
             else:
-                st.info(f"📅 UPCOMING: {bill['state']} - {bill['name']} (${bill['amount']}) - Due in {bill['days_until_due']} days")
+                st.info(f"UPCOMING: {bill['state']} - {bill['name']} (${bill['amount']}) - Due in {bill['days_until_due']} days")
     else:
-        st.success("✅ No bills due in the next 7 days!")
+        st.success("No bills due in the next 7 days!")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -930,8 +958,15 @@ with tab7:
 st.markdown("---")
 st.markdown("""
 <div style="text-align: center; color: #64748B; font-size: 0.9rem; padding: 1rem;">
-    <p><strong>🚀 Coming Soon:</strong></p>
-    <p>📅 Google Calendar Integration • 🔐 Multi-device Sync • 📱 Mobile App (CapacitorJS) • 📧 Email Reminders</p>
-    <p><em>Built with ❄️ by Snowbird Financial Assistant</em></p>
+    <p><strong><i data-lucide="rocket" class="icon"></i>Coming Soon:</strong></p>
+    <p><i data-lucide="calendar" class="icon"></i>Google Calendar Integration • <i data-lucide="shield" class="icon"></i>Multi-device Sync • <i data-lucide="smartphone" class="icon"></i>Mobile App (CapacitorJS) • <i data-lucide="mail" class="icon"></i>Email Reminders</p>
+    <p><em>Built with <i data-lucide="snowflake" class="icon"></i> by Snowbird Financial Assistant</em></p>
 </div>
+
+<script>
+    // Initialize Lucide icons after content loads
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
+</script>
 """, unsafe_allow_html=True)
