@@ -6,6 +6,10 @@ def load_custom_css():
     # Initialize and apply theme system
     initialize_theme_system()
     ThemeManager.apply_theme_css()
+    
+    # Add accessibility improvements
+    from utils.accessibility import add_accessibility_css
+    add_accessibility_css()
 
 def render_main_header():
     """Render the enhanced sleek application header"""

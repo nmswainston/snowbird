@@ -1,0 +1,76 @@
+
+{
+  "app_title": "Snowbird Financial Assistant",
+  "app_subtitle": "Manage your multi-state lifestyle with confidence",
+  "nav_dashboard": "Dashboard",
+  "nav_day_tracker": "Day Tracker", 
+  "nav_budgets": "Budgets",
+  "nav_ai_assistant": "AI Assistant",
+  "nav_admin": "Admin",
+  "nav_help": "Help",
+  
+  "dashboard_welcome": "Welcome to your Snowbird Dashboard",
+  "dashboard_days_logged": "Days Logged This Year",
+  "dashboard_tax_status": "Tax Residency Status",
+  "dashboard_budget_overview": "Budget Overview",
+  
+  "day_tracker_title": "Track Your Location",
+  "day_tracker_select_state": "Select your state:",
+  "day_tracker_select_date": "Select date:",
+  "day_tracker_log_day": "Log Day",
+  "day_tracker_success": "Successfully logged {days} day(s) in {state}",
+  
+  "budget_title": "Dual-Home Budget Management",
+  "budget_monthly_total": "Monthly Total",
+  "budget_add_category": "Add Category",
+  "budget_category_name": "Category Name",
+  "budget_amount": "Amount",
+  
+  "ai_assistant_title": "AI Financial Assistant",
+  "ai_assistant_placeholder": "Ask me anything about your finances, taxes, or seasonal living...",
+  "ai_assistant_send": "Send",
+  "ai_assistant_thinking": "Thinking...",
+  
+  "tax_status_safe": "SAFE",
+  "tax_status_caution": "CAUTION", 
+  "tax_status_critical": "CRITICAL",
+  "tax_status_resident": "TAX RESIDENT",
+  
+  "help_faqs": "Frequently Asked Questions",
+  "help_contact": "Contact Information",
+  "help_feedback": "Share Your Feedback",
+  
+  "feedback_type_general": "General Feedback",
+  "feedback_type_bug": "Bug Report",
+  "feedback_type_feature": "Feature Request",
+  "feedback_type_support": "Support Request",
+  "feedback_message_placeholder": "Please describe your feedback in detail...",
+  "feedback_rating": "How would you rate your experience?",
+  "feedback_email_optional": "Email (optional)",
+  "feedback_submit": "Submit Feedback",
+  "feedback_success": "Thank you for your feedback!",
+  
+  "admin_title": "Admin Dashboard",
+  "admin_export_data": "Export Data",
+  "admin_import_data": "Import Data", 
+  "admin_feature_flags": "Feature Flags",
+  "admin_analytics": "Analytics",
+  
+  "export_csv": "Export as CSV",
+  "export_json": "Export as JSON",
+  "import_from_file": "Import from File",
+  
+  "error_generic": "An error occurred. Please try again.",
+  "error_network": "Connection issue. Please check your internet connection.",
+  "error_validation": "Please check your input and try again.",
+  
+  "success_generic": "Operation completed successfully!",
+  "loading": "Loading...",
+  "save": "Save",
+  "cancel": "Cancel",
+  "close": "Close",
+  "delete": "Delete",
+  "edit": "Edit",
+  "add": "Add",
+  "remove": "Remove"
+}

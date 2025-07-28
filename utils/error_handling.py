@@ -260,6 +260,99 @@ def get_error_context() -> Dict[str, Any]:
     
     return context
 
+def initialize_error_monitoring():
+    """Initialize Sentry error monitoring if available"""
+    try:
+        import sentry_sdk
+        from sentry_sdk.integrations.logging import LoggingIntegration
+        
+        sentry_dsn = os.getenv('SENTRY_DSN')
+        if sentry_dsn:
+            sentry_logging = LoggingIntegration(
+                level=logging.INFO,
+                event_level=logging.ERROR
+            )
+            
+            sentry_sdk.init(
+                dsn=sentry_dsn,
+                integrations=[sentry_logging],
+                traces_sample_rate=0.1,
+                environment=os.getenv('ENVIRONMENT', 'development')
+            )
+            logger.info("Sentry error monitoring initialized")
+    except ImportError:
+        logger.info("Sentry not available, using local error logging")
+
+def render_error_banner(error_type: str, message: str, show_details: bool = False):
+    """Render user-friendly error banner"""
+    error_configs = {
+        'network': {
+            'icon': '🌐',
+            'title': 'Connection Issue',
+            'color': 'orange',
+            'suggestions': [
+                'Check your internet connection',
+                'Refresh the page',
+                'Try again in a few moments'
+            ]
+        },
+        'validation': {
+            'icon': '⚠️',
+            'title': 'Input Error',
+            'color': 'yellow',
+            'suggestions': [
+                'Check your input data',
+                'Ensure all required fields are filled',
+                'Verify date formats and numbers'
+            ]
+        },
+        'server': {
+            'icon': '🔧',
+            'title': 'Server Error',
+            'color': 'red',
+            'suggestions': [
+                'This error has been automatically reported',
+                'Please try refreshing the page',
+                'Contact support if the issue persists'
+            ]
+        },
+        'permission': {
+            'icon': '🔒',
+            'title': 'Permission Error',
+            'color': 'red',
+            'suggestions': [
+                'Check your API keys and credentials',
+                'Verify your account permissions',
+                'Contact support for assistance'
+            ]
+        }
+    }
+    
+    config = error_configs.get(error_type, error_configs['server'])
+    
+    st.markdown(f"""
+    <div style="
+        background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+        color: white;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 10px rgba(238, 90, 90, 0.3);
+    ">
+        <div style="display: flex; align-items: center; margin-bottom: 0.5rem;">
+            <span style="font-size: 1.5rem; margin-right: 0.5rem;">{config['icon']}</span>
+            <strong style="font-size: 1.1rem;">{config['title']}</strong>
+        </div>
+        <p style="margin: 0.5rem 0;">{message}</p>
+        <details style="margin-top: 1rem;">
+            <summary style="cursor: pointer; font-weight: bold;">💡 What you can do:</summary>
+            <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+                {''.join(f'<li>{suggestion}</li>' for suggestion in config['suggestions'])}
+            </ul>
+        </details>
+    </div>
+    """, unsafe_allow_html=True)
+
 class ErrorDisplay:
     """Utility class for displaying different types of errors to users"""
     

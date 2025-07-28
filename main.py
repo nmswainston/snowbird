@@ -2,9 +2,13 @@
 Snowbird Financial Assistant - Main Application
 """
 import streamlit as st
-import sys
-import os
-import traceback
+from components.styles import load_custom_css
+from utils.accessibility import AccessibilityManager
+from utils.performance import PerformanceOptimizer, monitor_memory_usage
+from components.feedback_system import render_feedback_form, render_help_section
+from utils.i18n import render_language_selector, t
+from utils.version_manager import render_version_info
+from utils.error_handling import initialize_error_monitoring, render_error_banner
 
 # Configure Streamlit page first
 st.set_page_config(
