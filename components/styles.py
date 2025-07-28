@@ -267,7 +267,6 @@ def apply_basic_styles():
             font-size: 1.5rem;
         }
     }
-}
 
     .status-danger { 
         color: var(--error);
