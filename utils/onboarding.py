@@ -242,7 +242,7 @@ def render_onboarding_carousel():
         padding: 0.75rem 1.5rem !important;
         font-size: 0.95rem !important;
         font-weight: 600 !important;
-        border-radius: 10px !important;
+        border-radius: 12px !important;
         white-space: nowrap !important;
         text-overflow: ellipsis !important;
         overflow: hidden !important;
@@ -250,11 +250,81 @@ def render_onboarding_carousel():
         letter-spacing: 0.01em !important;
         height: auto !important;
         min-height: 44px !important;
+        border: 2px solid transparent !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        position: relative !important;
+        overflow: hidden !important;
     }
     
-    .onboarding-nav .stButton > button:hover {
+    /* Previous button - secondary styling */
+    .onboarding-nav .stButton:first-child > button {
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%) !important;
+        color: #475569 !important;
+        border: 2px solid #cbd5e1 !important;
+        box-shadow: 0 2px 8px rgba(71, 85, 105, 0.1) !important;
+    }
+    
+    .onboarding-nav .stButton:first-child > button:hover {
+        background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%) !important;
+        color: #334155 !important;
+        border-color: #94a3b8 !important;
         transform: translateY(-2px) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        box-shadow: 0 6px 16px rgba(71, 85, 105, 0.15) !important;
+    }
+    
+    /* Next/Primary buttons - enhanced styling */
+    .onboarding-nav .stButton:last-child > button,
+    .onboarding-nav .stButton[data-testid*="primary"] > button {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+        color: white !important;
+        border: 2px solid #2563eb !important;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25) !important;
+    }
+    
+    .onboarding-nav .stButton:last-child > button:hover,
+    .onboarding-nav .stButton[data-testid*="primary"] > button:hover {
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%) !important;
+        border-color: #1d4ed8 !important;
+        transform: translateY(-2px) scale(1.02) !important;
+        box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35) !important;
+    }
+    
+    /* Skip button - tertiary styling */
+    .onboarding-nav .stButton:nth-child(2) > button {
+        background: transparent !important;
+        color: #64748b !important;
+        border: 2px solid #e2e8f0 !important;
+        box-shadow: none !important;
+    }
+    
+    .onboarding-nav .stButton:nth-child(2) > button:hover {
+        background: #f8fafc !important;
+        color: #475569 !important;
+        border-color: #cbd5e1 !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 2px 8px rgba(71, 85, 105, 0.1) !important;
+    }
+    
+    /* Button shine effect */
+    .onboarding-nav .stButton > button::before {
+        content: '' !important;
+        position: absolute !important;
+        top: 0 !important;
+        left: -100% !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent) !important;
+        transition: left 0.6s ease !important;
+        z-index: 1 !important;
+    }
+    
+    .onboarding-nav .stButton > button:hover::before {
+        left: 100% !important;
+    }
+    
+    /* Active state */
+    .onboarding-nav .stButton > button:active {
+        transform: translateY(0) scale(0.98) !important;
     }
     
     .step-indicator {
