@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = ""
     DEBUG: bool = False
     ENVIRONMENT: str = "development"
+    SENTRY_DSN: str = ""
 
     class Config:
         env_file = ".env"
