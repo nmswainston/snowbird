@@ -1,14 +1,24 @@
+[server]
+port = 8501
+address = "0.0.0.0"
+headless = true
+enableCORS = false
+enableXsrfProtection = false
+enableWebsocketCompression = false
+maxMessageSize = 200
+maxUploadSize = 200
+fileWatcherType = "none"
+runOnSave = false
+
+[browser]
+gatherUsageStats = false
 
 [theme]
+base = "light"
 primaryColor = "#12BDF2"
 backgroundColor = "#FFFFFF"
 secondaryBackgroundColor = "#F0F4F8"
 textColor = "#1E293B"
 
-[server]
-headless = true
-port = 5000
-address = "0.0.0.0"
-
-[browser]
-gatherUsageStats = false
+[logger]
+level = "warning"
