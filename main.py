@@ -21,14 +21,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# Initialize session state immediately after page config
+initialize_session_state()
+
 def safe_main():
     """Safely run the main application with error handling"""
     try:
         # Try to import and run main app
         from main_app import main
-
-        # Initialize session state
-        initialize_session_state()
 
         # Load custom CSS
         load_custom_css()
