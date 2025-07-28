@@ -405,6 +405,43 @@ def render_settings_tab():
             st.write("- Authentication: Valid")
 
     with settings_tabs[4]:  # Data Management
+        st.markdown("### 📊 Data Management")
+
+        # Auto-save toggle
+        st.session_state.auto_save = st.toggle(
+            "Auto-save data", 
+            value=st.session_state.get('auto_save', True),
+            help="Automatically save your data when changes are made"
+        )
+
+        # AI Rating Statistics (optional display)
+        st.markdown("---")
+        st.markdown("### 🤖 AI Response Ratings")
+
+        from utils.ai_rating_system import ai_rating_manager
+        rating_stats = ai_rating_manager.get_rating_stats()
+
+        if rating_stats["total_ratings"] > 0:
+            col1, col2, col3 = st.columns(3)
+
+            with col1:
+                st.metric("Total AI Ratings", rating_stats["total_ratings"])
+
+            with col2:
+                st.metric("👍 Satisfaction", f"{rating_stats['thumbs_up_percentage']}%")
+
+            with col3:
+                st.metric("Recent Positive", rating_stats["thumbs_up"])
+
+            # Show rating breakdown
+            if st.checkbox("Show detailed AI rating statistics"):
+                st.write(f"**Positive ratings:** {rating_stats['thumbs_up']}")
+                st.write(f"**Negative ratings:** {rating_stats['thumbs_down']}")
+                st.write(f"**Average question length:** {rating_stats['average_question_length']} characters")
+                st.write(f"**Average response length:** {rating_stats['average_response_length']} characters")
+        else:
+            st.info("No AI ratings recorded yet. Use the AI Assistant to ask questions and rate responses!")
+
         st.subheader("Data Export & Backup")
 
         col1, col2 = st.columns(2)
@@ -687,79 +724,20 @@ def render_budgets_tab():
     """Render budgets management tab"""
     st.markdown('<h2><i data-lucide="wallet" class="icon"></i>Budget Management</h2>', unsafe_allow_html=True)
 
-    # Import currency conversion utilities
-    from utils.budget_converter import (
-        convert_budget_value, convert_budget_dict, format_budget_value, 
-        display_conversion_banner, get_conversion_status, display_budget_comparison
-    )
-
-    # Display currency conversion status
-    display_conversion_banner()
-
     # Budget overview
     col1, col2, col3 = st.columns(3)
 
-    conversion_status = get_conversion_status()
-
-    # Calculate totals with currency conversion
-    total_home_budgets_original = {state: sum(budget.values()) for state, budget in st.session_state.home_budgets.items()}
-    total_seasonal_original = sum(st.session_state.seasonal_cash_flow.values())
-
-    # Convert to current currency settings
-    total_home_budgets_converted = {}
-    for state, budget in st.session_state.home_budgets.items():
-        converted_budget = convert_budget_dict(budget)
-        total_home_budgets_converted[state] = sum(converted_budget.values())
-
-    total_seasonal_converted = sum(convert_budget_dict(st.session_state.seasonal_cash_flow).values())
-
     with col1:
-        arizona_total = total_home_budgets_converted.get('Arizona', 0)
-        arizona_original = total_home_budgets_original.get('Arizona', 0)
-
-        delta_text = ""
-        if conversion_status['has_adjustments'] and arizona_original > 0:
-            change = ((arizona_total - arizona_original) / arizona_original) * 100
-            delta_text = f"{change:+.1f}% vs USD"
-
-        st.metric(
-            "Arizona Monthly", 
-            format_budget_value(arizona_total),
-            delta=delta_text
-        )
-        if conversion_status['has_adjustments']:
-            st.caption(f"💵 Original: ${arizona_original:,} USD")
+        total_budget = sum(sum(budget.values()) for budget in st.session_state.home_budgets.values())
+        st.metric("Total Monthly Budget", f"${total_budget:,}")
 
     with col2:
-        minnesota_total = total_home_budgets_converted.get('Minnesota', 0)
-        minnesota_original = total_home_budgets_original.get('Minnesota', 0)
-
-        delta_text = ""
-        if conversion_status['has_adjustments'] and minnesota_original > 0:
-            change = ((minnesota_total - minnesota_original) / minnesota_original) * 100
-            delta_text = f"{change:+.1f}% vs USD"
-
-        st.metric(
-            "Minnesota Monthly", 
-            format_budget_value(minnesota_total),
-            delta=delta_text
-        )
-        if conversion_status['has_adjustments']:
-            st.caption(f"💵 Original: ${minnesota_original:,} USD")
+        num_homes = len(st.session_state.home_budgets)
+        st.metric("Properties", num_homes)
 
     with col3:
-        delta_text = ""
-        if conversion_status['has_adjustments'] and total_seasonal_original > 0:
-            change = ((total_seasonal_converted - total_seasonal_original) / total_seasonal_original) * 100
-            delta_text = f"{change:+.1f}% vs USD"
-
-        st.metric(
-            "Seasonal Monthly", 
-            format_budget_value(total_seasonal_converted),
-            delta=delta_text
-        )
-        if conversion_status['has_adjustments']:
-            st.caption(f"💵 Original: ${total_seasonal_original:,} USD")
+        avg_budget = total_budget / max(num_homes, 1)
+        st.metric("Average per Property", f"${avg_budget:,.0f}")
 
     st.markdown("---")
 
@@ -775,128 +753,62 @@ def render_budgets_tab():
             budget = st.session_state.home_budgets[selected_home]
 
             # Display current budget breakdown
-            converted_budget = convert_budget_dict(budget)
-            updated_budget = {}
+            budget_col1, budget_col2 = st.columns(2)
 
-            for category, original_amount in budget.items():
-                converted_amount = converted_budget[category]
+            with budget_col1:
+                st.write("**Current Budget:**")
+                for category, amount in budget.items():
+                    st.write(f"• {category}: ${amount:,}")
+                st.write(f"**Total: ${sum(budget.values()):,}**")
 
-                # Show both original and converted amounts for reference
-                col_input, col_converted = st.columns([2, 1])
-
-                with col_input:
-                    new_amount = st.number_input(
-                        f"{category} (USD)",
-                        value=float(original_amount),
-                        min_value=0.0,
-                        step=10.0,
-                        key=f"budget_{selected_home}_{category}",
-                        help="Enter amount in USD - conversion will be applied automatically"
+            with budget_col2:
+                st.write("**Edit Budget:**")
+                new_budget = {}
+                for category, current_amount in budget.items():
+                    new_budget[category] = st.number_input(
+                        f"{category}", 
+                        value=current_amount, 
+                        min_value=0, 
+                        step=100,
+                        key=f"budget_{selected_home}_{category}"
                     )
-                    updated_budget[category] = new_amount
 
-                with col_converted:
-                    if conversion_status['has_adjustments']:
-                        # Show what the converted amount would be
-                        preview_converted = convert_budget_value(new_amount)
-                        st.metric(
-                            label=f"Converts to",
-                            value=format_budget_value(preview_converted),
-                            help=f"Amount after currency conversion and inflation adjustment"
-                        )
-                    else:
-                        st.write("")  # Empty space to maintain layout
+                if st.button("Update Budget", type="primary"):
+                    st.session_state.home_budgets[selected_home] = new_budget
+                    st.success(f"Budget updated for {selected_home}")
 
-            # Add new category
-            st.write("**Add New Category:**")
-            col1, col2, col3 = st.columns([2, 1, 1])
-            with col1:
-                new_category = st.text_input("Category Name", key=f"new_cat_{selected_home}")
-            with col2:
-                new_amount = st.number_input(
-                    "Amount (USD)", 
-                    min_value=0.0, 
-                    step=10.0, 
-                    key=f"new_amt_{selected_home}",
-                    help="Enter amount in USD"
-                )
-            with col3:
-                if st.button("Add Category", key=f"add_{selected_home}"):
-                    if new_category and new_amount > 0:
-                        updated_budget[new_category] = new_amount
-                        st.success(f"Added {new_category}")
+                    # Sync bill reminders to calendar if enabled
+                    if (st.session_state.get('sync_bill_reminders', False) and 
+                        'google_calendar_credentials' in st.session_state):
 
-            # Update budget
-            if st.button("Update Budget", type="primary"):
-                st.session_state.home_budgets[selected_home] = updated_budget
-                st.success(f"Budget updated for {selected_home}")
+                        from utils.google_calendar import calendar_sync
 
-                # Sync bill reminders to calendar if enabled
-                if (st.session_state.get('sync_bill_reminders', False) and 
-                    'google_calendar_credentials' in st.session_state):
+                        # Create calendar reminders for bills
+                        try:
+                            today = datetime.date.today()
+                            next_month = today.replace(day=1) + datetime.timedelta(days=32)
+                            next_month = next_month.replace(day=1)
 
-                    from utils.google_calendar import calendar_sync
+                            for category, amount in new_budget.items():
+                                # Create reminder for next month (simplified - in production you'd use actual due dates)
+                                bill_date = next_month.replace(day=15)  # Default to 15th of month
 
-                    # Create calendar reminders for bills
-                    try:
-                        today = datetime.date.today()
-                        next_month = today.replace(day=1) + datetime.timedelta(days=32)
-                        next_month = next_month.replace(day=1)
+                                reminder_created = calendar_sync.create_reminder_event(
+                                    title=f"{selected_home} {category} Bill",
+                                    description=f"${amount} {category} bill due for {selected_home}",
+                                    due_date=bill_date,
+                                    reminder_type="bill"
+                                )
 
-                        for category, amount in updated_budget.items():
-                            # Create reminder for next month (simplified - in production you'd use actual due dates)
-                            bill_date = next_month.replace(day=15)  # Default to 15th of month
+                                if reminder_created:
+                                    st.info(f"📅 Created calendar reminder for {category} bill")
 
-                            reminder_created = calendar_sync.create_reminder_event(
-                                title=f"{selected_home} {category} Bill",
-                                description=f"${amount} {category} bill due for {selected_home}",
-                                due_date=bill_date,
-                                reminder_type="bill"
-                            )
+                        except Exception as e:
+                            st.warning(f"Calendar sync failed: {e}")
 
-                            if reminder_created:
-                                st.info(f"📅 Created calendar reminder for {category} bill")
-
-                    except Exception as e:
-                        st.warning(f"Calendar sync failed: {e}")
-
-                st.rerun()
+                    st.rerun()
     else:
         st.info("No properties configured yet. Go to Day Tracker to add properties.")
-
-    # Currency Conversion Summary
-    if conversion_status['has_adjustments']:
-        st.markdown("---")
-        st.subheader("🔄 Currency Conversion Summary")
-
-        st.info("""
-        **💡 Budget Management Notes:**
-        - All budget amounts are stored in USD for consistency
-        - Currency conversion and inflation adjustments are applied for display
-        - Changes to currency/inflation settings in Settings will update all displays
-        - Original USD amounts are preserved for accurate conversions
-        """)
-        # Show current conversion settings
-        target_currency = st.session_state.get('primary_currency', 'USD')
-        inflation_enabled = st.session_state.get('inflation_enabled', False)
-        inflation_rate = st.session_state.get('inflation_rate', 0.03) # Already in decimal form
-
-        col1, col2 = st.columns(2)
-        with col1:
-            st.write(f"**💱 Target Currency:** {target_currency}")
-            if target_currency != 'USD':
-                from utils.currency import get_exchange_rates
-                try:
-                    rates = get_exchange_rates('USD')
-                    rate = rates.get(target_currency, 1.0)
-                    st.write(f"**📊 Exchange Rate:** 1 USD = {rate:.4f} {target_currency}")
-                except:
-                    st.write("**📊 Exchange Rate:** Using fallback rates")
-
-        with col2:
-            st.write(f"**📈 Inflation Adjustment:** {'Enabled' if inflation_enabled else 'Disabled'}")
-            if inflation_enabled:
-                st.write(f"**📊 Annual Rate:** {inflation_rate*100:.1f}%")
 
 def render_ai_assistant_tab(openai_available, openai_client):
     """Render AI assistant tab"""

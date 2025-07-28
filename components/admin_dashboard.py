@@ -346,20 +346,20 @@ def render_configuration_status():
         st.markdown('**Environment Variables**', unsafe_allow_html=True)
 
         from utils.config import settings
-        
+
         config_vars = {
             'OPENAI_API_KEY': settings.OPENAI_API_KEY,
             'STREAMLIT_PORT': str(settings.STREAMLIT_PORT),
             'STREAMLIT_HOST': settings.STREAMLIT_HOST,
             'TAX_THRESHOLD': str(settings.TAX_THRESHOLD),
             'SMTP_SERVER': settings.SMTP_SERVER,
-            'SMTP_PORT': str(settings.SMTP_PORT),
+            'SMTP_PORT': settings.SMTP_PORT),
             'SMTP_USERNAME': settings.SMTP_USERNAME,
             'GMAIL_CREDENTIALS_FILE': settings.GMAIL_CREDENTIALS_FILE,
             'DEBUG': str(settings.DEBUG),
             'ENVIRONMENT': settings.ENVIRONMENT
         }
-        
+
         sensitive_vars = ['OPENAI_API_KEY', 'SMTP_PASSWORD']
 
         for key, value in config_vars.items():
@@ -417,3 +417,19 @@ def run_health_checks() -> Dict[str, Dict[str, str]]:
         checks['Analytics'] = {'status': 'error', 'message': f'Analytics check failed: {e}'}
 
     return checks
+# Feedback System Stats
+    st.markdown("### 📝 Feedback System")
+    feedback_stats = feedback_manager.get_feedback_stats()
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Feedback", feedback_stats["total"])
+    with col2:
+        st.metric("Average Rating", f"{feedback_stats['rating_average']}/5")
+    with col3:
+        st.metric("Bug Reports", feedback_stats["bug_report"])
+
+    # AI Rating Analytics
+    st.markdown("---")
+    from utils.ai_rating_system import render_rating_analytics
+    render_rating_analytics()
