@@ -1,3 +1,15 @@
+"""
+AI Assistant Component for Snowbird Financial Assistant
+Provides AI-powered financial advice and guidance
+"""
+
+import streamlit as st
+import datetime
+import openai
+import random
+from typing import Dict, List
+from utils.logger import logger
+
 def get_ai_response(question: str, context: dict = None) -> str:
     """Get AI response for user question with enhanced context"""
 
