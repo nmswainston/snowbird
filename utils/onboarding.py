@@ -8,7 +8,7 @@ to key features and helping them get started with the application.
 import streamlit as st
 from typing import Dict, List, Any
 import time
-from utils.hawaiian_features import StandardFeatures
+from utils.standard_features import StandardFeatures
 
 
 # Onboarding steps configuration
@@ -273,7 +273,7 @@ def render_onboarding_carousel():
         background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%) !important;
         color: #475569 !important;
         border: 2px solid #cbd5e1 !important;
-        box-shadow: 0 2px 8px rgba(71, 85, 105, 0.1) !important;
+        box-shadow: 0 2px 8px rgba(71, 85, 85, 105, 0.1) !important;
     }
 
     .onboarding-nav .stButton:first-child > button:hover {
@@ -482,6 +482,7 @@ def render_onboarding_carousel():
                     st.session_state.onboarding_step += 1
                     st.rerun()
             else:
+                # Plain English success message
                 success_msg = StandardFeatures.get_success_message()
                 if st.button("Get Started", key="onboarding_finish", type="primary"):
                     st.session_state.onboarded = True

@@ -79,7 +79,7 @@ def render_floating_actions():
     """, unsafe_allow_html=True)
 
 def render_quick_action_panel():
-    """Render quick action panel at top of dashboard with enhanced styling"""
+    """Render quick action panel at top of dashboard"""
 
     st.markdown(f"### ⚡ Quick Actions")
 

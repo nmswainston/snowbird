@@ -317,7 +317,7 @@ def apply_basic_styles():
     </style>
     """, unsafe_allow_html=True)
 
-    # Add mobile optimizations with enhanced styling
+    # Add mobile optimizations
     st.markdown("""
     <style>
     /* Mobile-first responsive design with island vibes */
@@ -420,7 +420,7 @@ def apply_basic_styles():
         }
     }
 
-    /* Enhanced colors and animations */
+    /* App theme colors and animations */
     .hawaii-card {
         background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
         border: 1px solid #0ea5e9;
@@ -443,6 +443,7 @@ def apply_basic_styles():
     @keyframes wave {
         0%, 100% { transform: translateY(0); }
         50% { transform: translateY(-10px); }
+        100% { transform: translateY(0); }
     }
 
     /* Better touch targets */

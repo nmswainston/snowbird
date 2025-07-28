@@ -1,4 +1,3 @@
-# Removing the Hawaiian expression import and updating the success message to plain English.
 import streamlit as st
 import datetime
 from typing import List, Dict, Any
@@ -61,7 +60,7 @@ class SmartNotificationSystem:
         alerts = SmartNotificationSystem.get_priority_alerts()
 
         if not alerts:
-            # Show positive message when no alerts with standard messaging
+            # Show positive message when no alerts
             st.success("🌊 Great job! You're staying compliant and on budget!")
             return
 
@@ -102,4 +101,3 @@ def render_smart_notifications():
 def render_sidebar_notifications():
     """Render sidebar notifications"""
     SmartNotificationSystem.render_notification_sidebar()
-`
