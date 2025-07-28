@@ -96,10 +96,11 @@ def main():
     # Dashboard now includes integrated quick actions
 
     # Main navigation tabs
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
         "📊 Dashboard", 
         "📅 Day Tracker", 
         "💰 Budgets", 
+        "🏠 Properties",
         "🤖 AI Assistant", 
         "📋 Reports",
         "⚙️ Settings",
@@ -116,15 +117,18 @@ def main():
         render_budgets_tab()
 
     with tab4:
-        render_ai_assistant_tab(openai_available, openai_client)
+        render_properties_tab()
 
     with tab5:
-        render_reports_tab()
+        render_ai_assistant_tab(openai_available, openai_client)
 
     with tab6:
-        render_settings_tab()
+        render_reports_tab()
 
     with tab7:
+        render_settings_tab()
+
+    with tab8:
         render_community_tab()
 
     # Footer
@@ -660,176 +664,7 @@ def render_settings_tab():
                         st.error(f"❌ Restore failed: {str(e)}")
                         logger.error(f"Backup restore error: {e}")
 
-        # Property Management Section
-        st.markdown("---")
-        st.subheader("🏠 Property Management")
-
-        # Initialize properties if not exists
-        if 'user_properties' not in st.session_state:
-            st.session_state.user_properties = {
-                "Arizona Home": {
-                    "state": "Arizona",
-                    "address": "",
-                    "property_type": "Primary",
-                    "notes": ""
-                },
-                "Minnesota Home": {
-                    "state": "Minnesota", 
-                    "address": "",
-                    "property_type": "Secondary",
-                    "notes": ""
-                }
-            }
-
-        # Display current properties
-        st.write("**Current Properties:**")
-
-        properties_to_delete = []
-
-        for prop_name, prop_details in st.session_state.user_properties.items():
-            with st.expander(f"🏠 {prop_name} ({prop_details['state']})"):
-                col1, col2 = st.columns([3, 1])
-
-                with col1:
-                    st.write(f"**State:** {prop_details['state']}")
-                    st.write(f"**Type:** {prop_details['property_type']}")
-                    if prop_details.get('address'):
-                        st.write(f"**Address:** {prop_details['address']}")
-                    if prop_details.get('notes'):
-                        st.write(f"**Notes:** {prop_details['notes']}")
-
-                with col2:
-                    if st.button(f"🗑️ Delete", key=f"delete_{prop_name}"):
-                        properties_to_delete.append(prop_name)
-
-        # Remove deleted properties
-        for prop_name in properties_to_delete:
-            del st.session_state.user_properties[prop_name]
-            # Also remove from budgets if exists
-            if prop_name in st.session_state.home_budgets:
-                del st.session_state.home_budgets[prop_name]
-            st.success(f"✅ Deleted property: {prop_name}")
-            st.rerun()
-
-        # Add new property section
-        st.markdown("**Add New Property:**")
-
-        add_col1, add_col2, add_col3 = st.columns(3)
-
-        with add_col1:
-            new_prop_name = st.text_input(
-                "Property Name",
-                placeholder="e.g., 'Florida Condo', 'Texas Ranch'",
-                key="new_property_name"
-            )
-
-        with add_col2:
-            # All 50 US states plus DC and territories
-            available_states = [
-                "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", 
-                "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", 
-                "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", 
-                "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", 
-                "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", 
-                "New Hampshire", "New Jersey", "New Mexico", "New York", 
-                "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", 
-                "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", 
-                "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", 
-                "West Virginia", "Wisconsin", "Wyoming", "Washington DC", 
-                "Puerto Rico", "US Virgin Islands", "Guam", "Other"
-            ]
-            new_prop_state = st.selectbox(
-                "State",
-                options=available_states,
-                key="new_property_state"
-            )
-
-            # If "Other" is selected, show text input
-            if new_prop_state == "Other":
-                new_prop_state = st.text_input(
-                    "Enter State/Territory Name",
-                    placeholder="Enter state or territory name",
-                    key="custom_state_name"
-                )
-
-        with add_col3:
-            new_prop_type = st.selectbox(
-                "Property Type",
-                options=["Primary", "Secondary", "Vacation", "Investment", "Rental"],
-                key="new_property_type"
-            )
-
-        # Additional property details
-        new_prop_address = st.text_area(
-            "Address (Optional)",
-            placeholder="Enter property address...",
-            key="new_property_address",
-            height=60
-        )
-
-        new_prop_notes = st.text_area(
-            "Notes (Optional)",
-            placeholder="Any additional notes about this property...",
-            key="new_property_notes", 
-            height=60
-        )
-
-        # Add property button
-        if st.button("➕ Add Property", type="primary"):
-            if new_prop_name and new_prop_state:
-                if new_prop_name not in st.session_state.user_properties:
-                    # Add new property
-                    st.session_state.user_properties[new_prop_name] = {
-                        "state": new_prop_state,
-                        "address": new_prop_address,
-                        "property_type": new_prop_type,
-                        "notes": new_prop_notes
-                    }
-
-                    # Initialize budget for new property
-                    if new_prop_name not in st.session_state.home_budgets:
-                        st.session_state.home_budgets[new_prop_name] = {
-                            "Utilities": 200,
-                            "Insurance": 150, 
-                            "Maintenance": 100,
-                            "Property Tax": 300,
-                            "HOA": 0
-                        }
-
-                    # Add to states tracking if new state
-                    if new_prop_state not in st.session_state.states:
-                        st.session_state.states[new_prop_state] = 0
-
-                    st.success(f"✅ Added property: {new_prop_name} in {new_prop_state}")
-
-                    # Clear form
-                    st.session_state.new_property_name = ""
-                    st.session_state.new_property_address = ""
-                    st.session_state.new_property_notes = ""
-
-                    st.rerun()
-                else:
-                    st.error("❌ Property name already exists. Please choose a different name.")
-            else:
-                st.error("❌ Please enter both property name and state.")
-
-        # Property statistics
-        if st.session_state.user_properties:
-            st.markdown("**Property Summary:**")
-            total_properties = len(st.session_state.user_properties)
-            states_with_properties = len(set(prop['state'] for prop in st.session_state.user_properties.values()))
-
-            summary_col1, summary_col2, summary_col3 = st.columns(3)
-
-            with summary_col1:
-                st.metric("Total Properties", total_properties)
-
-            with summary_col2:
-                st.metric("States with Properties", states_with_properties)
-
-            with summary_col3:
-                primary_properties = sum(1 for prop in st.session_state.user_properties.values() if prop['property_type'] == 'Primary')
-                st.metric("Primary Residences", primary_properties)
+        # Property management moved to dedicated Properties tab for better mobile access
 
         st.subheader("Import Data")
         uploaded_file = st.file_uploader(
@@ -1076,6 +911,179 @@ def render_settings_tab():
             # In a real app, this would save to database
             st.success("✅ All settings saved successfully!")
             st.balloons()
+
+def render_properties_tab():
+    """Render properties management tab with mobile-optimized interface"""
+    st.markdown('<h2><i data-lucide="home" class="icon"></i>Property Management</h2>', unsafe_allow_html=True)
+
+    # Initialize properties if not exists
+    if 'user_properties' not in st.session_state:
+        st.session_state.user_properties = {
+            "Arizona Home": {
+                "state": "Arizona",
+                "address": "",
+                "property_type": "Primary",
+                "notes": ""
+            },
+            "Minnesota Home": {
+                "state": "Minnesota", 
+                "address": "",
+                "property_type": "Secondary",
+                "notes": ""
+            }
+        }
+
+    # Property overview metrics
+    st.subheader("📊 Property Overview")
+    
+    total_properties = len(st.session_state.user_properties)
+    states_with_properties = len(set(prop['state'] for prop in st.session_state.user_properties.values()))
+    primary_properties = sum(1 for prop in st.session_state.user_properties.values() if prop['property_type'] == 'Primary')
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("Total Properties", total_properties)
+    with col2:
+        st.metric("States", states_with_properties)
+    with col3:
+        st.metric("Primary Residences", primary_properties)
+
+    st.markdown("---")
+
+    # Display current properties in mobile-friendly cards
+    st.subheader("🏠 Your Properties")
+
+    if st.session_state.user_properties:
+        properties_to_delete = []
+
+        for prop_name, prop_details in st.session_state.user_properties.items():
+            # Mobile-friendly property card
+            st.markdown(f"""
+            <div style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); 
+                        padding: 1.5rem; border-radius: 12px; border: 1px solid #cbd5e1; 
+                        margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h4 style="margin: 0 0 0.5rem 0; color: #1e293b; font-size: 1.2rem;">
+                    🏠 {prop_name}
+                </h4>
+            </div>
+            """, unsafe_allow_html=True)
+
+            prop_col1, prop_col2 = st.columns([3, 1])
+            
+            with prop_col1:
+                st.write(f"**📍 State:** {prop_details['state']}")
+                st.write(f"**🏷️ Type:** {prop_details['property_type']}")
+                if prop_details.get('address'):
+                    st.write(f"**📮 Address:** {prop_details['address']}")
+                if prop_details.get('notes'):
+                    st.write(f"**📝 Notes:** {prop_details['notes']}")
+
+            with prop_col2:
+                if st.button(f"🗑️", key=f"delete_{prop_name}", help=f"Delete {prop_name}"):
+                    properties_to_delete.append(prop_name)
+
+        # Remove deleted properties
+        for prop_name in properties_to_delete:
+            del st.session_state.user_properties[prop_name]
+            # Also remove from budgets if exists
+            if prop_name in st.session_state.home_budgets:
+                del st.session_state.home_budgets[prop_name]
+            st.success(f"✅ Deleted property: {prop_name}")
+            st.rerun()
+
+    else:
+        st.info("No properties configured yet. Add your first property below!")
+
+    st.markdown("---")
+
+    # Add new property section - mobile optimized
+    st.subheader("➕ Add New Property")
+
+    with st.form("add_property_form", clear_on_submit=True):
+        # Stack inputs vertically on mobile
+        new_prop_name = st.text_input(
+            "Property Name *",
+            placeholder="e.g., 'Florida Condo', 'Texas Ranch'",
+            help="Give your property a memorable name"
+        )
+
+        # All 50 US states plus territories
+        available_states = [
+            "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", 
+            "Connecticut", "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", 
+            "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky", "Louisiana", 
+            "Maine", "Maryland", "Massachusetts", "Michigan", "Minnesota", 
+            "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", 
+            "New Hampshire", "New Jersey", "New Mexico", "New York", 
+            "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon", 
+            "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota", 
+            "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", 
+            "West Virginia", "Wisconsin", "Wyoming", "Washington DC", 
+            "Puerto Rico", "US Virgin Islands", "Guam", "Other"
+        ]
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            new_prop_state = st.selectbox("State *", options=available_states)
+        with col2:
+            new_prop_type = st.selectbox(
+                "Property Type *",
+                options=["Primary", "Secondary", "Vacation", "Investment", "Rental"]
+            )
+
+        # Custom state input for "Other"
+        if new_prop_state == "Other":
+            new_prop_state = st.text_input(
+                "Enter State/Territory Name *",
+                placeholder="Enter state or territory name"
+            )
+
+        new_prop_address = st.text_area(
+            "Address (Optional)",
+            placeholder="Enter property address...",
+            height=60
+        )
+
+        new_prop_notes = st.text_area(
+            "Notes (Optional)",
+            placeholder="Any additional notes about this property...",
+            height=60
+        )
+
+        # Submit button
+        submitted = st.form_submit_button("➕ Add Property", type="primary", use_container_width=True)
+
+        if submitted:
+            if new_prop_name and new_prop_state:
+                if new_prop_name not in st.session_state.user_properties:
+                    # Add new property
+                    st.session_state.user_properties[new_prop_name] = {
+                        "state": new_prop_state,
+                        "address": new_prop_address,
+                        "property_type": new_prop_type,
+                        "notes": new_prop_notes
+                    }
+
+                    # Initialize budget for new property
+                    if new_prop_name not in st.session_state.home_budgets:
+                        st.session_state.home_budgets[new_prop_name] = {
+                            "Utilities": 200,
+                            "Insurance": 150, 
+                            "Maintenance": 100,
+                            "Property Tax": 300,
+                            "HOA": 0
+                        }
+
+                    # Add to states tracking if new state
+                    if new_prop_state not in st.session_state.states:
+                        st.session_state.states[new_prop_state] = 0
+
+                    st.success(f"✅ Added property: {new_prop_name} in {new_prop_state}")
+                    st.rerun()
+                else:
+                    st.error("❌ Property name already exists. Please choose a different name.")
+            else:
+                st.error("❌ Please enter both property name and state.")
 
 def render_budgets_tab():
     """Render budgets management tab"""
