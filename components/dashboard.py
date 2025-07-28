@@ -283,7 +283,7 @@ def render_dashboard():
             state_threshold = snowbird_data.state_tax_thresholds.get(state, snowbird_data.tax_threshold)
             
             # Progress bar with percentage
-            st.progress(progress, text=f"{days}/{state_threshold} days ({progress*100:.1f}%)")ext=f"{days}/{st.session_state.tax_threshold} days ({progress*100:.1f}%)")
+            st.progress(progress, text=f"{days}/{state_threshold} days ({progress*100:.1f}%)")
             
             # Status message with appropriate styling
             if status_text == "SAFE":
