@@ -27,9 +27,3 @@ firebase-admin
 google-cloud-firestore
 pyrebase4
 streamlit-firebase-auth
-firebase-admin
-google-cloud-firestore
-pyrebase4
-firebase-admin
-google-cloud-firestore
-pyrebase4
