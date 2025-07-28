@@ -130,13 +130,13 @@ def render_settings_tab():
         st.subheader("Currency & Financial Settings")
 
         col1, col2, col3 = st.columns(3)
-        
+
         with col1:
             # Currency selector
             from utils.currency import SUPPORTED_CURRENCIES
             currency_options = list(SUPPORTED_CURRENCIES.keys())
             currency_names = [f"{code} - {SUPPORTED_CURRENCIES[code]['name']}" for code in currency_options]
-            
+
             selected_currency_index = st.selectbox(
                 "Primary Currency",
                 options=range(len(currency_options)),
@@ -199,16 +199,16 @@ def render_settings_tab():
     with settings_tabs[1]:  # Email & Notifications
         from components.email_settings import render_email_settings
         render_email_settings()
-        
+
         st.divider()
         st.subheader("Google Calendar Integration")
-        
+
         # Import calendar sync utility
         from utils.google_calendar import calendar_sync
-        
+
         if calendar_sync.is_authenticated():
             st.success("✅ Connected to Google Calendar")
-            
+
             # Auto-sync settings
             auto_sync = st.checkbox(
                 "Auto-sync residency logs to calendar",
@@ -216,7 +216,7 @@ def render_settings_tab():
                 help="Automatically create calendar events when logging days"
             )
             st.session_state.auto_calendar_sync = auto_sync
-            
+
             # Reminder sync settings
             sync_reminders = st.checkbox(
                 "Sync bill reminders to calendar",
@@ -224,16 +224,16 @@ def render_settings_tab():
                 help="Create calendar reminders for upcoming bills"
             )
             st.session_state.sync_bill_reminders = sync_reminders
-            
+
             # Show recent synced events
             if st.button("📅 View Recent Calendar Events"):
                 try:
                     from datetime import timedelta
                     start_date = datetime.date.today() - timedelta(days=30)
                     end_date = datetime.date.today() + timedelta(days=30)
-                    
+
                     events = calendar_sync.get_snowbird_events(start_date, end_date)
-                    
+
                     if events:
                         st.write("**Recent Snowbird Calendar Events:**")
                         for event in events[:10]:  # Show last 10 events
@@ -241,40 +241,40 @@ def render_settings_tab():
                             st.write(f"{event_type} {event['title']} - {event['date']}")
                     else:
                         st.info("No Snowbird events found in your calendar")
-                        
+
                 except Exception as e:
                     st.error(f"Error retrieving calendar events: {e}")
-            
+
             # Disconnect option
             if st.button("🔌 Disconnect from Google Calendar", type="secondary"):
                 calendar_sync.disconnect()
                 st.success("Disconnected from Google Calendar")
                 st.rerun()
-                
+
         else:
             st.info("🔗 Connect your Google Calendar to automatically sync residency logs and reminders")
-            
+
             # Instructions for setup
             with st.expander("📋 Setup Instructions"):
                 st.markdown("""
                 **To enable Google Calendar sync:**
-                
+
                 1. **Get Google API Credentials:**
                    - Go to [Google Cloud Console](https://console.cloud.google.com/)
                    - Create a project or select existing one
                    - Enable Google Calendar API
                    - Create OAuth 2.0 credentials
-                
+
                 2. **Add to Replit Secrets:**
                    - Add `GOOGLE_CLIENT_ID` with your client ID
                    - Add `GOOGLE_CLIENT_SECRET` with your client secret
-                
+
                 3. **Authorize Access:**
                    - Click "Connect to Google Calendar" below
                    - Sign in to your Google account
                    - Grant calendar permissions
                 """)
-            
+
             # Show connect button if credentials are available
             # Check if secrets exist first to avoid StreamlitSecretNotFoundError
             try:
@@ -285,16 +285,16 @@ def render_settings_tab():
                 )
             except Exception:
                 has_google_credentials = False
-            
+
             if has_google_credentials:
                 if st.button("📅 Connect to Google Calendar", type="primary"):
                     auth_url = calendar_sync.get_auth_url()
                     if auth_url:
                         st.markdown(f"🔗 **[Click here to authorize Google Calendar access]({auth_url})**")
                         st.info("After authorizing, copy the authorization code and paste it below:")
-                        
+
                         auth_code = st.text_input("Authorization Code:", placeholder="Paste code here...")
-                        
+
                         if st.button("✅ Complete Setup") and auth_code:
                             if calendar_sync.authenticate_with_code(auth_code):
                                 st.success("🎉 Successfully connected to Google Calendar!")
@@ -524,7 +524,7 @@ def render_settings_tab():
         # Widget Configuration Section
         st.subheader("Dashboard Widget Configuration")
         st.write("Choose which widgets to display on your dashboard:")
-        
+
         # Available widgets with descriptions
         available_widgets = {
             "quick_location_logger": {
@@ -568,7 +568,7 @@ def render_settings_tab():
                 "description": "Important dates and threshold warnings"
             }
         }
-        
+
         # Initialize widgets session state with defaults if not set
         if 'widgets' not in st.session_state:
             # Default selection - core widgets enabled by default
@@ -584,19 +584,19 @@ def render_settings_tab():
                 "expense_sparkline": False,
                 "reminders": False
             }
-        
+
         # Create checkboxes for each widget in a two-column layout
         widget_col1, widget_col2 = st.columns(2)
-        
+
         widget_keys = list(available_widgets.keys())
         mid_point = len(widget_keys) // 2
-        
+
         # First column of widgets
         with widget_col1:
             for widget_key in widget_keys[:mid_point]:
                 widget_info = available_widgets[widget_key]
                 current_state = st.session_state.widgets.get(widget_key, True)
-                
+
                 new_state = st.checkbox(
                     widget_info["name"],
                     value=current_state,
@@ -604,13 +604,13 @@ def render_settings_tab():
                     help=widget_info["description"]
                 )
                 st.session_state.widgets[widget_key] = new_state
-        
+
         # Second column of widgets  
         with widget_col2:
             for widget_key in widget_keys[mid_point:]:
                 widget_info = available_widgets[widget_key]
                 current_state = st.session_state.widgets.get(widget_key, True)
-                
+
                 new_state = st.checkbox(
                     widget_info["name"],
                     value=current_state,
@@ -618,23 +618,23 @@ def render_settings_tab():
                     help=widget_info["description"]
                 )
                 st.session_state.widgets[widget_key] = new_state
-        
+
         # Widget selection helper buttons
         st.write("")
         widget_btn_col1, widget_btn_col2, widget_btn_col3 = st.columns(3)
-        
+
         with widget_btn_col1:
             if st.button("✅ Select All Widgets", use_container_width=True):
                 for widget_key in available_widgets.keys():
                     st.session_state.widgets[widget_key] = True
                 st.rerun()
-        
+
         with widget_btn_col2:
             if st.button("❌ Deselect All", use_container_width=True):
                 for widget_key in available_widgets.keys():
                     st.session_state.widgets[widget_key] = False
                 st.rerun()
-        
+
         with widget_btn_col3:
             if st.button("🔄 Reset to Defaults", use_container_width=True):
                 # Reset to default widget selection
@@ -651,7 +651,7 @@ def render_settings_tab():
                     "reminders": False
                 }
                 st.rerun()
-        
+
         # Show current selection summary
         enabled_count = sum(1 for enabled in st.session_state.widgets.values() if enabled)
         total_count = len(st.session_state.widgets)
@@ -687,20 +687,79 @@ def render_budgets_tab():
     """Render budgets management tab"""
     st.markdown('<h2><i data-lucide="wallet" class="icon"></i>Budget Management</h2>', unsafe_allow_html=True)
 
+    # Import currency conversion utilities
+    from utils.budget_converter import (
+        convert_budget_value, convert_budget_dict, format_budget_value, 
+        display_conversion_banner, get_conversion_status, display_budget_comparison
+    )
+
+    # Display currency conversion status
+    display_conversion_banner()
+
     # Budget overview
     col1, col2, col3 = st.columns(3)
 
+    conversion_status = get_conversion_status()
+
+    # Calculate totals with currency conversion
+    total_home_budgets_original = {state: sum(budget.values()) for state, budget in st.session_state.home_budgets.items()}
+    total_seasonal_original = sum(st.session_state.seasonal_cash_flow.values())
+
+    # Convert to current currency settings
+    total_home_budgets_converted = {}
+    for state, budget in st.session_state.home_budgets.items():
+        converted_budget = convert_budget_dict(budget)
+        total_home_budgets_converted[state] = sum(converted_budget.values())
+
+    total_seasonal_converted = sum(convert_budget_dict(st.session_state.seasonal_cash_flow).values())
+
     with col1:
-        total_budget = sum(sum(budget.values()) for budget in st.session_state.home_budgets.values())
-        st.metric("Total Monthly Budget", f"${total_budget:,}")
+        arizona_total = total_home_budgets_converted.get('Arizona', 0)
+        arizona_original = total_home_budgets_original.get('Arizona', 0)
+
+        delta_text = ""
+        if conversion_status['has_adjustments'] and arizona_original > 0:
+            change = ((arizona_total - arizona_original) / arizona_original) * 100
+            delta_text = f"{change:+.1f}% vs USD"
+
+        st.metric(
+            "Arizona Monthly", 
+            format_budget_value(arizona_total),
+            delta=delta_text
+        )
+        if conversion_status['has_adjustments']:
+            st.caption(f"💵 Original: ${arizona_original:,} USD")
 
     with col2:
-        num_homes = len(st.session_state.home_budgets)
-        st.metric("Properties", num_homes)
+        minnesota_total = total_home_budgets_converted.get('Minnesota', 0)
+        minnesota_original = total_home_budgets_original.get('Minnesota', 0)
+
+        delta_text = ""
+        if conversion_status['has_adjustments'] and minnesota_original > 0:
+            change = ((minnesota_total - minnesota_original) / minnesota_original) * 100
+            delta_text = f"{change:+.1f}% vs USD"
+
+        st.metric(
+            "Minnesota Monthly", 
+            format_budget_value(minnesota_total),
+            delta=delta_text
+        )
+        if conversion_status['has_adjustments']:
+            st.caption(f"💵 Original: ${minnesota_original:,} USD")
 
     with col3:
-        avg_budget = total_budget / max(num_homes, 1)
-        st.metric("Average per Property", f"${avg_budget:,.0f}")
+        delta_text = ""
+        if conversion_status['has_adjustments'] and total_seasonal_original > 0:
+            change = ((total_seasonal_converted - total_seasonal_original) / total_seasonal_original) * 100
+            delta_text = f"{change:+.1f}% vs USD"
+
+        st.metric(
+            "Seasonal Monthly", 
+            format_budget_value(total_seasonal_converted),
+            delta=delta_text
+        )
+        if conversion_status['has_adjustments']:
+            st.caption(f"💵 Original: ${total_seasonal_original:,} USD")
 
     st.markdown("---")
 
@@ -716,62 +775,128 @@ def render_budgets_tab():
             budget = st.session_state.home_budgets[selected_home]
 
             # Display current budget breakdown
-            budget_col1, budget_col2 = st.columns(2)
+            converted_budget = convert_budget_dict(budget)
+            updated_budget = {}
 
-            with budget_col1:
-                st.write("**Current Budget:**")
-                for category, amount in budget.items():
-                    st.write(f"• {category}: ${amount:,}")
-                st.write(f"**Total: ${sum(budget.values()):,}**")
+            for category, original_amount in budget.items():
+                converted_amount = converted_budget[category]
 
-            with budget_col2:
-                st.write("**Edit Budget:**")
-                new_budget = {}
-                for category, current_amount in budget.items():
-                    new_budget[category] = st.number_input(
-                        f"{category}", 
-                        value=current_amount, 
-                        min_value=0, 
-                        step=100,
-                        key=f"budget_{selected_home}_{category}"
+                # Show both original and converted amounts for reference
+                col_input, col_converted = st.columns([2, 1])
+
+                with col_input:
+                    new_amount = st.number_input(
+                        f"{category} (USD)",
+                        value=float(original_amount),
+                        min_value=0.0,
+                        step=10.0,
+                        key=f"budget_{selected_home}_{category}",
+                        help="Enter amount in USD - conversion will be applied automatically"
                     )
+                    updated_budget[category] = new_amount
 
-                if st.button("Update Budget", type="primary"):
-                    st.session_state.home_budgets[selected_home] = new_budget
-                    st.success(f"Budget updated for {selected_home}")
-                    
-                    # Sync bill reminders to calendar if enabled
-                    if (st.session_state.get('sync_bill_reminders', False) and 
-                        'google_calendar_credentials' in st.session_state):
-                        
-                        from utils.google_calendar import calendar_sync
-                        
-                        # Create calendar reminders for bills
-                        try:
-                            today = datetime.date.today()
-                            next_month = today.replace(day=1) + datetime.timedelta(days=32)
-                            next_month = next_month.replace(day=1)
-                            
-                            for category, amount in new_budget.items():
-                                # Create reminder for next month (simplified - in production you'd use actual due dates)
-                                bill_date = next_month.replace(day=15)  # Default to 15th of month
-                                
-                                reminder_created = calendar_sync.create_reminder_event(
-                                    title=f"{selected_home} {category} Bill",
-                                    description=f"${amount} {category} bill due for {selected_home}",
-                                    due_date=bill_date,
-                                    reminder_type="bill"
-                                )
-                                
-                                if reminder_created:
-                                    st.info(f"📅 Created calendar reminder for {category} bill")
-                                    
-                        except Exception as e:
-                            st.warning(f"Calendar sync failed: {e}")
-                    
-                    st.rerun()
+                with col_converted:
+                    if conversion_status['has_adjustments']:
+                        # Show what the converted amount would be
+                        preview_converted = convert_budget_value(new_amount)
+                        st.metric(
+                            label=f"Converts to",
+                            value=format_budget_value(preview_converted),
+                            help=f"Amount after currency conversion and inflation adjustment"
+                        )
+                    else:
+                        st.write("")  # Empty space to maintain layout
+
+            # Add new category
+            st.write("**Add New Category:**")
+            col1, col2, col3 = st.columns([2, 1, 1])
+            with col1:
+                new_category = st.text_input("Category Name", key=f"new_cat_{selected_home}")
+            with col2:
+                new_amount = st.number_input(
+                    "Amount (USD)", 
+                    min_value=0.0, 
+                    step=10.0, 
+                    key=f"new_amt_{selected_home}",
+                    help="Enter amount in USD"
+                )
+            with col3:
+                if st.button("Add Category", key=f"add_{selected_home}"):
+                    if new_category and new_amount > 0:
+                        updated_budget[new_category] = new_amount
+                        st.success(f"Added {new_category}")
+
+            # Update budget
+            if st.button("Update Budget", type="primary"):
+                st.session_state.home_budgets[selected_home] = updated_budget
+                st.success(f"Budget updated for {selected_home}")
+
+                # Sync bill reminders to calendar if enabled
+                if (st.session_state.get('sync_bill_reminders', False) and 
+                    'google_calendar_credentials' in st.session_state):
+
+                    from utils.google_calendar import calendar_sync
+
+                    # Create calendar reminders for bills
+                    try:
+                        today = datetime.date.today()
+                        next_month = today.replace(day=1) + datetime.timedelta(days=32)
+                        next_month = next_month.replace(day=1)
+
+                        for category, amount in updated_budget.items():
+                            # Create reminder for next month (simplified - in production you'd use actual due dates)
+                            bill_date = next_month.replace(day=15)  # Default to 15th of month
+
+                            reminder_created = calendar_sync.create_reminder_event(
+                                title=f"{selected_home} {category} Bill",
+                                description=f"${amount} {category} bill due for {selected_home}",
+                                due_date=bill_date,
+                                reminder_type="bill"
+                            )
+
+                            if reminder_created:
+                                st.info(f"📅 Created calendar reminder for {category} bill")
+
+                    except Exception as e:
+                        st.warning(f"Calendar sync failed: {e}")
+
+                st.rerun()
     else:
         st.info("No properties configured yet. Go to Day Tracker to add properties.")
+
+    # Currency Conversion Summary
+    if conversion_status['has_adjustments']:
+        st.markdown("---")
+        st.subheader("🔄 Currency Conversion Summary")
+
+        st.info("""
+        **💡 Budget Management Notes:**
+        - All budget amounts are stored in USD for consistency
+        - Currency conversion and inflation adjustments are applied for display
+        - Changes to currency/inflation settings in Settings will update all displays
+        - Original USD amounts are preserved for accurate conversions
+        """)
+        # Show current conversion settings
+        target_currency = st.session_state.get('primary_currency', 'USD')
+        inflation_enabled = st.session_state.get('inflation_enabled', False)
+        inflation_rate = st.session_state.get('inflation_rate', 0.03) # Already in decimal form
+
+        col1, col2 = st.columns(2)
+        with col1:
+            st.write(f"**💱 Target Currency:** {target_currency}")
+            if target_currency != 'USD':
+                from utils.currency import get_exchange_rates
+                try:
+                    rates = get_exchange_rates('USD')
+                    rate = rates.get(target_currency, 1.0)
+                    st.write(f"**📊 Exchange Rate:** 1 USD = {rate:.4f} {target_currency}")
+                except:
+                    st.write("**📊 Exchange Rate:** Using fallback rates")
+
+        with col2:
+            st.write(f"**📈 Inflation Adjustment:** {'Enabled' if inflation_enabled else 'Disabled'}")
+            if inflation_enabled:
+                st.write(f"**📊 Annual Rate:** {inflation_rate*100:.1f}%")
 
 def render_ai_assistant_tab(openai_available, openai_client):
     """Render AI assistant tab"""

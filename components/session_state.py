@@ -5,96 +5,68 @@ from utils.data_models import (
 )
 
 def initialize_session_state():
-    """Initialize session state variables with default values"""
+    """Initialize all session state variables with default values"""
 
-    # Try to load saved data first
-    try:
-        from utils.data_persistence import load_user_data
-        if load_user_data():
-            # Data loaded successfully, add any missing keys
-            if 'data_loaded' not in st.session_state:
-                st.session_state.data_loaded = True
-            return
-    except ImportError:
-        pass  # data_persistence module not available
-    except Exception as e:
-        st.warning(f"Could not load saved data: {e}")
-
-    # Use defaults if no saved data
-
-    # Core data
-    if "states" not in st.session_state:
+    # Core data initialization
+    if 'states' not in st.session_state:
         st.session_state.states = DEFAULT_STATES.copy()
 
-    if "home_budgets" not in st.session_state:
+    if 'home_budgets' not in st.session_state:
         st.session_state.home_budgets = DEFAULT_HOME_BUDGETS.copy()
 
-    if "seasonal_cash_flow" not in st.session_state:
+    if 'seasonal_cash_flow' not in st.session_state:
         st.session_state.seasonal_cash_flow = DEFAULT_SEASONAL_CASH_FLOW.copy()
 
-    if "bills" not in st.session_state:
+    if 'bills' not in st.session_state:
         st.session_state.bills = DEFAULT_BILLS.copy()
 
-    if "migration_checklist" not in st.session_state:
+    if 'migration_checklist' not in st.session_state:
         st.session_state.migration_checklist = DEFAULT_MIGRATION_CHECKLIST.copy()
 
-    # Logging and history
-    if "day_log" not in st.session_state:
-        st.session_state.day_log = []
-
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = []
-
-    if "notification_history" not in st.session_state:
-        st.session_state.notification_history = []
-
-    # Settings
-    if "tax_threshold" not in st.session_state:
+    # Settings and preferences
+    if 'tax_threshold' not in st.session_state:
         st.session_state.tax_threshold = 183
 
-    if "first_visit" not in st.session_state:
-        st.session_state.first_visit = True
+    if 'day_log' not in st.session_state:
+        st.session_state.day_log = []
 
-    # Preferences
-    if "user_email" not in st.session_state:
-        st.session_state.user_email = ""
+    # Currency and Financial Settings
+    if 'primary_currency' not in st.session_state:
+        st.session_state.primary_currency = 'USD'  # Default currency
 
-    if "alert_frequency" not in st.session_state:
-        st.session_state.alert_frequency = "Weekly"
+    if 'inflation_enabled' not in st.session_state:
+        st.session_state.inflation_enabled = False  # Default: inflation adjustment disabled
 
-    if "auto_weekend" not in st.session_state:
-        st.session_state.auto_weekend = False
+    if 'inflation_rate' not in st.session_state:
+        st.session_state.inflation_rate = 0.03  # Default: 3% annual inflation rate (as decimal)
 
-    if "auto_travel" not in st.session_state:
-        st.session_state.auto_travel = False
+    if 'inflation_rate_percent' not in st.session_state:
+        st.session_state.inflation_rate_percent = 3.0  # Default: 3% annual inflation rate (as percentage)
 
-    if "auto_bills" not in st.session_state:
-        st.session_state.auto_bills = False
+    # Exchange rate cache (will be populated when needed)
+    if 'exchange_rates_cache' not in st.session_state:
+        st.session_state.exchange_rates_cache = {}
 
-    # Email notification preferences
-    if "email_notifications" not in st.session_state:
-        st.session_state.email_notifications = False
+    if 'exchange_rates_timestamp' not in st.session_state:
+        st.session_state.exchange_rates_timestamp = None
 
-    if "daily_email_time" not in st.session_state:
-        st.session_state.daily_email_time = "09:00"
+    # Feature flags
+    if 'email_notifications_enabled' not in st.session_state:
+        st.session_state.email_notifications_enabled = False
 
-    # Dashboard widget configuration - controls which widgets are displayed
-    if "widgets" not in st.session_state:
-        st.session_state.widgets = {
-            # Core widgets enabled by default
-            "quick_location_logger": True,   # Fast location logging interface
-            "key_metrics": True,            # Arizona/Minnesota days overview  
-            "tax_progress": True,           # Visual progress toward 183-day threshold
-            "quick_insights": True,         # Tax optimization and recommendations
-            "status_overview": True,        # Detailed status and risk levels
-            "state_breakdown": True,        # Individual state progress bars
-            "financial_summary": True,     # Budget and expense summaries
+    if 'auto_logging_enabled' not in st.session_state:
+        st.session_state.auto_logging_enabled = False
 
-            # Optional widgets disabled by default
-            "ai_tips": False,              # AI-powered financial advice
-            "expense_sparkline": False,    # Mini expense trend charts
-            "reminders": False             # Upcoming dates and warnings
-        }
+    # UI state
+    if 'selected_page' not in st.session_state:
+        st.session_state.selected_page = "Dashboard"
+
+    # Theme settings
+    if 'current_theme' not in st.session_state:
+        st.session_state.current_theme = "Winter Luxury"
+
+    if 'theme_animations_enabled' not in st.session_state:
+        st.session_state.theme_animations_enabled = True
 
 def reset_session_state():
     """Reset session state to defaults"""

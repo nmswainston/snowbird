@@ -303,11 +303,20 @@ def render_dashboard():
     # === FINANCIAL OVERVIEW SECTION ===
     st.markdown("### 💰 Financial Overview")
     
+    # Import currency conversion utilities
+    from utils.budget_converter import (
+        convert_budget_value, convert_budget_dict, format_budget_value, 
+        display_conversion_banner, get_conversion_status
+    )
+    
+    # Display currency conversion status banner if adjustments are active
+    display_conversion_banner()
+    
     # Use responsive columns that stack on mobile
     fin_col1, fin_col2 = st.columns([1, 1])
     
     with fin_col1:
-        # Home budgets card
+        # Home budgets card with currency conversion
         st.markdown("""
         <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); 
                     padding: 1.5rem; border-radius: 12px; border: 1px solid #bbf7d0; 
@@ -318,19 +327,47 @@ def render_dashboard():
         </div>
         """, unsafe_allow_html=True)
         
+        conversion_status = get_conversion_status()
+        
         for state, budget in st.session_state.home_budgets.items():
-            total_budget = sum(budget.values())
+            # Convert budget values based on current settings
+            converted_budget = convert_budget_dict(budget)
+            total_budget = sum(converted_budget.values())
+            original_total = sum(budget.values())
+            
             state_icon = "🌵" if "Arizona" in state else "❄️"
             
-            # Use metric component for better display
+            # Calculate delta for currency/inflation impact
+            delta_text = "per month"
+            if conversion_status['has_adjustments'] and original_total > 0:
+                change_percent = ((total_budget - original_total) / original_total) * 100
+                if abs(change_percent) > 0.1:
+                    delta_text = f"{change_percent:+.1f}% vs USD"
+            
+            # Use metric component with converted values
             st.metric(
                 label=f"{state_icon} {state}",
-                value=f"${total_budget:,}",
-                delta="per month"
+                value=format_budget_value(total_budget),
+                delta=delta_text
             )
+            
+            # Show individual category breakdown with conversion
+            with st.expander(f"📋 {state} Budget Details"):
+                for category, original_amount in budget.items():
+                    converted_amount = converted_budget[category]
+                    
+                    col_cat, col_amount = st.columns([2, 1])
+                    with col_cat:
+                        st.write(f"• {category}")
+                    with col_amount:
+                        st.write(f"**{format_budget_value(converted_amount)}**")
+                        
+                        # Show original amount if converted
+                        if conversion_status['has_adjustments']:
+                            st.caption(f"(Original: ${original_amount:,} USD)")
     
     with fin_col2:
-        # Seasonal expenses card
+        # Seasonal expenses card with currency conversion
         st.markdown("""
         <div style="background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%); 
                     padding: 1.5rem; border-radius: 12px; border: 1px solid #fdba74; 
@@ -341,18 +378,30 @@ def render_dashboard():
         </div>
         """, unsafe_allow_html=True)
         
-        total_seasonal = sum(st.session_state.seasonal_cash_flow.values())
+        # Convert seasonal cash flow values
+        converted_seasonal = convert_budget_dict(st.session_state.seasonal_cash_flow)
+        total_seasonal = sum(converted_seasonal.values())
+        original_total_seasonal = sum(st.session_state.seasonal_cash_flow.values())
         
-        # Total seasonal budget metric
+        # Calculate delta for total seasonal expenses
+        delta_text = "across all categories"
+        if conversion_status['has_adjustments'] and original_total_seasonal > 0:
+            change_percent = ((total_seasonal - original_total_seasonal) / original_total_seasonal) * 100
+            if abs(change_percent) > 0.1:
+                delta_text = f"{change_percent:+.1f}% vs USD"
+        
+        # Total seasonal budget metric with converted values
         st.metric(
             label="🗓️ Total Monthly Seasonal",
-            value=f"${total_seasonal:,}",
-            delta="across all categories"
+            value=format_budget_value(total_seasonal),
+            delta=delta_text
         )
         
-        # Individual category breakdown
+        # Individual category breakdown with conversion
         st.markdown("**Category Breakdown:**")
-        for category, amount in st.session_state.seasonal_cash_flow.items():
+        for category, original_amount in st.session_state.seasonal_cash_flow.items():
+            converted_amount = converted_seasonal[category]
+            
             # Add emoji based on category
             if "Travel" in category:
                 emoji = "✈️"
@@ -364,8 +413,36 @@ def render_dashboard():
                 emoji = "🚨"
             else:
                 emoji = "💸"
-                
-            st.write(f"  {emoji} {category}: **${amount:,}**")
+            
+            # Display converted amount
+            st.write(f"  {emoji} {category}: **{format_budget_value(converted_amount)}**")
+            
+            # Show original amount if converted
+            if conversion_status['has_adjustments']:
+                st.caption(f"    💵 Original: ${original_amount:,} USD")
+        
+        # Add annual totals calculation
+        st.markdown("---")
+        st.markdown("**📅 Annual Projections:**")
+        
+        annual_seasonal = total_seasonal * 12
+        st.write(f"• Total Annual Seasonal: **{format_budget_value(annual_seasonal)}**")
+        
+        # Calculate total annual home budgets
+        total_annual_homes = 0
+        for state, budget in st.session_state.home_budgets.items():
+            converted_budget = convert_budget_dict(budget)
+            total_annual_homes += sum(converted_budget.values()) * 12
+        
+        st.write(f"• Total Annual Home Budgets: **{format_budget_value(total_annual_homes)}**")
+        
+        # Grand total
+        grand_total_annual = annual_seasonal + total_annual_homes
+        st.write(f"• **Grand Total Annual: {format_budget_value(grand_total_annual)}**")
+        
+        if conversion_status['has_adjustments']:
+            original_grand_total = (original_total_seasonal + sum(sum(budget.values()) for budget in st.session_state.home_budgets.values())) * 12
+            st.caption(f"💵 Original Total: ${original_grand_total:,} USD")
     
     # Add final spacing
     st.write("")
