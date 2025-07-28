@@ -1,0 +1,23 @@
+
+{
+  "residency_tracker": true,
+  "dual_home_budgets": true,
+  "seasonal_cash_flow": true,
+  "ai_assistant": true,
+  "reports_export": false,
+  "onboarding_carousel": true,
+  "pwa_support": true,
+  "analytics": true,
+  "auth": true,
+  "admin_dashboard": true,
+  "theme_customization": true,
+  "auto_tracker": false,
+  "gmail_integration": false,
+  "notifications": false,
+  "export_data": false,
+  "import_data": false,
+  "multi_user": false,
+  "advanced_analytics": false,
+  "backup_restore": false,
+  "api_integrations": false
+}

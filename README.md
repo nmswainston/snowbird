@@ -267,6 +267,49 @@ We welcome contributions! Please see our **[Contributing Guidelines](CONTRIBUTIN
 - Testing requirements
 - Issue templates and bug reporting
 
+## 🚩 Feature Flags
+
+Snowbird uses a flexible feature flags system that allows you to enable/disable features without redeploying:
+
+### Configuration Methods
+
+1. **File-based** (`feature_flags.json`):
+   ```json
+   {
+     "ai_assistant": true,
+     "analytics": false,
+     "onboarding_carousel": true
+   }
+   ```
+
+2. **Environment Variables** (prefix with `FF_`):
+   ```bash
+   FF_AI_ASSISTANT=true
+   FF_ANALYTICS=false
+   ```
+
+3. **Streamlit Secrets** (`.streamlit/secrets.toml`):
+   ```toml
+   [feature_flags]
+   ai_assistant = true
+   analytics = false
+   ```
+
+### Available Features
+
+- **Core**: `residency_tracker`, `dual_home_budgets`, `seasonal_cash_flow`
+- **AI**: `ai_assistant`, `auto_tracker`, `gmail_integration`
+- **UX**: `onboarding_carousel`, `pwa_support`, `theme_customization`
+- **Admin**: `analytics`, `admin_dashboard`, `auth`
+- **Data**: `reports_export`, `export_data`, `import_data`
+
+### Management
+
+- **Admin Interface**: Access via the Admin tab when `admin_dashboard` is enabled
+- **Live Updates**: Changes apply immediately without restart
+- **Bulk Operations**: Enable/disable feature sets with one click
+- **Session Overrides**: Temporary toggles for testing
+
 ## 🔐 Security & Privacy
 
 - **Data Protection**: All sensitive data encrypted and stored securely

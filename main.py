@@ -56,24 +56,45 @@ window.addEventListener('beforeunload', function() {
 """, unsafe_allow_html=True)
 
 # Initialize Firebase authentication with error handling
-try:
-    from components.auth_components import check_authentication, render_logout_button
-    from utils.profile_sync import initialize_user_session, save_user_session, get_profile_sync
+if is_feature_enabled("auth"):
+    try:
+        from components.auth_components import check_authentication, render_logout_button
+        from utils.profile_sync import initialize_user_session, save_user_session, get_profile_sync
 
-    # Check authentication first
-    user = check_authentication()
+        # Check authentication first
+        user = check_authentication()
 
-    # Initialize user session with profile data
-    initialize_user_session()
-    FIREBASE_AVAILABLE = True
-except ImportError as e:
-    st.warning("⚠️ Firebase authentication not available. Running in local mode.")
+        # Initialize user session with profile data
+        initialize_user_session()
+        FIREBASE_AVAILABLE = True
+    except ImportError as e:
+        st.warning("⚠️ Firebase authentication not available. Running in local mode.")
+        user = {"uid": "local_user", "email": "local@demo.com"}
+        FIREBASE_AVAILABLE = False
+
+        # Define stub functions
+        def render_logout_button():
+            st.sidebar.markdown("**👤 Demo User (Local Mode)**")
+
+        def initialize_user_session():
+            pass
+
+        def save_user_session():
+            return True
+
+        def get_profile_sync():
+            class StubSync:
+                def sync_location_data(self, uid, data):
+                    return True
+            return StubSync()
+else:
+    # Authentication disabled via feature flag
     user = {"uid": "local_user", "email": "local@demo.com"}
     FIREBASE_AVAILABLE = False
 
     # Define stub functions
     def render_logout_button():
-        st.sidebar.markdown("**👤 Demo User (Local Mode)**")
+        st.sidebar.markdown("**👤 Demo User (Auth Disabled)**")
 
     def initialize_user_session():
         pass
@@ -87,7 +108,10 @@ except ImportError as e:
                 return True
         return StubSync()
 
-# Initialize configuration first
+# Initialize feature flags system first
+from utils.feature_flags import feature_flags, is_feature_enabled, feature_gate
+
+# Initialize configuration
 try:
     from config import config
 except ImportError:
@@ -118,18 +142,21 @@ else:
 
 # Load custom styling and onboarding
 from components.styles import load_custom_css, render_main_header
-from utils.onboarding import initialize_onboarding, should_show_onboarding, render_onboarding_carousel, render_onboarding_trigger
-
-# Initialize onboarding system
-initialize_onboarding()
 
 # Load styling
 load_custom_css()
 
-# Show onboarding carousel if needed (before main app content)
-if should_show_onboarding():
-    render_onboarding_carousel()
-    st.stop()  # Don't render main app until onboarding is complete
+# Initialize and show onboarding if enabled
+if is_feature_enabled("onboarding_carousel"):
+    from utils.onboarding import initialize_onboarding, should_show_onboarding, render_onboarding_carousel, render_onboarding_trigger
+
+    # Initialize onboarding system
+    initialize_onboarding()
+
+    # Show onboarding carousel if needed (before main app content)
+    if should_show_onboarding():
+        render_onboarding_carousel()
+        st.stop()  # Don't render main app until onboarding is complete
 
 def main():
     """Main application function"""
@@ -243,39 +270,89 @@ def main():
 
         with st.expander("❓ Help & Support"):
             st.markdown("**Need help getting started?**")
-            render_onboarding_trigger()
+            if is_feature_enabled("onboarding_carousel"):
+                render_onboarding_trigger()
 
             st.markdown("**Quick Tips:**")
-            st.markdown("• Log your location daily to track residency")
-            st.markdown("• Monitor the 183-day threshold closely")
-            st.markdown("• Set up budgets for both homes")
-            st.markdown("• Use AI assistant for financial questions")
+            if is_feature_enabled("residency_tracker"):
+                st.markdown("• Log your location daily to track residency")
+                st.markdown("• Monitor the 183-day threshold closely")
+            if is_feature_enabled("dual_home_budgets"):
+                st.markdown("• Set up budgets for both homes")
+            if is_feature_enabled("ai_assistant"):
+                st.markdown("• Use AI assistant for financial questions")
 
             st.markdown("**Documentation:**")
             st.markdown("📚 [Full Documentation](https://github.com/yourusername/snowbird-app/wiki)")
             st.markdown("🐛 [Report Issues](https://github.com/yourusername/snowbird-app/issues)")
             st.markdown("💬 [Community Support](https://github.com/yourusername/snowbird-app/discussions)")
+            
+            # Feature status indicator
+            if is_feature_enabled("admin_dashboard"):
+                from components.feature_admin import render_feature_status_sidebar
+                render_feature_status_sidebar()
 
-    # Import analytics
-    from components.analytics import track_page_view, track_user_action, track_feature_usage
+    # Import analytics if enabled
+    if is_feature_enabled("analytics"):
+        from components.analytics import track_page_view, track_user_action, track_feature_usage
+    else:
+        # Define stub functions when analytics is disabled
+        def track_page_view(page_name):
+            pass
+        def track_user_action(action, data=None):
+            pass
+        def track_feature_usage(feature, data=None):
+            pass
 
-    # Create main navigation tabs with error handling
-    try:
-        tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
-            "📊 Dashboard", 
-            "📅 Day Tracker", 
-            "🗺️ Auto-Track",
-            "💰 Budgets", 
-            "🤖 AI Assistant", 
-            "📋 Reports",
-            "🎨 Themes",
-            "🔧 Admin"
-        ])
-    except Exception as e:
-        st.error(f"Error creating tabs: {e}")
-        # Create simplified tabs as fallback
-        tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "📅 Day Tracker", "💰 Budgets", "🤖 AI Assistant"])
-        tab5 = tab6 = tab7 = tab8 = None
+    # Create main navigation tabs based on enabled features
+    tabs_config = []
+    tab_mapping = {}
+    
+    # Core tabs (always available)
+    if is_feature_enabled("residency_tracker"):
+        tabs_config.append("📊 Dashboard")
+        tab_mapping["dashboard"] = len(tabs_config) - 1
+        
+        tabs_config.append("📅 Day Tracker")
+        tab_mapping["day_tracker"] = len(tabs_config) - 1
+    
+    # Optional tabs based on feature flags
+    if is_feature_enabled("auto_tracker"):
+        tabs_config.append("🗺️ Auto-Track")
+        tab_mapping["auto_track"] = len(tabs_config) - 1
+    
+    if is_feature_enabled("dual_home_budgets"):
+        tabs_config.append("💰 Budgets")
+        tab_mapping["budgets"] = len(tabs_config) - 1
+    
+    if is_feature_enabled("ai_assistant"):
+        tabs_config.append("🤖 AI Assistant")
+        tab_mapping["ai_assistant"] = len(tabs_config) - 1
+    
+    if is_feature_enabled("reports_export"):
+        tabs_config.append("📋 Reports")
+        tab_mapping["reports"] = len(tabs_config) - 1
+    
+    if is_feature_enabled("theme_customization"):
+        tabs_config.append("🎨 Themes")
+        tab_mapping["themes"] = len(tabs_config) - 1
+    
+    if is_feature_enabled("admin_dashboard"):
+        tabs_config.append("🔧 Admin")
+        tab_mapping["admin"] = len(tabs_config) - 1
+    
+    # Create tabs
+    tabs = st.tabs(tabs_config)
+    
+    # Map tabs to variables for easier access
+    tab1 = tabs[tab_mapping["dashboard"]] if "dashboard" in tab_mapping else None
+    tab2 = tabs[tab_mapping["day_tracker"]] if "day_tracker" in tab_mapping else None
+    tab3 = tabs[tab_mapping["auto_track"]] if "auto_track" in tab_mapping else None
+    tab4 = tabs[tab_mapping["budgets"]] if "budgets" in tab_mapping else None
+    tab5 = tabs[tab_mapping["ai_assistant"]] if "ai_assistant" in tab_mapping else None
+    tab6 = tabs[tab_mapping["reports"]] if "reports" in tab_mapping else None
+    tab7 = tabs[tab_mapping["themes"]] if "themes" in tab_mapping else None
+    tab8 = tabs[tab_mapping["admin"]] if "admin" in tab_mapping else None
 
     with tab1:
         # Dashboard - Overview of all key metrics
@@ -376,27 +453,29 @@ def main():
             st.warning(f"Auto-tracker temporarily unavailable: {e}")
             st.info("Manual location logging is still available in the Day Tracker tab.")
 
-    with tab4:
-        # Budgets
-        track_page_view("budgets")
-        st.markdown('**💰 Budget Management**', unsafe_allow_html=True)
+    if tab4 and is_feature_enabled("dual_home_budgets"):
+        with tab4:
+            # Budgets
+            track_page_view("budgets")
+            st.markdown('**💰 Budget Management**', unsafe_allow_html=True)
 
-        # Home budgets
-        st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-        st.markdown('**🏠 Home Maintenance Budget**', unsafe_allow_html=True)
-        budget_home = st.selectbox("Select a home to view budget:", ["Arizona", "Minnesota"])
-        budget = home_budgets[budget_home]
-        st.subheader(f"{budget_home} Budget")
-        for k, v in budget.items():
-            st.write(f"• {k}: ${v}/month")
-        st.markdown('</div>', unsafe_allow_html=True)
+            # Home budgets
+            st.markdown('<div class="winter-card">', unsafe_allow_html=True)
+            st.markdown('**🏠 Home Maintenance Budget**', unsafe_allow_html=True)
+            budget_home = st.selectbox("Select a home to view budget:", ["Arizona", "Minnesota"])
+            budget = home_budgets[budget_home]
+            st.subheader(f"{budget_home} Budget")
+            for k, v in budget.items():
+                st.write(f"• {k}: ${v}/month")
+            st.markdown('</div>', unsafe_allow_html=True)
 
-        # Seasonal cash flow
-        st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-        st.markdown('**📈 Seasonal Cash Flow Plan**', unsafe_allow_html=True)
-        for k, v in seasonal_cash_flow.items():
-            st.write(f"• {k}: ${v}/month")
-        st.markdown('</div>', unsafe_allow_html=True)
+            # Seasonal cash flow if enabled
+            if is_feature_enabled("seasonal_cash_flow"):
+                st.markdown('<div class="winter-card">', unsafe_allow_html=True)
+                st.markdown('**📈 Seasonal Cash Flow Plan**', unsafe_allow_html=True)
+                for k, v in seasonal_cash_flow.items():
+                    st.write(f"• {k}: ${v}/month")
+                st.markdown('</div>', unsafe_allow_html=True)
 
     with tab5:
         # AI Assistant
@@ -484,20 +563,36 @@ def main():
                 st.warning(f"Theme customization temporarily unavailable: {e}")
                 st.info("Using default theme.")
 
-    if tab8:
+    if tab8 and is_feature_enabled("admin_dashboard"):
         with tab8:
             # Admin Dashboard
             track_page_view("admin")
+            
+            # Feature Flags Management
+            from components.feature_admin import render_feature_flags_admin
+            render_feature_flags_admin()
+            
+            st.markdown("---")
+            
+            # System Admin Dashboard
             try:
                 from components.admin_dashboard import render_admin_dashboard
                 render_admin_dashboard()
             except ImportError:
-                st.info("🔧 Admin dashboard coming soon!")
-                st.text("System Status: Running")
-                st.text("Active Users: 1")
+                st.info("🔧 System admin dashboard coming soon!")
+                
+                # Basic system info
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.metric("System Status", "Running ✅")
+                with col2:
+                    st.metric("Active Features", f"{sum(feature_flags.get_all_flags().values())}")
+                with col3:
+                    st.metric("Environment", config.environment.title())
+                    
             except Exception as e:
-                st.warning(f"Admin dashboard temporarily unavailable: {e}")
-                st.info("Core functionality remains available in other tabs.")
+                st.warning(f"System admin dashboard temporarily unavailable: {e}")
+                st.info("Feature flags management remains available above.")
 
 if __name__ == "__main__":
     main()
