@@ -1,4 +1,3 @@
-
 """
 Standard Features for Snowbird app
 Provides regular English expressions and messaging
@@ -10,7 +9,7 @@ from typing import Dict, List
 
 class StandardFeatures:
     """Standard features for the Snowbird app"""
-    
+
     # Standard greetings and expressions
     GREETINGS = [
         "Hello there! 👋",
@@ -20,7 +19,7 @@ class StandardFeatures:
         "Good morning! ☀️",
         "Hope you're having a great day! 😊"
     ]
-    
+
     RESPONSES = [
         "Sounds great! 👍",
         "Perfect, looks good! ✅", 
@@ -29,7 +28,7 @@ class StandardFeatures:
         "Looking good! 📈",
         "That's wonderful! 🌟"
     ]
-    
+
     SUCCESS_MESSAGES = [
         "Excellent! Success! ✅",
         "Awesome! All set! 🎉",
@@ -38,7 +37,7 @@ class StandardFeatures:
         "Perfect! All done! ✅",
         "Success achieved! 🎯"
     ]
-    
+
     # Standard financial terms
     FINANCIAL_TERMS = {
         "budget": "budget",
@@ -51,7 +50,7 @@ class StandardFeatures:
         "insurance": "insurance",
         "maintenance": "maintenance"
     }
-    
+
     # Standard state references
     STATE_REFERENCES = {
         "Arizona": "Arizona 🌵",
@@ -60,32 +59,32 @@ class StandardFeatures:
         "Florida": "Florida 🌴",
         "Hawaii": "Hawaii 🌺"
     }
-    
+
     @staticmethod
     def get_random_greeting() -> str:
         """Get a random standard greeting"""
         return random.choice(StandardFeatures.GREETINGS)
-    
+
     @staticmethod
     def get_success_message() -> str:
         """Get a random success message"""
         return random.choice(StandardFeatures.SUCCESS_MESSAGES)
-    
+
     @staticmethod
     def get_response() -> str:
         """Get a random positive response"""
         return random.choice(StandardFeatures.RESPONSES)
-    
+
     @staticmethod
     def get_financial_term(term: str) -> str:
         """Get standard financial term"""
         return StandardFeatures.FINANCIAL_TERMS.get(term, term)
-    
+
     @staticmethod
     def get_state_reference(state: str) -> str:
         """Get standard state reference"""
         return StandardFeatures.STATE_REFERENCES.get(state, f"{state} 🏠")
-    
+
     @staticmethod
     def render_welcome_banner():
         """Render standard welcome banner"""
@@ -101,42 +100,23 @@ class StandardFeatures:
             </p>
         </div>
         """, unsafe_allow_html=True)
-    
+
     @staticmethod
     def render_financial_terms():
         """Render financial terms reference"""
         with st.expander("📚 Financial Terms Reference", expanded=False):
             st.markdown("**Common terms used in the app:**")
-            
+
             for english_term, definition in StandardFeatures.FINANCIAL_TERMS.items():
                 st.write(f"• **{english_term.title()}**: {definition}")
-                
+
             st.info("💡 All terms are displayed in standard English throughout the app.")
-    
-    @staticmethod
-    def render_surf_report_style_metrics(metric_name: str, value: str, delta: str = ""):
-        """Render metrics in surf report style"""
-        wave_emoji = "🌊" if "tax" in metric_name.lower() else "🏄‍♂️"
-        
-        st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #00bcd4 0%, #0097a7 100%); 
-                    padding: 1.5rem; border-radius: 12px; text-align: center; margin: 0.5rem 0;
-                    box-shadow: 0 4px 15px rgba(0,188,212,0.3);">
-            <div style="color: white; font-size: 0.9rem; margin-bottom: 0.5rem;">
-                {wave_emoji} {metric_name}
-            </div>
-            <div style="color: white; font-size: 2rem; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
-                {value}
-            </div>
-            {f'<div style="color: #b2ebf2; font-size: 0.8rem; margin-top: 0.5rem;">{delta}</div>' if delta else ''}
-        </div>
-        """, unsafe_allow_html=True)
 
 def enable_enhanced_features():
     """Enable enhanced features for the app"""
     if 'enhanced_mode' not in st.session_state:
         st.session_state.enhanced_mode = False
-    
+
     # Toggle button in sidebar
     with st.sidebar:
         st.markdown("---")
@@ -146,7 +126,7 @@ def enable_enhanced_features():
             help="Enable additional features and enhanced styling"
         )
         st.session_state.enhanced_mode = enhanced_mode
-        
+
         if enhanced_mode:
             st.success("Enhanced features active! ✨")
             st.markdown("**Available Features:**")

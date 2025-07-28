@@ -1,32 +1,33 @@
+
 """
-Hawaiian expressions and local slang for the Snowbird app
-Bringing that authentic island vibe to your seasonal living experience
+Standard expressions for the Snowbird app
+Providing professional and friendly messaging throughout the application
 """
 
 import random
 from typing import List, Dict
 
-class HawaiiExpressions:
-    """Hawaiian and local pidgin expressions for the Snowbird app"""
+class StandardExpressions:
+    """Standard expressions for the Snowbird app"""
 
     # Friendly greetings and positive vibes
     GREETINGS = [
-        "Hello there! 🤙",
-        "Hi, how's it going! 🌺", 
-        "What's happening? 🏄‍♂️",
-        "Hey, how are you? 🌊",
-        "Great to see you! 🌴",
-        "Welcome back! 🏖️"
+        "Hello there! 👋",
+        "Hi, how's it going! 😊", 
+        "What's happening? 🙂",
+        "Hey, how are you? 👍",
+        "Great to see you! 🌟",
+        "Welcome back! 👋"
     ]
 
     # Success messages with positive flavor
     SUCCESS_MESSAGES = [
         "Excellent! That's perfect! ✨",
         "Great! All done! 🎉",
-        "Outstanding work! 🤙",
-        "All good to go! 🏄‍♂️",
+        "Outstanding work! 👍",
+        "All good to go! 🚀",
         "No worries, all set! 😎",
-        "That's how it's done! 🌊"
+        "That's how it's done! 👏"
     ]
 
     # Error messages with helpful spirit
@@ -35,65 +36,65 @@ class HawaiiExpressions:
         "Looks like there's an issue! 🔧",
         "Let's try that again! 💪",
         "Hmm, that didn't work! 🤔",
-        "Something went sideways! 🌀",
+        "Something went wrong! 🌀",
         "Let's get this fixed! 🛠️"
     ]
 
     # Loading and waiting messages
     LOADING_MESSAGES = [
-        "Please wait, loading... 🏄‍♂️",
-        "Just a moment... 🌊",
+        "Please wait, loading... ⏳",
+        "Just a moment... 🔄",
         "Almost done, small wait... ⏰",
         "Getting things ready... 📦",
-        "Making da magic happen... ✨",
-        "Chill out, almost done... 😎"
+        "Making the magic happen... ✨",
+        "Hang tight, almost done... 😊"
     ]
 
-    # Tax and financial advice with local wisdom
+    # Tax and financial advice with professional wisdom
     TAX_ADVICE = [
-        "No make pilikia with da taxes, brah! 📊",
-        "Keep track da kine or IRS stay mad! 💸",
-        "Smart money moves, island style! 🏝️",
-        "Stay organized like one good local! 📝",
-        "No mess around with da government! ⚖️",
-        "Financial planning, Hawaii style! 🌺"
+        "Stay organized with your taxes! 📊",
+        "Keep track of everything for the IRS! 💸",
+        "Smart money moves, professional style! 🏛️",
+        "Stay organized like a pro! 📝",
+        "Don't mess around with government requirements! ⚖️",
+        "Financial planning made simple! 💼"
     ]
 
     # Budget wisdom
     BUDGET_WISDOM = [
-        "Mo money, mo problems... but still need track! 💰",
-        "Spend wise like da old timers! 👴",
-        "Save some coin for da keiki! 👶",
-        "Budget tight like one good lei! 🌺",
-        "No blow all da money on one place! 🎯",
-        "Smart spending da Hawaiian way! 🏖️"
+        "More money, more responsibility... track it well! 💰",
+        "Spend wisely like the experts! 👔",
+        "Save for the future! 💳",
+        "Budget tight like a good plan! 📋",
+        "Don't spend everything in one place! 🎯",
+        "Smart spending the professional way! 💼"
     ]
 
     # State-specific expressions
     STATE_EXPRESSIONS = {
         "Arizona": [
-            "Hot like da desert, brah! 🌵",
-            "Dry heat, but still hot! ☀️",
-            "Cactus country vibes! 🌵",
-            "Desert living stay different! 🏜️"
+            "Hot desert climate! 🌵",
+            "Dry heat conditions! ☀️",
+            "Desert living lifestyle! 🌵",
+            "Southwest living is unique! 🏜️"
         ],
         "Minnesota": [
-            "Cold like da mountain top! ❄️", 
-            "Bundle up, bruddah! 🧥",
-            "Snow day vibes! ⛄",
-            "Mainland winter stay real! 🥶"
+            "Cold winter weather! ❄️", 
+            "Bundle up for the cold! 🧥",
+            "Snow season vibes! ⛄",
+            "Northern winters are intense! 🥶"
         ],
         "Florida": [
-            "Humid like da jungle! 🌴",
-            "Gator country, watch out! 🐊", 
-            "Beach vibes, but different! 🏖️",
-            "Mainland tropics! 🌺"
+            "Humid tropical climate! 🌴",
+            "Watch out for alligators! 🐊", 
+            "Beach lifestyle, different vibe! 🏖️",
+            "Southern tropics! 🌺"
         ],
         "California": [
-            "Surf's up, California style! 🏄",
-            "Golden state golden vibes! ✨",
-            "West coast, best coast! 🌊",
-            "Cali living da dream! 😎"
+            "Great surfing weather! 🏄",
+            "Golden state living! ✨",
+            "West coast lifestyle! 🌊",
+            "California dreaming! 😎"
         ]
     }
 
@@ -101,18 +102,18 @@ class HawaiiExpressions:
     TIME_GREETINGS = {
         "morning": [
             "Good morning, sunshine! 🌅",
-            "Rise and grind, island style! ☀️",
-            "Another beautiful day in paradise! 🌴",
-            "Morning waves looking good! 🌊"
+            "Rise and shine! ☀️",
+            "Beautiful morning ahead! 🌴",
+            "Morning energy is great! 🌊"
         ],
         "afternoon": [
-            "Afternoon vibes stay strong! 🌞",
-            "Midday grindtime! 💪",
-            "Sun stay high, energy stay higher! ⬆️",
-            "Afternoon hustle da kine! 🏃‍♂️"
+            "Afternoon productivity! 🌞",
+            "Midday focus time! 💪",
+            "High energy afternoon! ⬆️",
+            "Afternoon hustle time! 🏃‍♂️"
         ],
         "evening": [
-            "Evening pau hana vibes! 🌅",
+            "Evening relaxation time! 🌅",
             "Sunset time, relax time! 🌇", 
             "Night time, right time! 🌙",
             "Evening chill session! 😌"
@@ -121,7 +122,7 @@ class HawaiiExpressions:
 
     @classmethod
     def get_random_greeting(cls) -> str:
-        """Get a random Hawaiian greeting"""
+        """Get a random standard greeting"""
         return random.choice(cls.GREETINGS)
 
     @classmethod  
@@ -131,7 +132,7 @@ class HawaiiExpressions:
 
     @classmethod
     def get_error_message(cls) -> str:
-        """Get a random error message with aloha spirit"""
+        """Get a random error message with positive spirit"""
         return random.choice(cls.ERROR_MESSAGES)
 
     @classmethod
@@ -142,7 +143,7 @@ class HawaiiExpressions:
     @classmethod
     def get_state_expression(cls, state: str) -> str:
         """Get a state-specific expression"""
-        expressions = cls.STATE_EXPRESSIONS.get(state, ["Stay good wherever you stay! 🌍"])
+        expressions = cls.STATE_EXPRESSIONS.get(state, ["Great location wherever you are! 🌍"])
         return random.choice(expressions)
 
     @classmethod
@@ -163,35 +164,35 @@ class HawaiiExpressions:
 
     @classmethod
     def get_tax_advice(cls) -> str:
-        """Get Hawaiian-style tax wisdom"""
+        """Get professional tax wisdom"""
         return random.choice(cls.TAX_ADVICE)
 
     @classmethod
     def get_budget_wisdom(cls) -> str:
-        """Get local budget wisdom"""
+        """Get professional budget wisdom"""
         return random.choice(cls.BUDGET_WISDOM)
 
 # Convenience functions for easy use throughout the app
-def da_kine_greeting():
-    """Quick access to Hawaiian greeting"""
-    return HawaiiExpressions.get_random_greeting()
+def standard_greeting():
+    """Quick access to standard greeting"""
+    return StandardExpressions.get_random_greeting()
 
-def da_kine_success():
+def standard_success():
     """Quick access to success message"""
-    return HawaiiExpressions.get_success_message()
+    return StandardExpressions.get_success_message()
 
-def da_kine_loading():
+def standard_loading():
     """Quick access to loading message"""
-    return HawaiiExpressions.get_loading_message()
+    return StandardExpressions.get_loading_message()
 
-def da_kine_error():
-    """Quick access to error message with aloha spirit"""
-    return HawaiiExpressions.get_error_message()
+def standard_error():
+    """Quick access to error message with positive spirit"""
+    return StandardExpressions.get_error_message()
 
-def da_kine_state_vibe(state: str):
+def standard_state_vibe(state: str):
     """Quick access to state-specific vibes"""
-    return HawaiiExpressions.get_state_expression(state)
+    return StandardExpressions.get_state_expression(state)
 
-def da_kine_time_vibe():
+def standard_time_vibe():
     """Quick access to time-appropriate greeting"""
-    return HawaiiExpressions.get_time_greeting()
+    return StandardExpressions.get_time_greeting()
