@@ -443,15 +443,7 @@ def render_onboarding_carousel():
             if st.button("✕", key="onboarding_close", help="Close tour"):
                 st.session_state.onboarded = True
                 st.session_state.onboarding_dismissed = True
-                # Scroll to top when closing onboarding
-                st.markdown("""
-                <script>
-                    window.parent.document.querySelector('.main').scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                </script>
-                """, unsafe_allow_html=True)
+                st.session_state.scroll_to_top = True
                 st.rerun()
         
         # Step content
@@ -481,15 +473,7 @@ def render_onboarding_carousel():
             if st.button("Skip Tour", key="onboarding_skip", help="Skip the onboarding tour"):
                 st.session_state.onboarded = True
                 st.session_state.onboarding_dismissed = True
-                # Scroll to top when skipping onboarding
-                st.markdown("""
-                <script>
-                    window.parent.document.querySelector('.main').scrollTo({
-                        top: 0,
-                        behavior: 'smooth'
-                    });
-                </script>
-                """, unsafe_allow_html=True)
+                st.session_state.scroll_to_top = True
                 st.rerun()
         
         with col_nav3:
@@ -500,16 +484,8 @@ def render_onboarding_carousel():
             else:
                 if st.button("Get Started", key="onboarding_finish", type="primary"):
                     st.session_state.onboarded = True
+                    st.session_state.scroll_to_top = True
                     st.balloons()  # Celebration effect
-                    # Scroll to top after onboarding completion
-                    st.markdown("""
-                    <script>
-                        window.parent.document.querySelector('.main').scrollTo({
-                            top: 0,
-                            behavior: 'smooth'
-                        });
-                    </script>
-                    """, unsafe_allow_html=True)
                     st.rerun()
 
 

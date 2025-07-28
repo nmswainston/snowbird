@@ -39,6 +39,22 @@ def main():
         # Initialize session state
         initialize_session_state()
 
+        # Handle scroll to top after onboarding
+        if st.session_state.get('scroll_to_top', False):
+            st.session_state.scroll_to_top = False
+            # Use JavaScript with a delay to ensure page is loaded
+            st.markdown("""
+            <script>
+            setTimeout(function() {
+                window.parent.document.querySelector('.main').scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+                window.scrollTo(0, 0);
+            }, 100);
+            </script>
+            """, unsafe_allow_html=True)
+
         # Start health monitoring
         from utils.health_monitor import health_monitor
         health_monitor.start_monitoring()
@@ -506,15 +522,15 @@ def render_settings_tab():
         # Backup and Restore Section
         st.markdown("---")
         st.subheader("🔄 Backup & Restore")
-        
+
         col1_backup, col2_backup = st.columns(2)
-        
+
         with col1_backup:
             st.markdown("**💾 Create Backup**")
             if st.button("📦 Backup Data", type="primary"):
                 try:
                     from utils.backup_manager import backup_manager
-                    
+
                     # Create comprehensive backup with timestamp
                     backup_data = {
                         'timestamp': datetime.now().isoformat(),
@@ -537,19 +553,19 @@ def render_settings_tab():
                             'bills': dict(st.session_state.get('bills', {}))
                         }
                     }
-                    
+
                     # Create zip file with backup data
                     import zipfile
                     import io
-                    
+
                     zip_buffer = io.BytesIO()
                     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                    
+
                     with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
                         # Add main backup file
                         backup_json = json.dumps(backup_data, indent=2, default=str)
                         zip_file.writestr(f"snowbird_backup_{timestamp}.json", backup_json)
-                        
+
                         # Add metadata file
                         metadata = {
                             'backup_date': backup_data['timestamp'],
@@ -559,9 +575,9 @@ def render_settings_tab():
                             'checksum': str(hash(backup_json))
                         }
                         zip_file.writestr("backup_metadata.json", json.dumps(metadata, indent=2))
-                    
+
                     zip_buffer.seek(0)
-                    
+
                     st.download_button(
                         label="⬇️ Download Backup ZIP",
                         data=zip_buffer.getvalue(),
@@ -570,7 +586,7 @@ def render_settings_tab():
                         help="Download your complete Snowbird data backup"
                     )
                     st.success("✅ Backup created successfully!")
-                    
+
                 except Exception as e:
                     st.error(f"❌ Backup failed: {str(e)}")
                     logger.error(f"Backup creation error: {e}")
@@ -583,59 +599,59 @@ def render_settings_tab():
                 help="Upload a backup ZIP or JSON file to restore your data",
                 key="backup_restore"
             )
-            
+
             if uploaded_backup is not None:
                 if st.button("🔄 Restore Data", type="secondary"):
                     try:
                         # Validate and restore backup
                         restore_success = False
-                        
+
                         if uploaded_backup.name.endswith('.zip'):
                             # Handle ZIP backup
                             import zipfile
                             import io
-                            
+
                             zip_data = io.BytesIO(uploaded_backup.read())
-                            
+
                             with zipfile.ZipFile(zip_data, 'r') as zip_file:
                                 # List contents for validation
                                 file_list = zip_file.namelist()
-                                
+
                                 # Look for backup JSON file
                                 backup_files = [f for f in file_list if f.startswith('snowbird_backup_') and f.endswith('.json')]
-                                
+
                                 if not backup_files:
                                     st.error("❌ Invalid backup ZIP: No backup file found")
                                 else:
                                     # Extract and validate backup data
                                     backup_content = zip_file.read(backup_files[0]).decode('utf-8')
                                     backup_data = json.loads(backup_content)
-                                    
+
                                     # Validate backup structure
                                     if validate_backup_data(backup_data):
                                         restore_backup_data(backup_data)
                                         restore_success = True
                                     else:
                                         st.error("❌ Invalid backup format")
-                        
+
                         elif uploaded_backup.name.endswith('.json'):
                             # Handle JSON backup (legacy support)
                             backup_content = uploaded_backup.read().decode('utf-8')
                             backup_data = json.loads(backup_content)
-                            
+
                             if validate_backup_data(backup_data):
                                 restore_backup_data(backup_data)
                                 restore_success = True
                             else:
                                 st.error("❌ Invalid backup format")
-                        
+
                         if restore_success:
                             st.success("✅ Data restored successfully!")
                             st.info("🔄 Please refresh the page to see restored data")
                             # Auto-refresh after short delay
                             time.sleep(2)
                             st.rerun()
-                            
+
                     except json.JSONDecodeError:
                         st.error("❌ Invalid JSON format in backup file")
                     except zipfile.BadZipFile:
@@ -647,7 +663,7 @@ def render_settings_tab():
         # Property Management Section
         st.markdown("---")
         st.subheader("🏠 Property Management")
-        
+
         # Initialize properties if not exists
         if 'user_properties' not in st.session_state:
             st.session_state.user_properties = {
@@ -664,16 +680,16 @@ def render_settings_tab():
                     "notes": ""
                 }
             }
-        
+
         # Display current properties
         st.write("**Current Properties:**")
-        
+
         properties_to_delete = []
-        
+
         for prop_name, prop_details in st.session_state.user_properties.items():
             with st.expander(f"🏠 {prop_name} ({prop_details['state']})"):
                 col1, col2 = st.columns([3, 1])
-                
+
                 with col1:
                     st.write(f"**State:** {prop_details['state']}")
                     st.write(f"**Type:** {prop_details['property_type']}")
@@ -681,11 +697,11 @@ def render_settings_tab():
                         st.write(f"**Address:** {prop_details['address']}")
                     if prop_details.get('notes'):
                         st.write(f"**Notes:** {prop_details['notes']}")
-                
+
                 with col2:
                     if st.button(f"🗑️ Delete", key=f"delete_{prop_name}"):
                         properties_to_delete.append(prop_name)
-        
+
         # Remove deleted properties
         for prop_name in properties_to_delete:
             del st.session_state.user_properties[prop_name]
@@ -694,19 +710,19 @@ def render_settings_tab():
                 del st.session_state.home_budgets[prop_name]
             st.success(f"✅ Deleted property: {prop_name}")
             st.rerun()
-        
+
         # Add new property section
         st.markdown("**Add New Property:**")
-        
+
         add_col1, add_col2, add_col3 = st.columns(3)
-        
+
         with add_col1:
             new_prop_name = st.text_input(
                 "Property Name",
                 placeholder="e.g., 'Florida Condo', 'Texas Ranch'",
                 key="new_property_name"
             )
-        
+
         with add_col2:
             # All 50 US states plus DC and territories
             available_states = [
@@ -727,7 +743,7 @@ def render_settings_tab():
                 options=available_states,
                 key="new_property_state"
             )
-            
+
             # If "Other" is selected, show text input
             if new_prop_state == "Other":
                 new_prop_state = st.text_input(
@@ -735,14 +751,14 @@ def render_settings_tab():
                     placeholder="Enter state or territory name",
                     key="custom_state_name"
                 )
-        
+
         with add_col3:
             new_prop_type = st.selectbox(
                 "Property Type",
                 options=["Primary", "Secondary", "Vacation", "Investment", "Rental"],
                 key="new_property_type"
             )
-        
+
         # Additional property details
         new_prop_address = st.text_area(
             "Address (Optional)",
@@ -750,14 +766,14 @@ def render_settings_tab():
             key="new_property_address",
             height=60
         )
-        
+
         new_prop_notes = st.text_area(
             "Notes (Optional)",
             placeholder="Any additional notes about this property...",
             key="new_property_notes", 
             height=60
         )
-        
+
         # Add property button
         if st.button("➕ Add Property", type="primary"):
             if new_prop_name and new_prop_state:
@@ -769,7 +785,7 @@ def render_settings_tab():
                         "property_type": new_prop_type,
                         "notes": new_prop_notes
                     }
-                    
+
                     # Initialize budget for new property
                     if new_prop_name not in st.session_state.home_budgets:
                         st.session_state.home_budgets[new_prop_name] = {
@@ -779,38 +795,38 @@ def render_settings_tab():
                             "Property Tax": 300,
                             "HOA": 0
                         }
-                    
+
                     # Add to states tracking if new state
                     if new_prop_state not in st.session_state.states:
                         st.session_state.states[new_prop_state] = 0
-                    
+
                     st.success(f"✅ Added property: {new_prop_name} in {new_prop_state}")
-                    
+
                     # Clear form
                     st.session_state.new_property_name = ""
                     st.session_state.new_property_address = ""
                     st.session_state.new_property_notes = ""
-                    
+
                     st.rerun()
                 else:
                     st.error("❌ Property name already exists. Please choose a different name.")
             else:
                 st.error("❌ Please enter both property name and state.")
-        
+
         # Property statistics
         if st.session_state.user_properties:
             st.markdown("**Property Summary:**")
             total_properties = len(st.session_state.user_properties)
             states_with_properties = len(set(prop['state'] for prop in st.session_state.user_properties.values()))
-            
+
             summary_col1, summary_col2, summary_col3 = st.columns(3)
-            
+
             with summary_col1:
                 st.metric("Total Properties", total_properties)
-            
+
             with summary_col2:
                 st.metric("States with Properties", states_with_properties)
-            
+
             with summary_col3:
                 primary_properties = sum(1 for prop in st.session_state.user_properties.values() if prop['property_type'] == 'Primary')
                 st.metric("Primary Residences", primary_properties)
@@ -863,6 +879,7 @@ def render_settings_tab():
         st.subheader("Feature Flags")
 
         # Gmail integration
+```python
         gmail_integration = st.checkbox(
             "Gmail Travel Detection (Beta)",
             value=st.session_state.get('gmail_integration', False),
@@ -1095,7 +1112,7 @@ def render_budgets_tab():
                 property_options.append(f"{prop_name} ({state})")
             else:
                 property_options.append(prop_name)
-        
+
         selected_display = st.selectbox("Select Property", property_options)
         selected_home = selected_display.split(" (")[0]  # Extract property name
 
@@ -1104,7 +1121,7 @@ def render_budgets_tab():
             if 'user_properties' in st.session_state and selected_home in st.session_state.user_properties:
                 prop_details = st.session_state.user_properties[selected_home]
                 st.info(f"🏠 **{selected_home}** - {prop_details['state']} ({prop_details['property_type']})")
-            
+
             st.write(f"**Budget for {selected_home}:**")
             budget = st.session_state.home_budgets[selected_home]
 
@@ -1133,7 +1150,7 @@ def render_budgets_tab():
                 st.write("**Add Category:**")
                 new_category = st.text_input("Category Name", key=f"new_category_{selected_home}")
                 new_amount = st.number_input("Amount", min_value=0, step=50, key=f"new_amount_{selected_home}")
-                
+
                 if st.button("Add Category", key=f"add_cat_{selected_home}"):
                     if new_category and new_category not in budget:
                         new_budget[new_category] = new_amount
@@ -1337,18 +1354,18 @@ def render_reports_tab():
 def render_community_tab():
     """Render community forum and discussion tab"""
     st.markdown('<h2><i data-lucide="users" class="icon"></i>Snowbird Community</h2>', unsafe_allow_html=True)
-    
+
     # Community description
     st.markdown("""
     ### 🌐 Connect with Fellow Snowbirds
-    
+
     Join our vibrant community of seasonal residents sharing tips, asking questions, 
     and helping each other navigate the snowbird lifestyle.
     """)
-    
+
     # Community features overview
     col1, col2, col3 = st.columns(3)
-    
+
     with col1:
         st.markdown("""
         **💬 Share Tips**
@@ -1357,7 +1374,7 @@ def render_community_tab():
         - Travel recommendations
         - Cost-saving ideas
         """)
-    
+
     with col2:
         st.markdown("""
         **❓ Ask Questions**
@@ -1366,7 +1383,7 @@ def render_community_tab():
         - Legal considerations
         - Property management
         """)
-    
+
     with col3:
         st.markdown("""
         **🏪 Find Local Services**
@@ -1375,12 +1392,12 @@ def render_community_tab():
         - Property managers
         - Emergency contacts
         """)
-    
+
     st.markdown("---")
-    
+
     # Forum access section
     st.subheader("🗣️ Join the Discussion")
-    
+
     # Primary forum link with prominent styling
     st.markdown("""
     <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); 
@@ -1399,12 +1416,12 @@ def render_community_tab():
         </a>
     </div>
     """, unsafe_allow_html=True)
-    
+
     # Alternative community platforms
     st.subheader("🌍 Other Community Platforms")
-    
+
     community_col1, community_col2 = st.columns(2)
-    
+
     with community_col1:
         st.markdown("""
         **📱 Social Media Groups**
@@ -1412,7 +1429,7 @@ def render_community_tab():
         - [Twitter #SnowbirdLife](https://twitter.com/hashtag/snowbirdlife)
         - [LinkedIn Snowbird Network](https://linkedin.com/groups/snowbirds)
         """)
-        
+
     with community_col2:
         st.markdown("""
         **📧 Newsletter & Updates**
@@ -1421,64 +1438,64 @@ def render_community_tab():
         - New member introductions
         - Local event announcements
         """)
-    
+
     # Community guidelines and rules
     with st.expander("📋 Community Guidelines"):
         st.markdown("""
         **Our Community Values:**
-        
+
         🤝 **Be Respectful** - Treat all members with kindness and respect
-        
+
         💡 **Share Knowledge** - Help others with your experiences and insights
-        
+
         🎯 **Stay On Topic** - Keep discussions relevant to snowbird lifestyle
-        
+
         🔒 **Protect Privacy** - Don't share personal financial or location details
-        
+
         ⚖️ **No Legal Advice** - Always consult professionals for legal/tax matters
-        
+
         🚫 **No Spam** - Commercial promotions must be approved by moderators
         """)
-    
+
     # Quick tips for new community members
     st.subheader("💡 Getting Started in the Community")
-    
+
     st.markdown("""
     **New to our community? Here's how to get the most out of it:**
-    
+
     1. **📝 Introduce Yourself** - Share your snowbird journey and which states you split time between
-    
+
     2. **🔍 Search First** - Check if your question has been answered before posting
-    
+
     3. **🏷️ Use Tags** - Help others find your posts with relevant tags (#taxes, #arizona, #minnesota, etc.)
-    
+
     4. **👥 Follow Topics** - Subscribe to discussions about your areas of interest
-    
+
     5. **🎁 Give Back** - Share your own tips and experiences to help newcomers
     """)
-    
+
     # Community stats and activity (placeholder for future integration)
     st.markdown("---")
     st.subheader("📊 Community Activity")
-    
+
     stats_col1, stats_col2, stats_col3, stats_col4 = st.columns(4)
-    
+
     with stats_col1:
         st.metric("Active Members", "2,847", "↗️ +127 this month")
-    
+
     with stats_col2:
         st.metric("Discussions", "1,392", "↗️ +89 this week")
-    
+
     with stats_col3:
         st.metric("Tips Shared", "5,621", "↗️ +203 this month")
-    
+
     with stats_col4:
         st.metric("States Covered", "48", "Complete coverage!")
-    
+
     # Embedded forum preview (using iframe for demonstration)
     st.markdown("---")
     st.subheader("📖 Recent Community Discussions")
-    
+
     # Option to embed forum content via iframe
     if st.checkbox("📺 Show Live Forum Feed", help="Display recent discussions directly in the app"):
         st.markdown("""
@@ -1492,16 +1509,16 @@ def render_community_tab():
             </iframe>
         </div>
         """, unsafe_allow_html=True)
-        
+
         st.caption("🔗 Forum content loads from external source - may take a moment to appear")
-    
+
     # Quick contact for community issues
     st.markdown("---")
     st.info("""
     **Need Help with the Community?**
-    
+
     📧 Contact our community moderators: community@snowbirdapp.com
-    
+
     🐛 Report technical issues or suggest improvements for better community integration
     """)
 
@@ -1528,10 +1545,10 @@ def render_footer():
 def validate_backup_data(backup_data: dict) -> bool:
     """
     Validate backup data structure and integrity
-    
+
     Args:
         backup_data (dict): The backup data to validate
-        
+
     Returns:
         bool: True if backup is valid, False otherwise
     """
@@ -1540,10 +1557,10 @@ def validate_backup_data(backup_data: dict) -> bool:
         required_keys = ['timestamp', 'version', 'data']
         if not all(key in backup_data for key in required_keys):
             return False
-        
+
         # Check data structure
         data = backup_data['data']
-        
+
         # Validate states data
         if 'states' in data:
             states = data['states']
@@ -1553,7 +1570,7 @@ def validate_backup_data(backup_data: dict) -> bool:
             for state, days in states.items():
                 if not isinstance(days, (int, float)) or days < 0:
                     return False
-        
+
         # Validate budgets data
         if 'home_budgets' in data:
             budgets = data['home_budgets']
@@ -1566,15 +1583,15 @@ def validate_backup_data(backup_data: dict) -> bool:
                 for category, amount in budget.items():
                     if not isinstance(amount, (int, float)) or amount < 0:
                         return False
-        
+
         # Validate threshold
         if 'tax_threshold' in data:
             threshold = data['tax_threshold']
             if not isinstance(threshold, (int, float)) or threshold <= 0 or threshold > 365:
                 return False
-        
+
         return True
-        
+
     except Exception as e:
         logger.error(f"Backup validation error: {e}")
         return False
@@ -1582,33 +1599,33 @@ def validate_backup_data(backup_data: dict) -> bool:
 def restore_backup_data(backup_data: dict):
     """
     Restore backup data to session state
-    
+
     Args:
         backup_data (dict): The validated backup data to restore
     """
     try:
         data = backup_data['data']
-        
+
         # Restore core tracking data
         if 'states' in data:
             st.session_state.states = data['states']
-        
+
         if 'home_budgets' in data:
             st.session_state.home_budgets = data['home_budgets']
-        
+
         if 'seasonal_cash_flow' in data:
             st.session_state.seasonal_cash_flow = data['seasonal_cash_flow']
-        
+
         # Restore settings
         if 'tax_threshold' in data:
             st.session_state.tax_threshold = data['tax_threshold']
-        
+
         if 'risk_warning_days' in data:
             st.session_state.risk_warning_days = data['risk_warning_days']
-        
+
         if 'default_state' in data:
             st.session_state.default_state = data['default_state']
-        
+
         # Restore user preferences
         if 'user_preferences' in data:
             prefs = data['user_preferences']
@@ -1616,20 +1633,20 @@ def restore_backup_data(backup_data: dict):
             st.session_state.notify_email = prefs.get('notifications', False)
             st.session_state.auto_save = prefs.get('auto_save', True)
             st.session_state.show_tips = prefs.get('show_tips', True)
-        
+
         # Restore additional data if present
         if 'migration_checklist' in data:
             st.session_state.migration_checklist = data['migration_checklist']
-        
+
         if 'bills' in data:
             st.session_state.bills = data['bills']
-        
+
         # Auto-save the restored data
         from utils.data_persistence import save_user_data
         save_user_data()
-        
+
         logger.info("Backup restored successfully")
-        
+
     except Exception as e:
         logger.error(f"Backup restoration error: {e}")
         raise e
