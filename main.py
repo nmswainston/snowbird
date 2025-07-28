@@ -19,7 +19,7 @@ st.set_page_config(
 st.markdown("""
 <style>
     /* Import Google Fonts and Lucide Icons */
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
     @import url('https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js');
 
     /* Root variables for winter theme */
@@ -37,32 +37,36 @@ st.markdown("""
     /* Main app styling */
     .stApp {
         background: linear-gradient(135deg, var(--ice-white) 0%, var(--light-blue) 100%);
-        font-family: 'Inter', sans-serif;
+        font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        font-weight: 400;
+        letter-spacing: -0.01em;
     }
 
     /* Header styling */
     .main-header {
         text-align: center;
-        padding: 2rem 0;
+        padding: 1.5rem 0;
         background: var(--ice-white);
-        border-radius: 20px;
-        margin-bottom: 2rem;
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
         box-shadow: 0 4px 20px var(--shadow);
         border: 1px solid var(--border-light);
     }
 
     .main-title {
         color: var(--primary-blue);
-        font-size: clamp(2rem, 4vw, 3rem);
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        text-shadow: 0 2px 4px rgba(18, 189, 242, 0.1);
+        font-size: clamp(1.5rem, 3vw, 2.2rem);
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+        text-shadow: none;
+        letter-spacing: -0.02em;
     }
 
     .subtitle {
         color: var(--text-light);
-        font-size: 1.2rem;
+        font-size: 0.95rem;
         font-weight: 400;
+        letter-spacing: -0.01em;
     }
 
     /* Icon styling */
@@ -84,7 +88,7 @@ st.markdown("""
     .winter-card {
         background: var(--ice-white);
         padding: 1.5rem;
-        border-radius: 15px;
+        border-radius: 12px;
         box-shadow: 0 4px 15px var(--shadow);
         border: 1px solid var(--border-light);
         margin: 1rem 0;
@@ -96,14 +100,23 @@ st.markdown("""
         box-shadow: 0 8px 25px var(--shadow);
     }
 
+    .winter-card h3 {
+        font-size: 1.1rem !important;
+        font-weight: 600 !important;
+        letter-spacing: -0.01em !important;
+        margin-bottom: 1rem !important;
+    }
+
     /* Button styling */
     .stButton > button {
         background: linear-gradient(135deg, var(--primary-blue) 0%, #0EA5E9 100%) !important;
         color: white !important;
         border: none !important;
-        border-radius: 10px !important;
-        padding: 0.5rem 1rem !important;
+        border-radius: 8px !important;
+        padding: 0.6rem 1.2rem !important;
         font-weight: 500 !important;
+        font-size: 0.9rem !important;
+        letter-spacing: -0.01em !important;
         transition: all 0.3s ease !important;
     }
 
@@ -138,6 +151,20 @@ st.markdown("""
         border-right: 2px solid var(--border-light) !important;
     }
 
+    /* Global text styling */
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Poppins', sans-serif !important;
+        font-weight: 600 !important;
+        letter-spacing: -0.01em !important;
+        color: var(--text-dark) !important;
+    }
+
+    p, div, span, label {
+        font-family: 'Poppins', sans-serif !important;
+        font-weight: 400 !important;
+        letter-spacing: -0.005em !important;
+    }
+
     /* Tab styling */
     .stTabs [data-baseweb="tab-list"] {
         background: var(--snow-gray);
@@ -150,7 +177,10 @@ st.markdown("""
         background: transparent;
         border-radius: 8px;
         color: var(--text-dark);
-        font-weight: 500;
+        font-family: 'Poppins', sans-serif !important;
+        font-weight: 500 !important;
+        font-size: 0.9rem !important;
+        letter-spacing: -0.01em !important;
     }
 
     .stTabs [aria-selected="true"] {
@@ -158,11 +188,32 @@ st.markdown("""
         color: white !important;
     }
 
+    /* Streamlit specific overrides */
+    .stSelectbox label, .stTextInput label, .stTextArea label, .stNumberInput label {
+        font-size: 0.85rem !important;
+        font-weight: 500 !important;
+        letter-spacing: -0.01em !important;
+    }
+
+    .stMetric label {
+        font-size: 0.8rem !important;
+        font-weight: 500 !important;
+        letter-spacing: -0.01em !important;
+    }
+
+    .stMetric [data-testid="metric-value"] {
+        font-size: 1.8rem !important;
+        font-weight: 600 !important;
+        letter-spacing: -0.02em !important;
+    }
+
     /* Mobile responsiveness */
     @media (max-width: 768px) {
         .main-header { padding: 1rem; }
-        .main-title { font-size: 2rem; }
+        .main-title { font-size: 1.4rem !important; }
         .winter-card { padding: 1rem; margin: 0.5rem 0; }
+        h2 { font-size: 1.3rem !important; }
+        h3 { font-size: 1.1rem !important; }
     }
 
     /* Alert styling */
