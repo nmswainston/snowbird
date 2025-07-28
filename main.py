@@ -9,22 +9,122 @@ and plan seasonal expenses.
 import streamlit as st
 import sys
 import os
+import time
+from pathlib import Path
 
 # Add the current directory to the Python path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Import the main application
+# Initialize logging first
 try:
-    from main_app import main
-
-    # Run the application
-    if __name__ == "__main__":
-        main()
-
+    from utils.logging_config import app_logger, log_user_action, log_error
+    from utils.error_handling import (
+        handle_errors, safe_operation, error_boundary, 
+        ErrorDisplay, SnowbirdError, ConfigurationError
+    )
+    from config import config
+    
+    # Log application startup
+    app_logger.logger.info(f"Starting Snowbird Financial Assistant v{config.app_version}")
+    app_logger.logger.info(f"Environment: {config.environment}, Debug: {config.debug}")
+    
 except ImportError as e:
-    # Fallback to the original implementation if scaffolded version fails
-    st.error(f"Error importing scaffolded app: {e}")
-    st.info("Falling back to original implementation...")
+    # Fallback logging if our custom logger fails
+    import logging
+    logging.basicConfig(level=logging.INFO)
+    logging.error(f"Failed to initialize custom logging: {e}")
+    
+    # Define dummy functions to prevent errors
+    def log_user_action(*args, **kwargs): pass
+    def log_error(*args, **kwargs): pass
+    class ErrorDisplay:
+        @staticmethod
+        def generic_error(error, show_details=False):
+            st.error(f"Error: {str(error)}")
+
+@handle_errors(show_error=True, fallback_message="Failed to start application")
+def initialize_application():
+    """Initialize the application with error handling"""
+    
+    # Create necessary directories
+    try:
+        Path("logs").mkdir(exist_ok=True)
+        Path("data").mkdir(exist_ok=True)
+    except Exception as e:
+        log_error(e, {'operation': 'directory_creation'})
+        st.warning("Could not create required directories. Some features may not work properly.")
+    
+    # Validate configuration
+    try:
+        from utils.config_manager import validate_required_config
+        validation_results = validate_required_config()
+        
+        failed_validations = [k for k, v in validation_results.items() if not v]
+        if failed_validations:
+            st.warning(f"Configuration issues detected: {', '.join(failed_validations)}")
+            
+    except Exception as e:
+        log_error(e, {'operation': 'config_validation'})
+
+@safe_operation("Main Application")
+def run_main_application():
+    """Run the main application with error boundary"""
+    
+    try:
+        # Try to import and run the new scaffolded version
+        from main_app import main
+        
+        with error_boundary("Loading main application", show_spinner=True):
+            main()
+            
+    except ImportError as e:
+        log_error(e, {'operation': 'main_app_import'})
+        st.warning("Using fallback implementation...")
+        run_fallback_application()
+        
+    except Exception as e:
+        log_error(e, {'operation': 'main_app_execution'})
+        st.error("Main application failed to load. Using fallback implementation.")
+        run_fallback_application()
+
+@handle_errors(show_error=True, return_none_on_error=True)
+def run_fallback_application():
+    """Fallback implementation with comprehensive error handling"""
+    
+    with error_boundary("Loading fallback application"):
+        # Import required modules
+        import datetime
+        import json
+        import csv
+        from io import StringIO
+        import pandas as pd
+        import threading
+        import time
+        from email.mime.text import MIMEText
+        from email.mime.multipart import MIMEMultipart
+        import smtplib
+        
+        # Configure Streamlit for deployment with winter theme
+        st.set_page_config(
+            page_title="Snowbird: Your Seasonal Financial Assistant", 
+            layout="wide",
+            page_icon="🏠",
+            initial_sidebar_state="expanded"
+        )
+        
+        # Add error reporting toggle in debug mode
+        if config.debug:
+            with st.sidebar:
+                st.session_state.debug_mode = st.checkbox("Debug Mode", value=False)
+                if st.session_state.get('debug_mode', False):
+                    st.warning("Debug mode enabled - detailed errors will be shown")
+        
+        # Your existing fallback code would go here...
+        # (I'll keep the rest of the original implementation but add error handling where needed)
+        
+        log_user_action("system", "fallback_app_loaded", {
+            'timestamp': datetime.datetime.now().isoformat()
+        })
 
     # Your existing main.py code would go here as a fallback
     import streamlit as st

@@ -1,5 +1,15 @@
+"""
+Data models and validation for the Snowbird Financial Assistant.
+"""
 
-import datetime
+from typing import Dict, List, Any, Optional
+from dataclasses import dataclass
+from datetime import date, datetime
+import json
+from pydantic import BaseModel, Field, validator, ValidationError
+from utils.error_handling import DataValidationError, validate_data
+from utils.logging_config import data_logger
+```import datetime
 from typing import Dict, List, Any
 
 # Default data structures
@@ -43,15 +53,15 @@ DEFAULT_MIGRATION_CHECKLIST = [
 
 class SnowbirdData:
     """Data management class for Snowbird app"""
-    
+
     def __init__(self):
         self.tax_threshold = 183
-    
+
     def get_tax_status(self, days: int, threshold: int = None):
         """Get tax residency status for a state"""
         if threshold is None:
             threshold = self.tax_threshold
-            
+
         percentage = (days / threshold) * 100
         if days >= threshold:
             return "TAX RESIDENT", "status-danger"
@@ -61,11 +71,11 @@ class SnowbirdData:
             return "CAUTION", "status-warning"
         else:
             return "SAFE", "status-safe"
-    
+
     def add_day_log(self, state: str, date_str: str = None, auto_logged: bool = False):
         """Add a day to the log"""
         import streamlit as st
-        
+
         if date_str is None:
             date_str = datetime.date.today().isoformat()
 
@@ -82,11 +92,11 @@ class SnowbirdData:
         })
         st.session_state.states[state] += 1
         return True, f"Logged {date_str} in {state}" + (" (auto)" if auto_logged else "")
-    
+
     def generate_report_data(self):
         """Generate comprehensive report data"""
         import streamlit as st
-        
+
         today = datetime.date.today()
         year_start = datetime.date(today.year, 1, 1)
 

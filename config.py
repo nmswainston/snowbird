@@ -224,6 +224,31 @@ class AppConfig(PydanticBaseSettings):
         env="CACHE_TTL"
     )
     
+    # Error Monitoring Settings
+    sentry_dsn: Optional[str] = Field(
+        default=None,
+        description="Sentry DSN for error tracking",
+        env="SENTRY_DSN"
+    )
+    
+    log_level: str = Field(
+        default="INFO",
+        description="Logging level",
+        env="LOG_LEVEL"
+    )
+    
+    enable_performance_monitoring: bool = Field(
+        default=True,
+        description="Enable performance monitoring",
+        env="ENABLE_PERFORMANCE_MONITORING"
+    )
+    
+    error_notification_email: Optional[EmailStr] = Field(
+        default=None,
+        description="Email for critical error notifications",
+        env="ERROR_NOTIFICATION_EMAIL"
+    )
+    
     @validator('environment')
     def validate_environment(cls, v):
         allowed_envs = ['development', 'staging', 'production']
