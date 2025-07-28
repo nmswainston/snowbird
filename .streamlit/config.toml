@@ -1,0 +1,13 @@
+
+[theme]
+# Day mode (default)
+primaryColor = "#12BDF2"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F0F4F8"
+textColor = "#0D2540"
+font = "sans serif"
+
+[server]
+headless = true
+port = 5000
+address = "0.0.0.0"

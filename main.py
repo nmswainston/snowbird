@@ -6,134 +6,275 @@ import json
 import csv
 from io import StringIO
 
-# Configure Streamlit for deployment
+# Configure Streamlit for deployment with winter theme
 st.set_page_config(
-    page_title="Snowbird AI Financial Assistant", 
+    page_title="❄️ Snowbird AI Financial Assistant", 
     layout="wide",
     page_icon="❄️",
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for better appearance
+# Initialize theme state
+if "dark_mode" not in st.session_state:
+    st.session_state.dark_mode = False
+
+# Winter-themed CSS with day/night modes
+def get_theme_css():
+    if st.session_state.dark_mode:
+        # Night mode - Deep navy theme
+        return """
+<style>
+    :root {
+        --primary-color: #12BDF2;
+        --background-color: #0D2540;
+        --secondary-bg-color: #1a3a5c;
+        --text-color: #FFFFFF;
+        --accent-color: #F0F4F8;
+        --card-bg: #1a3a5c;
+        --border-color: #2a4a6c;
+        --shadow: rgba(18, 189, 242, 0.2);
+        --gradient-start: #12BDF2;
+        --gradient-end: #0891D1;
+    }
+    
+    /* Dark mode overrides */
+    .stApp {
+        background-color: var(--background-color) !important;
+        color: var(--text-color) !important;
+    }
+    
+    .stSidebar > div {
+        background-color: var(--secondary-bg-color) !important;
+    }
+    
+    .metric-card, .winter-card {
+        background: var(--card-bg) !important;
+        border: 1px solid var(--border-color) !important;
+        color: var(--text-color) !important;
+    }
+    
+    .stSelectbox > div > div {
+        background-color: var(--secondary-bg-color) !important;
+        color: var(--text-color) !important;
+    }
+    
+    .stTextInput > div > div > input {
+        background-color: var(--secondary-bg-color) !important;
+        color: var(--text-color) !important;
+        border-color: var(--border-color) !important;
+    }
+    
+    .stRadio > div {
+        color: var(--text-color) !important;
+    }
+</style>
+"""
+    else:
+        # Day mode - Winter white theme
+        return """
+<style>
+    :root {
+        --primary-color: #12BDF2;
+        --background-color: #FFFFFF;
+        --secondary-bg-color: #F0F4F8;
+        --text-color: #0D2540;
+        --accent-color: #12BDF2;
+        --card-bg: #FFFFFF;
+        --border-color: #E2E8F0;
+        --shadow: rgba(13, 37, 64, 0.1);
+        --gradient-start: #12BDF2;
+        --gradient-end: #0891D1;
+    }
+</style>
+"""
+
+# Apply theme CSS
+st.markdown(get_theme_css(), unsafe_allow_html=True)
+
+# Enhanced winter theme CSS
 st.markdown("""
 <style>
-    /* Main app styling */
+    /* Base theme variables are set above */
+    
+    /* Auto-detect system preference */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --primary-color: #12BDF2;
+            --background-color: #0D2540;
+            --secondary-bg-color: #1a3a5c;
+            --text-color: #FFFFFF;
+            --accent-color: #F0F4F8;
+            --card-bg: #1a3a5c;
+            --border-color: #2a4a6c;
+            --shadow: rgba(18, 189, 242, 0.2);
+        }
+    }
+    
+    /* Winter-themed styling */
     .main > div {
-        padding: 2rem 1rem;
+        padding: 1.5rem 1rem;
+        background: var(--background-color);
+        color: var(--text-color);
     }
     
-    /* Header styling */
-    .stApp > header {
-        background-color: transparent;
+    /* Snowflake animation */
+    @keyframes snowfall {
+        0% { transform: translateY(-100vh) translateX(0px); opacity: 1; }
+        100% { transform: translateY(100vh) translateX(100px); opacity: 0; }
     }
     
-    /* Custom title styling */
-    .main-title {
+    .snowflake {
+        position: fixed;
+        top: -10px;
+        z-index: 1;
+        user-select: none;
+        pointer-events: none;
+        animation: snowfall linear infinite;
+        color: var(--primary-color);
+        opacity: 0.6;
+    }
+    
+    /* Custom title styling with winter gradient */
+    .winter-title {
         text-align: center;
         padding: 2rem 0;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
-        font-size: 3rem;
+        font-size: clamp(2rem, 5vw, 3.5rem);
         font-weight: bold;
         margin-bottom: 0.5rem;
+        text-shadow: 0 0 20px rgba(18, 189, 242, 0.3);
     }
     
-    .subtitle {
+    .winter-subtitle {
         text-align: center;
-        color: #666;
+        color: var(--text-color);
+        opacity: 0.8;
         font-size: 1.2rem;
         margin-bottom: 2rem;
     }
     
-    /* Card-like containers */
-    .metric-card {
-        background: white;
+    /* Winter-themed cards */
+    .winter-card {
+        background: var(--card-bg);
         padding: 1.5rem;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        border-left: 4px solid #667eea;
+        border-radius: 15px;
+        box-shadow: 0 4px 20px var(--shadow);
+        border: 1px solid var(--border-color);
         margin: 1rem 0;
-    }
-    
-    .warning-card {
-        background: #fff3cd;
-        border: 1px solid #ffeaa7;
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 1rem 0;
-    }
-    
-    .success-card {
-        background: #d4edda;
-        border: 1px solid #c3e6cb;
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 1rem 0;
-    }
-    
-    .info-card {
-        background: #d1ecf1;
-        border: 1px solid #bee5eb;
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 1rem 0;
-    }
-    
-    /* Button styling */
-    .stButton > button {
-        border-radius: 20px;
-        border: none;
-        padding: 0.5rem 1rem;
-        font-weight: 500;
+        backdrop-filter: blur(10px);
         transition: all 0.3s ease;
     }
     
-    .stButton > button:hover {
+    .winter-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        box-shadow: 0 8px 30px var(--shadow);
     }
     
-    /* Sidebar styling */
-    .css-1d391kg {
-        background-color: #f8f9fa;
+    .ice-card {
+        background: linear-gradient(135deg, rgba(18, 189, 242, 0.1) 0%, rgba(240, 244, 248, 0.1) 100%);
+        border: 1px solid rgba(18, 189, 242, 0.2);
+        backdrop-filter: blur(10px);
     }
     
-    /* Metric styling */
-    .metric-container {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Frosted glass effect for important cards */
+    .frost-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(18, 189, 242, 0.3);
+        box-shadow: 0 8px 32px rgba(18, 189, 242, 0.1);
+    }
+    
+    /* Winter button styling */
+    .stButton > button {
+        background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 25px !important;
+        padding: 0.6rem 1.5rem !important;
+        font-weight: 600 !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 15px rgba(18, 189, 242, 0.3) !important;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 25px rgba(18, 189, 242, 0.4) !important;
+        filter: brightness(1.1) !important;
+    }
+    
+    /* Winter sidebar styling */
+    .stSidebar > div {
+        background: var(--secondary-bg-color) !important;
+        border-right: 2px solid var(--border-color) !important;
+    }
+    
+    /* Theme toggle button */
+    .theme-toggle {
+        position: fixed;
+        top: 1rem;
+        right: 1rem;
+        z-index: 1000;
+        background: var(--primary-color);
         color: white;
-        padding: 1rem;
-        border-radius: 10px;
+        border: none;
+        border-radius: 50px;
+        padding: 0.8rem;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(18, 189, 242, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .theme-toggle:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 20px rgba(18, 189, 242, 0.4);
+    }
+    
+    /* Winter metric styling */
+    .winter-metric {
+        background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 15px;
         text-align: center;
         margin: 0.5rem 0;
+        box-shadow: 0 4px 20px rgba(18, 189, 242, 0.3);
     }
     
-    /* Progress bar styling */
+    /* Progress bar winter styling */
     .stProgress > div > div > div > div {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(90deg, var(--gradient-start) 0%, var(--gradient-end) 100%) !important;
     }
     
-    /* Status indicators */
+    .stProgress > div > div {
+        background: var(--secondary-bg-color) !important;
+        border-radius: 10px !important;
+    }
+    
+    /* Winter status indicators */
     .status-safe {
-        color: #28a745;
+        color: #10B981;
         font-weight: bold;
+        text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
     }
     
     .status-warning {
-        color: #ffc107;
+        color: #F59E0B;
         font-weight: bold;
+        text-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
     }
     
     .status-danger {
-        color: #dc3545;
+        color: #EF4444;
         font-weight: bold;
+        text-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
     }
     
-    /* Section headers */
-    .section-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Section headers with winter styling */
+    .winter-section-header {
+        background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -141,32 +282,94 @@ st.markdown("""
         font-weight: bold;
         margin: 2rem 0 1rem 0;
         padding-bottom: 0.5rem;
-        border-bottom: 2px solid #eee;
+        border-bottom: 2px solid var(--border-color);
+        text-shadow: 0 0 20px rgba(18, 189, 242, 0.3);
     }
     
-    /* Table styling */
-    .dataframe {
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    /* Location detection styling */
-    .location-container {
-        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        padding: 1.5rem;
-        border-radius: 15px;
+    /* Location detection winter styling */
+    .winter-location-container {
+        background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
+        padding: 2rem;
+        border-radius: 20px;
         color: white;
         text-align: center;
         margin: 1rem 0;
+        box-shadow: 0 8px 30px rgba(18, 189, 242, 0.3);
+        position: relative;
+        overflow: hidden;
     }
     
-    /* Quick actions styling */
-    .quick-actions {
-        background: #f8f9fa;
+    .winter-location-container::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+        animation: shimmer 3s ease-in-out infinite;
+    }
+    
+    @keyframes shimmer {
+        0%, 100% { transform: rotate(0deg); }
+        50% { transform: rotate(180deg); }
+    }
+    
+    /* Quick actions winter styling */
+    .winter-quick-actions {
+        background: var(--secondary-bg-color);
+        padding: 1.5rem;
+        border-radius: 15px;
+        border: 1px solid var(--border-color);
+        backdrop-filter: blur(10px);
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .main > div {
+            padding: 1rem 0.5rem;
+        }
+        
+        .winter-title {
+            font-size: 2rem;
+        }
+        
+        .winter-card {
+            padding: 1rem;
+            margin: 0.5rem 0;
+        }
+        
+        .theme-toggle {
+            top: 0.5rem;
+            right: 0.5rem;
+            padding: 0.6rem;
+        }
+    }
+    
+    /* Enhanced form styling */
+    .stSelectbox > div > div, 
+    .stTextInput > div > div > input,
+    .stNumberInput > div > div > input {
+        background: var(--secondary-bg-color) !important;
+        border: 1px solid var(--border-color) !important;
+        border-radius: 10px !important;
+        color: var(--text-color) !important;
+    }
+    
+    /* Radio button winter styling */
+    .stRadio > div {
+        background: var(--secondary-bg-color);
         padding: 1rem;
         border-radius: 10px;
-        border: 1px solid #dee2e6;
+        border: 1px solid var(--border-color);
+    }
+    
+    /* Data table winter styling */
+    .dataframe {
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px var(--shadow);
+        border: 1px solid var(--border-color);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -279,13 +482,69 @@ if "current_location" not in st.session_state:
 if "last_nudge_date" not in st.session_state:
     st.session_state.last_nudge_date = None
 
-# Streamlit UI with enhanced styling
-st.markdown('<h1 class="main-title">❄️ Snowbird AI Financial Assistant 🏖️</h1>', unsafe_allow_html=True)
-st.markdown('<p class="subtitle">Helping you fly between seasons with your finances in check</p>', unsafe_allow_html=True)
+# Add snowflake animation
+snowflake_script = """
+<script>
+function createSnowflake() {
+    const snowflake = document.createElement('div');
+    snowflake.className = 'snowflake';
+    snowflake.innerHTML = '❄';
+    snowflake.style.left = Math.random() * 100 + 'vw';
+    snowflake.style.animationDuration = Math.random() * 3 + 2 + 's';
+    snowflake.style.opacity = Math.random();
+    snowflake.style.fontSize = Math.random() * 10 + 10 + 'px';
+    document.body.appendChild(snowflake);
+    
+    setTimeout(() => {
+        snowflake.remove();
+    }, 5000);
+}
 
-# Settings section
+setInterval(createSnowflake, 300);
+</script>
+"""
+
+st.components.v1.html(snowflake_script, height=0)
+
+# Winter-themed header with theme toggle
+col1, col2 = st.columns([8, 1])
+with col1:
+    st.markdown('<h1 class="winter-title">❄️ Snowbird AI Financial Assistant 🏖️</h1>', unsafe_allow_html=True)
+    st.markdown('<p class="winter-subtitle">Helping you fly between seasons with your finances in check</p>', unsafe_allow_html=True)
+
+with col2:
+    # Theme toggle button
+    theme_icon = "🌙" if not st.session_state.dark_mode else "☀️"
+    if st.button(f"{theme_icon}", key="theme_toggle", help="Toggle day/night mode"):
+        st.session_state.dark_mode = not st.session_state.dark_mode
+        st.rerun()
+
+# Settings section with winter theming
 with st.sidebar:
-    st.header("⚙️ Settings")
+    st.markdown('<div class="winter-card"><h2>⚙️ Settings</h2></div>', unsafe_allow_html=True)
+    
+    # Theme settings
+    st.markdown('<div class="winter-card">', unsafe_allow_html=True)
+    st.subheader("🎨 Theme Settings")
+    
+    # Manual theme toggle
+    theme_mode = st.radio(
+        "Choose theme mode:",
+        options=["Auto (System)", "Day Mode ☀️", "Night Mode 🌙"],
+        index=0 if not hasattr(st.session_state, 'manual_theme') else 
+              (1 if not st.session_state.dark_mode else 2)
+    )
+    
+    if theme_mode == "Day Mode ☀️":
+        st.session_state.dark_mode = False
+        st.session_state.manual_theme = True
+    elif theme_mode == "Night Mode 🌙":
+        st.session_state.dark_mode = True
+        st.session_state.manual_theme = True
+    else:
+        st.session_state.manual_theme = False
+    
+    st.markdown('</div>', unsafe_allow_html=True)
     
     # Tax threshold setting
     st.subheader("Tax Residency Threshold")
@@ -349,13 +608,13 @@ with st.sidebar:
             st.success(f"Added {new_state}!")
             st.rerun()
 
-# Location tracking and logging
-st.markdown('<h2 class="section-header">📍 Location Tracking & Day Counter</h2>', unsafe_allow_html=True)
+# Location tracking and logging with winter styling
+st.markdown('<h2 class="winter-section-header">📍 Location Tracking & Day Counter</h2>', unsafe_allow_html=True)
 
 # Location detection section
 col1, col2 = st.columns([2, 1])
 with col1:
-    st.markdown('<div class="location-container">', unsafe_allow_html=True)
+    st.markdown('<div class="winter-location-container">', unsafe_allow_html=True)
     st.markdown("### 🌐 Smart Location Detection")
     location_html = """
     <div id="location-info" style="text-align: center;">
@@ -416,7 +675,7 @@ with col1:
     st.markdown('</div>', unsafe_allow_html=True)
 
 with col2:
-    st.markdown('<div class="quick-actions">', unsafe_allow_html=True)
+    st.markdown('<div class="winter-quick-actions">', unsafe_allow_html=True)
     st.subheader("📱 Quick Actions")
     today = datetime.date.today()
     st.write(f"📅 Today: {today.strftime('%B %d, %Y')}")
@@ -432,7 +691,7 @@ with col2:
                     consecutive_days += 1
                 else:
                     break
-            st.markdown(f'<div class="metric-container"><h4>🔥 Current Streak</h4><h2>{consecutive_days} days in {last_state}</h2></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="winter-metric"><h4>🔥 Current Streak</h4><h2>{consecutive_days} days in {last_state}</h2></div>', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # Manual day logging
@@ -524,11 +783,11 @@ def check_and_show_nudges():
 check_and_show_nudges()
 
 # Show budgets
-st.markdown('<h2 class="section-header">📊 Home Maintenance Budget</h2>', unsafe_allow_html=True)
+st.markdown('<h2 class="winter-section-header">📊 Home Maintenance Budget</h2>', unsafe_allow_html=True)
 budget_home = st.selectbox("Select a home to view budget:", list(st.session_state.states.keys()))
 budget = st.session_state.home_budgets[budget_home]
 
-st.markdown(f'<div class="metric-card"><h3>🏠 {budget_home} Budget</h3>', unsafe_allow_html=True)
+st.markdown(f'<div class="winter-card ice-card"><h3>🏠 {budget_home} Budget</h3>', unsafe_allow_html=True)
 
 # Display budget with total
 total_budget = 0
@@ -541,8 +800,8 @@ for i, (category, amount) in enumerate(budget.items()):
 st.markdown(f'<h3 style="text-align: center; color: #667eea; margin-top: 1rem;">💰 Total Monthly Budget: ${total_budget}</h3></div>', unsafe_allow_html=True)
 
 # Seasonal cash flow
-st.markdown('<h2 class="section-header">💸 Seasonal Cash Flow Plan</h2>', unsafe_allow_html=True)
-st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+st.markdown('<h2 class="winter-section-header">💸 Seasonal Cash Flow Plan</h2>', unsafe_allow_html=True)
+st.markdown('<div class="winter-card ice-card">', unsafe_allow_html=True)
 
 total_seasonal = 0
 if st.session_state.seasonal_cash_flow:
@@ -555,7 +814,7 @@ if st.session_state.seasonal_cash_flow:
 st.markdown(f'<h3 style="text-align: center; color: #667eea; margin-top: 1rem;">💰 Total Monthly Seasonal Expenses: ${total_seasonal}</h3></div>', unsafe_allow_html=True)
 
 # Residency tracker
-st.markdown('<h2 class="section-header">📅 Tax Residency Tracker</h2>', unsafe_allow_html=True)
+st.markdown('<h2 class="winter-section-header">📅 Tax Residency Tracker</h2>', unsafe_allow_html=True)
 st.markdown(f'<p style="text-align: center; font-style: italic; color: #666;">Tax residency threshold: {st.session_state.tax_threshold} days</p>', unsafe_allow_html=True)
 
 # Create visual cards for each state
@@ -777,13 +1036,13 @@ with col2:
             st.write(f"• 🚨 Already exceeded threshold for {state}")
 
 # Enhanced AI Chat with Context
-st.markdown('<h2 class="section-header">🤖 Enhanced Snowbird AI Assistant</h2>', unsafe_allow_html=True)
+st.markdown('<h2 class="winter-section-header">🤖 Enhanced Snowbird AI Assistant</h2>', unsafe_allow_html=True)
 
 # Add planning features
 col1, col2 = st.columns([2, 1])
 
 with col1:
-    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+    st.markdown('<div class="winter-card frost-card">', unsafe_allow_html=True)
     question = st.text_input("💬 Ask about your travel plans, tax implications, or get smart suggestions:")
     
     # Quick suggestion buttons
@@ -858,7 +1117,7 @@ if st.button("🚀 Get AI Advice"):
 
 if st.session_state.chat_response:
     st.markdown('''
-    <div class="metric-card" style="border-left: 4px solid #28a745;">
+    <div class="winter-card frost-card" style="border-left: 4px solid var(--primary-color);">
         <h4>🤖 AI Response:</h4>
     </div>
     ''', unsafe_allow_html=True)
