@@ -166,8 +166,9 @@ def render_icon(name: str, size: str = "16", color: str = None):
     color_style = f'color: {color};' if color else ''
     # Use span instead of i to avoid React conflicts
     st.markdown(f'<span class="lucide-icon" data-icon="{name}" style="width: {size}px; height: {size}px; {color_style}; display: inline-block;"></span>', unsafe_allow_html=True)
-"""Basic styling for Snowbird app"""
 
+def apply_basic_styles():
+    """Basic styling for Snowbird app"""
     st.markdown("""
     <style>
     /* Light-blue accent for CTAs - consistent branding */
