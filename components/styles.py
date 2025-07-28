@@ -42,3 +42,37 @@ def render_icon(name: str, size: str = "16", color: str = None):
     """Render a Lucide icon"""
     color_style = f'color: {color};' if color else ''
     st.markdown(f'<i data-lucide="{name}" style="width: {size}px; height: {size}px; {color_style}"></i>', unsafe_allow_html=True)
+"""Basic styling for Snowbird app"""
+import streamlit as st
+
+def load_custom_css():
+    """Load custom CSS styles"""
+    st.markdown("""
+    <style>
+    .winter-card {
+        background: #f8fafc;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        margin: 1rem 0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .status-safe { color: #059669; font-weight: bold; }
+    .status-warning { color: #d97706; font-weight: bold; }
+    .status-danger { color: #dc2626; font-weight: bold; }
+    
+    .icon {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+def render_main_header():
+    """Render main application header"""
+    st.title("❄️ Snowbird Financial Assistant 🏖️")
+    st.markdown("Helping you fly between seasons with your finances in check.")
+    st.markdown("---")

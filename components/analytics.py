@@ -160,3 +160,38 @@ def get_analytics_summary() -> Dict[str, Any]:
     except Exception as e:
         logger.error(f"Failed to generate analytics summary: {e}")
         return {'error': str(e)}
+"""Basic analytics tracking for Snowbird app"""
+import streamlit as st
+from datetime import datetime
+
+def track_page_view(page_name):
+    """Track page view"""
+    if 'page_views' not in st.session_state:
+        st.session_state.page_views = []
+    
+    st.session_state.page_views.append({
+        'page': page_name,
+        'timestamp': datetime.now().isoformat()
+    })
+
+def track_user_action(action, data=None):
+    """Track user action"""
+    if 'user_actions' not in st.session_state:
+        st.session_state.user_actions = []
+    
+    st.session_state.user_actions.append({
+        'action': action,
+        'data': data or {},
+        'timestamp': datetime.now().isoformat()
+    })
+
+def track_feature_usage(feature, data=None):
+    """Track feature usage"""
+    if 'feature_usage' not in st.session_state:
+        st.session_state.feature_usage = []
+    
+    st.session_state.feature_usage.append({
+        'feature': feature,
+        'data': data or {},
+        'timestamp': datetime.now().isoformat()
+    })
