@@ -3,8 +3,35 @@ import datetime
 from utils.data_models import SnowbirdData
 
 def render_dashboard():
-    """Render the enhanced premium dashboard with configurable widgets"""
-    
+    """Render the main dashboard with all widgets"""
+
+    # Check for threshold warnings and offer calendar sync
+    from utils.threshold_monitor import threshold_monitor
+    from utils.google_calendar import calendar_sync
+
+    warnings = threshold_monitor.check_thresholds()
+    if warnings and calendar_sync.is_authenticated():
+        # Show option to create calendar reminders for warnings
+        if any(w['severity'] in ['critical', 'warning'] for w in warnings):
+            with st.expander("⚠️ Threshold Warnings - Calendar Sync Available", expanded=False):
+                st.write("**Active threshold warnings detected:**")
+                for warning in warnings[:3]:  # Show top 3 warnings
+                    st.write(f"• {warning['message']}")
+
+                if st.button("📅 Create Calendar Reminders for Warnings"):
+                    created_count = threshold_monitor.create_threshold_reminders(warnings)
+                    if created_count > 0:
+                        st.success(f"✅ Created {created_count} calendar reminders for threshold warnings!")
+                    else:
+                        st.warning("No reminders created. Check your calendar connection.")
+
+                # Option to schedule monthly reviews
+                if st.button("📅 Schedule Monthly Tax Review"):
+                    if threshold_monitor.schedule_monthly_check():
+                        st.success("✅ Scheduled monthly tax residency review in your calendar!")
+                    else:
+                        st.error("Failed to schedule monthly review.")
+
     # Initialize default widget configuration if not present
     if 'widgets' not in st.session_state:
         st.session_state.widgets = {
@@ -19,7 +46,7 @@ def render_dashboard():
             "expense_sparkline": False,
             "reminders": False
         }
-    
+
     st.markdown('<div class="winter-card fade-in">', unsafe_allow_html=True)
 
     # Premium header section
@@ -408,13 +435,13 @@ def render_dashboard():
         st.markdown("---")
         st.markdown('<h3><i data-lucide="bot" class="icon"></i>🤖 AI Tips</h3>', unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
-        
+
         # AI Tips placeholder content
         tip_col1, tip_col2 = st.columns(2)
-        
+
         with tip_col1:
             st.info("💡 **Planning Tip**: Consider your travel schedule when approaching the 183-day threshold.")
-        
+
         with tip_col2:
             st.info("💰 **Budget Tip**: Track seasonal expenses to optimize your dual-state budgeting.")
 
@@ -424,7 +451,7 @@ def render_dashboard():
         st.markdown("---")
         st.markdown('<h3><i data-lucide="trending-up" class="icon"></i>📈 Expense Trends</h3>', unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
-        
+
         # Expense sparkline placeholder
         import numpy as np
         sample_data = np.random.randint(1000, 5000, 12)
@@ -437,7 +464,7 @@ def render_dashboard():
         st.markdown("---")
         st.markdown('<h3><i data-lucide="bell" class="icon"></i>🔔 Reminders</h3>', unsafe_allow_html=True)
         st.markdown("<br>", unsafe_allow_html=True)
-        
+
         # Reminders placeholder content
         st.warning("⚠️ **Upcoming**: Tax threshold check recommended in 30 days")
         st.info("📅 **Reminder**: Review quarterly budget allocations")

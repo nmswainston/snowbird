@@ -146,6 +146,102 @@ def render_settings_tab():
     with settings_tabs[1]:  # Email & Notifications
         from components.email_settings import render_email_settings
         render_email_settings()
+        
+        st.divider()
+        st.subheader("Google Calendar Integration")
+        
+        # Import calendar sync utility
+        from utils.google_calendar import calendar_sync
+        
+        if calendar_sync.is_authenticated():
+            st.success("✅ Connected to Google Calendar")
+            
+            # Auto-sync settings
+            auto_sync = st.checkbox(
+                "Auto-sync residency logs to calendar",
+                value=st.session_state.get('auto_calendar_sync', False),
+                help="Automatically create calendar events when logging days"
+            )
+            st.session_state.auto_calendar_sync = auto_sync
+            
+            # Reminder sync settings
+            sync_reminders = st.checkbox(
+                "Sync bill reminders to calendar",
+                value=st.session_state.get('sync_bill_reminders', False),
+                help="Create calendar reminders for upcoming bills"
+            )
+            st.session_state.sync_bill_reminders = sync_reminders
+            
+            # Show recent synced events
+            if st.button("📅 View Recent Calendar Events"):
+                try:
+                    from datetime import timedelta
+                    start_date = datetime.date.today() - timedelta(days=30)
+                    end_date = datetime.date.today() + timedelta(days=30)
+                    
+                    events = calendar_sync.get_snowbird_events(start_date, end_date)
+                    
+                    if events:
+                        st.write("**Recent Snowbird Calendar Events:**")
+                        for event in events[:10]:  # Show last 10 events
+                            event_type = "🏠" if event['type'] == 'residency_log' else "🔔"
+                            st.write(f"{event_type} {event['title']} - {event['date']}")
+                    else:
+                        st.info("No Snowbird events found in your calendar")
+                        
+                except Exception as e:
+                    st.error(f"Error retrieving calendar events: {e}")
+            
+            # Disconnect option
+            if st.button("🔌 Disconnect from Google Calendar", type="secondary"):
+                calendar_sync.disconnect()
+                st.success("Disconnected from Google Calendar")
+                st.rerun()
+                
+        else:
+            st.info("🔗 Connect your Google Calendar to automatically sync residency logs and reminders")
+            
+            # Instructions for setup
+            with st.expander("📋 Setup Instructions"):
+                st.markdown("""
+                **To enable Google Calendar sync:**
+                
+                1. **Get Google API Credentials:**
+                   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+                   - Create a project or select existing one
+                   - Enable Google Calendar API
+                   - Create OAuth 2.0 credentials
+                
+                2. **Add to Replit Secrets:**
+                   - Add `GOOGLE_CLIENT_ID` with your client ID
+                   - Add `GOOGLE_CLIENT_SECRET` with your client secret
+                
+                3. **Authorize Access:**
+                   - Click "Connect to Google Calendar" below
+                   - Sign in to your Google account
+                   - Grant calendar permissions
+                """)
+            
+            # Show connect button if credentials are available
+            if st.secrets.get("GOOGLE_CLIENT_ID") and st.secrets.get("GOOGLE_CLIENT_SECRET"):
+                if st.button("📅 Connect to Google Calendar", type="primary"):
+                    auth_url = calendar_sync.get_auth_url()
+                    if auth_url:
+                        st.markdown(f"🔗 **[Click here to authorize Google Calendar access]({auth_url})**")
+                        st.info("After authorizing, copy the authorization code and paste it below:")
+                        
+                        auth_code = st.text_input("Authorization Code:", placeholder="Paste code here...")
+                        
+                        if st.button("✅ Complete Setup") and auth_code:
+                            if calendar_sync.authenticate_with_code(auth_code):
+                                st.success("🎉 Successfully connected to Google Calendar!")
+                                st.rerun()
+                            else:
+                                st.error("❌ Failed to connect. Please check your authorization code.")
+                    else:
+                        st.error("Failed to generate authorization URL. Check your Google API credentials.")
+            else:
+                st.warning("⚠️ Google API credentials not found in Replit Secrets. Please add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.")
 
         st.divider()
         st.subheader("Notification Preferences")
@@ -580,6 +676,36 @@ def render_budgets_tab():
                 if st.button("Update Budget", type="primary"):
                     st.session_state.home_budgets[selected_home] = new_budget
                     st.success(f"Budget updated for {selected_home}")
+                    
+                    # Sync bill reminders to calendar if enabled
+                    if (st.session_state.get('sync_bill_reminders', False) and 
+                        'google_calendar_credentials' in st.session_state):
+                        
+                        from utils.google_calendar import calendar_sync
+                        
+                        # Create calendar reminders for bills
+                        try:
+                            today = datetime.date.today()
+                            next_month = today.replace(day=1) + datetime.timedelta(days=32)
+                            next_month = next_month.replace(day=1)
+                            
+                            for category, amount in new_budget.items():
+                                # Create reminder for next month (simplified - in production you'd use actual due dates)
+                                bill_date = next_month.replace(day=15)  # Default to 15th of month
+                                
+                                reminder_created = calendar_sync.create_reminder_event(
+                                    title=f"{selected_home} {category} Bill",
+                                    description=f"${amount} {category} bill due for {selected_home}",
+                                    due_date=bill_date,
+                                    reminder_type="bill"
+                                )
+                                
+                                if reminder_created:
+                                    st.info(f"📅 Created calendar reminder for {category} bill")
+                                    
+                        except Exception as e:
+                            st.warning(f"Calendar sync failed: {e}")
+                    
                     st.rerun()
     else:
         st.info("No properties configured yet. Go to Day Tracker to add properties.")
