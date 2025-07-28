@@ -1065,20 +1065,6 @@ with col1:
                         question = quick_questions[i + j]
     st.markdown('</div>', unsafe_allow_html=True)
 
-with col2:
-    st.markdown('''
-    <div class="info-card">
-        <h4>🎯 Smart Features</h4>
-        <ul style="margin: 0; padding-left: 1.2rem;">
-            <li>🚨 Real-time nudges</li>
-            <li>📊 Risk assessments</li>
-            <li>🗓️ Travel optimization</li>
-            <li>💰 Cost comparisons</li>
-            <li>📋 Tax planning advice</li>
-        </ul>
-    </div>
-    ''', unsafe_allow_html=True)
-
 if st.button("🚀 Get AI Advice"):
     if not openai_available:
         st.session_state.chat_response = "OpenAI API key not configured. Please add your OPENAI_API_KEY to Replit Secrets."
