@@ -401,13 +401,14 @@ def render_day_tracker():
 
             # Sync to Google Calendar if enabled and authenticated
             calendar_synced = False
-            if calendar_sync and sync_to_calendar and calendar_sync.is_authenticated():
+            if calendar_sync and sync_to_calendar:
                 try:
-                    calendar_synced = calendar_sync.create_residency_log_event(
-                        state=current_location,  # Use current_location instead of selected_state
-                        date=custom_date,  # Use custom_date instead of selected_date
-                        notes=f"Snowbird day logged via app on {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}"
-                    )
+                    if hasattr(calendar_sync, 'is_authenticated') and calendar_sync.is_authenticated():
+                        calendar_synced = calendar_sync.create_residency_log_event(
+                            state=current_location,
+                            date=custom_date,
+                            notes=f"Snowbird day logged via app on {datetime.datetime.now().strftime('%Y-%m-%d %H:%M')}"
+                        )
                 except Exception as e:
                     st.warning(f"Calendar sync failed: {e}")
 
@@ -417,7 +418,7 @@ def render_day_tracker():
                 success_msg = f"✅ Logged {current_location} for {formatted_date}"
                 if calendar_synced:
                     success_msg += " 📅 Synced to calendar!"
-                elif sync_to_calendar and (calendar_sync is None or not calendar_sync.is_authenticated()):
+                elif sync_to_calendar and (calendar_sync is None or not hasattr(calendar_sync, 'is_authenticated') or not calendar_sync.is_authenticated()):
                     success_msg += " ⚠️ Calendar not connected - go to Settings to set up sync."
 
                 st.success(success_msg)
