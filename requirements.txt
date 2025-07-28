@@ -23,3 +23,5 @@ streamlit-analytics
 psutil
 mixpanel
 streamlit-authenticator
+psutil
+psutil
