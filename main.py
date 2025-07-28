@@ -272,6 +272,258 @@ except ImportError:
     openai_available = False
     st.info("OpenAI library not available. AI chat features will be disabled.")
 
+# Try to load Gmail API components
+try:
+    from google.auth.transport.requests import Request
+    from google.oauth2.credentials import Credentials
+    from google_auth_oauthlib.flow import InstalledAppFlow
+    from googleapiclient.discovery import build
+    import base64
+    import email
+    import re
+    gmail_available = True
+except ImportError:
+    gmail_available = False
+    st.info("Gmail API libraries not available. Gmail features will be disabled.")
+
+# Gmail API setup
+GMAIL_SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
+
+def authenticate_gmail():
+    """Authenticate with Gmail API"""
+    creds = None
+    
+    # Check if we have stored credentials
+    if 'gmail_creds' in st.session_state:
+        creds = st.session_state.gmail_creds
+    
+    # If there are no (valid) credentials available, let the user log in
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            try:
+                creds.refresh(Request())
+            except Exception as e:
+                st.error(f"Failed to refresh credentials: {e}")
+                return None
+        else:
+            # For production, you'd need to set up OAuth credentials
+            st.warning("Gmail integration requires OAuth setup. Please contact support for setup instructions.")
+            return None
+    
+    st.session_state.gmail_creds = creds
+    return creds
+
+def search_bills_in_gmail(service, query="bill OR invoice OR payment due", max_results=50):
+    """Search for bills and invoices in Gmail"""
+    try:
+        results = service.users().messages().list(
+            userId='me',
+            q=query,
+            maxResults=max_results
+        ).execute()
+        
+        messages = results.get('messages', [])
+        bills_found = []
+        
+        for message in messages:
+            msg = service.users().messages().get(
+                userId='me',
+                id=message['id'],
+                format='full'
+            ).execute()
+            
+            # Extract email content
+            bill_info = extract_bill_info(msg)
+            if bill_info:
+                bills_found.append(bill_info)
+        
+        return bills_found
+    except Exception as e:
+        st.error(f"Error searching Gmail: {e}")
+        return []
+
+def extract_bill_info(message):
+    """Extract bill information from email message"""
+    try:
+        headers = message['payload'].get('headers', [])
+        subject = next((h['value'] for h in headers if h['name'] == 'Subject'), '')
+        sender = next((h['value'] for h in headers if h['name'] == 'From'), '')
+        date = next((h['value'] for h in headers if h['name'] == 'Date'), '')
+        
+        # Get email body
+        body = get_email_body(message['payload'])
+        
+        # Extract amount using regex
+        amount_patterns = [
+            r'\$(\d+[,.]?\d*)',
+            r'(\d+[,.]?\d*)\s*USD',
+            r'Amount.*?\$(\d+[,.]?\d*)',
+            r'Total.*?\$(\d+[,.]?\d*)'
+        ]
+        
+        amount = None
+        for pattern in amount_patterns:
+            match = re.search(pattern, body, re.IGNORECASE)
+            if match:
+                amount = match.group(1).replace(',', '')
+                break
+        
+        # Extract due date
+        due_date_patterns = [
+            r'due\s+(?:on\s+)?(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})',
+            r'payment\s+due\s+(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})',
+            r'due\s+date\s*:?\s*(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})'
+        ]
+        
+        due_date = None
+        for pattern in due_date_patterns:
+            match = re.search(pattern, body, re.IGNORECASE)
+            if match:
+                due_date = match.group(1)
+                break
+        
+        # Determine bill category based on sender
+        category = categorize_bill(sender, subject)
+        
+        if amount or due_date:
+            return {
+                'subject': subject,
+                'sender': sender,
+                'amount': float(amount) if amount else 0,
+                'due_date': due_date,
+                'category': category,
+                'email_date': date,
+                'message_id': message['id']
+            }
+        
+        return None
+    except Exception as e:
+        return None
+
+def get_email_body(payload):
+    """Extract text body from email payload"""
+    body = ""
+    
+    if 'parts' in payload:
+        for part in payload['parts']:
+            if part['mimeType'] == 'text/plain':
+                data = part['body']['data']
+                body = base64.urlsafe_b64decode(data).decode('utf-8')
+                break
+    else:
+        if payload['mimeType'] == 'text/plain':
+            data = payload['body']['data']
+            body = base64.urlsafe_b64decode(data).decode('utf-8')
+    
+    return body
+
+def categorize_bill(sender, subject):
+    """Categorize bill based on sender and subject"""
+    sender_lower = sender.lower()
+    subject_lower = subject.lower()
+    
+    if any(word in sender_lower for word in ['electric', 'power', 'energy', 'utility']):
+        return 'Utilities'
+    elif any(word in sender_lower for word in ['water', 'sewer']):
+        return 'Utilities'
+    elif any(word in sender_lower for word in ['gas', 'propane']):
+        return 'Utilities'
+    elif any(word in sender_lower for word in ['insurance', 'allstate', 'geico', 'progressive']):
+        return 'Insurance'
+    elif any(word in sender_lower for word in ['hoa', 'association', 'community']):
+        return 'HOA'
+    elif any(word in sender_lower for word in ['mortgage', 'loan', 'bank']):
+        return 'Mortgage'
+    elif any(word in sender_lower for word in ['credit', 'visa', 'mastercard', 'amex']):
+        return 'Credit Card'
+    else:
+        return 'Other'
+
+def search_travel_confirmations(service):
+    """Search for travel confirmations in Gmail"""
+    try:
+        travel_queries = [
+            'flight confirmation',
+            'booking confirmation',
+            'itinerary',
+            'travel confirmation',
+            'airline',
+            'hotel reservation'
+        ]
+        
+        travel_info = []
+        
+        for query in travel_queries:
+            results = service.users().messages().list(
+                userId='me',
+                q=query,
+                maxResults=20
+            ).execute()
+            
+            messages = results.get('messages', [])
+            
+            for message in messages:
+                msg = service.users().messages().get(
+                    userId='me',
+                    id=message['id'],
+                    format='full'
+                ).execute()
+                
+                travel_data = extract_travel_info(msg)
+                if travel_data:
+                    travel_info.append(travel_data)
+        
+        return travel_info
+    except Exception as e:
+        st.error(f"Error searching travel confirmations: {e}")
+        return []
+
+def extract_travel_info(message):
+    """Extract travel information from email"""
+    try:
+        headers = message['payload'].get('headers', [])
+        subject = next((h['value'] for h in headers if h['name'] == 'Subject'), '')
+        sender = next((h['value'] for h in headers if h['name'] == 'From'), '')
+        
+        body = get_email_body(message['payload'])
+        
+        # Extract travel dates
+        date_patterns = [
+            r'(?:departure|depart|leaving)\s*:?\s*(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})',
+            r'(?:arrival|arrive|arriving)\s*:?\s*(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})',
+            r'(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})'
+        ]
+        
+        dates = []
+        for pattern in date_patterns:
+            matches = re.findall(pattern, body, re.IGNORECASE)
+            dates.extend(matches)
+        
+        # Extract destinations
+        destination_patterns = [
+            r'(?:to|destination)\s*:?\s*([A-Z]{3})',  # Airport codes
+            r'(?:to|destination)\s*:?\s*([A-Za-z\s]+?)(?:\n|,)',
+        ]
+        
+        destinations = []
+        for pattern in destination_patterns:
+            matches = re.findall(pattern, body, re.IGNORECASE)
+            destinations.extend(matches)
+        
+        if dates or destinations:
+            return {
+                'subject': subject,
+                'sender': sender,
+                'dates': dates,
+                'destinations': destinations,
+                'type': 'travel',
+                'message_id': message['id']
+            }
+        
+        return None
+    except Exception as e:
+        return None
+
 # Default data
 default_states = {"Arizona": 0, "Minnesota": 0}
 default_home_budgets = {
@@ -396,14 +648,15 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Navigation tabs
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "Dashboard", 
     "Day Tracker", 
     "Budgets", 
     "AI Assistant", 
     "Reports", 
     "Migration Checklist",
-    "Bill Tracker"
+    "Bill Tracker",
+    "Gmail Integration"
 ])
 
 # Tab 1: Dashboard
@@ -1005,12 +1258,230 @@ with tab7:
 
     st.markdown('</div>', unsafe_allow_html=True)
 
+# Tab 8: Gmail Integration
+with tab8:
+    st.markdown('<h2><i data-lucide="mail" class="icon"></i>Gmail Integration</h2>', unsafe_allow_html=True)
+
+    if not gmail_available:
+        st.warning("Gmail integration requires additional libraries. Install google-api-python-client and related packages.")
+        
+        # Show setup instructions
+        st.markdown('<div class="winter-card">', unsafe_allow_html=True)
+        st.markdown('**<i data-lucide="settings" class="icon"></i>Setup Instructions:**', unsafe_allow_html=True)
+        st.write("1. Install required packages (already added to requirements.txt)")
+        st.write("2. Set up Google Cloud Project and enable Gmail API")
+        st.write("3. Create OAuth 2.0 credentials")
+        st.write("4. Add credentials to Replit Secrets")
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        # Show demo of what the features would do
+        st.markdown('<div class="winter-card">', unsafe_allow_html=True)
+        st.markdown('**<i data-lucide="eye" class="icon"></i>Available Features (when enabled):**', unsafe_allow_html=True)
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown('**<i data-lucide="receipt" class="icon"></i>Bill Detection:**', unsafe_allow_html=True)
+            st.write("• Auto-scan emails for utility bills")
+            st.write("• Extract due dates and amounts")
+            st.write("• Categorize by bill type")
+            st.write("• Add to bill tracker automatically")
+            
+        with col2:
+            st.markdown('**<i data-lucide="plane" class="icon"></i>Travel Tracking:**', unsafe_allow_html=True)
+            st.write("• Find flight confirmations")
+            st.write("• Extract travel dates")
+            st.write("• Track destination changes")
+            st.write("• Auto-log location changes")
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+
+    else:
+        # Gmail authentication section
+        st.markdown('<div class="winter-card">', unsafe_allow_html=True)
+        st.markdown('**<i data-lucide="key" class="icon"></i>Gmail Connection**', unsafe_allow_html=True)
+        
+        if 'gmail_authenticated' not in st.session_state:
+            st.session_state.gmail_authenticated = False
+        
+        if not st.session_state.gmail_authenticated:
+            if st.button("Connect to Gmail", type="primary"):
+                creds = authenticate_gmail()
+                if creds:
+                    st.session_state.gmail_authenticated = True
+                    st.success("Successfully connected to Gmail!")
+                    st.rerun()
+                else:
+                    st.error("Failed to connect to Gmail. Please check your credentials.")
+        else:
+            st.success("Connected to Gmail!")
+            
+            col1, col2 = st.columns([3, 1])
+            with col1:
+                st.write("Your Gmail account is connected and ready to scan for bills and travel confirmations.")
+            with col2:
+                if st.button("Disconnect"):
+                    st.session_state.gmail_authenticated = False
+                    if 'gmail_creds' in st.session_state:
+                        del st.session_state.gmail_creds
+                    st.rerun()
+        
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        # Bill scanning section
+        if st.session_state.gmail_authenticated:
+            st.markdown('<div class="winter-card">', unsafe_allow_html=True)
+            st.markdown('**<i data-lucide="search" class="icon"></i>Scan for Bills**', unsafe_allow_html=True)
+            
+            col1, col2 = st.columns([2, 1])
+            
+            with col1:
+                search_query = st.text_input(
+                    "Custom search query:",
+                    value="bill OR invoice OR payment due",
+                    help="Modify the search terms to find specific bills"
+                )
+                
+                max_emails = st.number_input("Max emails to scan:", min_value=10, max_value=200, value=50)
+            
+            with col2:
+                if st.button("Scan Bills", type="primary"):
+                    with st.spinner("Scanning your Gmail for bills..."):
+                        try:
+                            creds = st.session_state.gmail_creds
+                            service = build('gmail', 'v1', credentials=creds)
+                            
+                            bills = search_bills_in_gmail(service, search_query, max_emails)
+                            
+                            if bills:
+                                st.success(f"Found {len(bills)} potential bills!")
+                                st.session_state.scanned_bills = bills
+                            else:
+                                st.info("No bills found with current search criteria.")
+                        except Exception as e:
+                            st.error(f"Error scanning emails: {e}")
+            
+            # Display scanned bills
+            if 'scanned_bills' in st.session_state and st.session_state.scanned_bills:
+                st.markdown('**<i data-lucide="list" class="icon"></i>Found Bills:**', unsafe_allow_html=True)
+                
+                for i, bill in enumerate(st.session_state.scanned_bills):
+                    with st.expander(f"{bill['sender']} - ${bill['amount']} ({bill['category']})"):
+                        col1, col2, col3 = st.columns(3)
+                        
+                        with col1:
+                            st.write(f"**Subject:** {bill['subject']}")
+                            st.write(f"**Amount:** ${bill['amount']}")
+                            st.write(f"**Category:** {bill['category']}")
+                        
+                        with col2:
+                            st.write(f"**Due Date:** {bill['due_date'] or 'Not found'}")
+                            st.write(f"**Sender:** {bill['sender']}")
+                        
+                        with col3:
+                            # Option to add to bill tracker
+                            bill_state = st.selectbox(
+                                "Add to state:",
+                                list(st.session_state.bills.keys()),
+                                key=f"bill_state_{i}"
+                            )
+                            
+                            if st.button(f"Add to {bill_state}", key=f"add_bill_{i}"):
+                                # Extract day from due date if available
+                                due_day = "15"  # Default
+                                if bill['due_date']:
+                                    try:
+                                        # Try to extract day from various date formats
+                                        import datetime as dt
+                                        for fmt in ['%m/%d/%Y', '%m-%d-%Y', '%d/%m/%Y']:
+                                            try:
+                                                date_obj = dt.datetime.strptime(bill['due_date'], fmt)
+                                                due_day = str(date_obj.day)
+                                                break
+                                            except:
+                                                continue
+                                    except:
+                                        pass
+                                
+                                new_bill = {
+                                    "name": bill['category'],
+                                    "amount": int(bill['amount']),
+                                    "due_date": due_day,
+                                    "frequency": "monthly"
+                                }
+                                
+                                st.session_state.bills[bill_state].append(new_bill)
+                                st.success(f"Added {bill['category']} bill to {bill_state}!")
+            
+            st.markdown('</div>', unsafe_allow_html=True)
+
+            # Travel confirmation scanning
+            st.markdown('<div class="winter-card">', unsafe_allow_html=True)
+            st.markdown('**<i data-lucide="plane-takeoff" class="icon"></i>Scan for Travel Confirmations**', unsafe_allow_html=True)
+            
+            if st.button("Scan Travel Confirmations", type="secondary"):
+                with st.spinner("Scanning for travel confirmations..."):
+                    try:
+                        creds = st.session_state.gmail_creds
+                        service = build('gmail', 'v1', credentials=creds)
+                        
+                        travel_info = search_travel_confirmations(service)
+                        
+                        if travel_info:
+                            st.success(f"Found {len(travel_info)} travel confirmations!")
+                            st.session_state.scanned_travel = travel_info
+                        else:
+                            st.info("No travel confirmations found.")
+                    except Exception as e:
+                        st.error(f"Error scanning travel emails: {e}")
+            
+            # Display travel confirmations
+            if 'scanned_travel' in st.session_state and st.session_state.scanned_travel:
+                st.markdown('**<i data-lucide="calendar-days" class="icon"></i>Found Travel Confirmations:**', unsafe_allow_html=True)
+                
+                for i, travel in enumerate(st.session_state.scanned_travel):
+                    with st.expander(f"Travel: {travel['subject'][:60]}..."):
+                        st.write(f"**From:** {travel['sender']}")
+                        st.write(f"**Dates Found:** {', '.join(travel['dates'])}")
+                        st.write(f"**Destinations:** {', '.join(travel['destinations'])}")
+                        
+                        # Option to log location changes
+                        if travel['dates']:
+                            for date_str in travel['dates'][:2]:  # Limit to first 2 dates
+                                col1, col2, col3 = st.columns(3)
+                                
+                                with col1:
+                                    st.write(f"Date: {date_str}")
+                                
+                                with col2:
+                                    travel_state = st.selectbox(
+                                        "Destination state:",
+                                        list(st.session_state.states.keys()),
+                                        key=f"travel_state_{i}_{date_str}"
+                                    )
+                                
+                                with col3:
+                                    if st.button(f"Log {date_str}", key=f"log_travel_{i}_{date_str}"):
+                                        try:
+                                            # Convert date format if needed
+                                            import datetime as dt
+                                            date_obj = dt.datetime.strptime(date_str, '%m/%d/%Y').date()
+                                            success, message = add_day_log(travel_state, date_obj.isoformat())
+                                            if success:
+                                                st.success(message)
+                                            else:
+                                                st.warning(message)
+                                        except:
+                                            st.error("Could not parse date format")
+            
+            st.markdown('</div>', unsafe_allow_html=True)
+
 # Footer with TODO notes
 st.markdown("---")
 st.markdown("""
 <div style="text-align: center; color: #64748B; font-size: 0.9rem; padding: 1rem;">
     <p><strong><i data-lucide="rocket" class="icon"></i>Coming Soon:</strong></p>
-    <p><i data-lucide="calendar" class="icon"></i>Google Calendar Integration • <i data-lucide="shield" class="icon"></i>Multi-device Sync • <i data-lucide="smartphone" class="icon"></i>Mobile App (CapacitorJS) • <i data-lucide="mail" class="icon"></i>Email Reminders</p>
+    <p><i data-lucide="calendar" class="icon"></i>Google Calendar Integration • <i data-lucide="shield" class="icon"></i>Multi-device Sync • <i data-lucide="smartphone" class="icon"></i>Mobile App (CapacitorJS) • <i data-lucide="database" class="icon"></i>Banking Integration (Plaid)</p>
     <p><em>Built with <i data-lucide="snowflake" class="icon"></i> by Snowbird Financial Assistant</em></p>
 </div>
 
