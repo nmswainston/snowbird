@@ -34,7 +34,7 @@ mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "streamlit run main.py --server.port 5000 --server.address 0.0.0.0 --browser.gatherUsageStats false --theme.base light"
+args = "streamlit run main.py --server.port 5000 --server.address 0.0.0.0 --browser.gatherUsageStats false --theme.base light --server.headless true --server.enableCORS false --server.enableWebsocketCompression false"
 
 [[ports]]
 localPort = 5000

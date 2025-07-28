@@ -13,7 +13,25 @@ from typing import Dict, Any, List
 
 from components.analytics import get_analytics_summary
 from utils.logging_config import logger
-from config import config
+
+# Import config more safely to avoid circular imports
+try:
+    from config import config
+except ImportError:
+    import os
+    # Fallback config if import fails
+    class FallbackConfig:
+        environment = os.getenv('ENVIRONMENT', 'development')
+        debug = os.getenv('DEBUG', 'false').lower() == 'true'
+        tax_threshold = int(os.getenv('TAX_THRESHOLD', '183'))
+        server_host = os.getenv('SERVER_HOST', '0.0.0.0')
+        server_port = int(os.getenv('SERVER_PORT', '5000'))
+        enable_gmail_integration = os.getenv('ENABLE_GMAIL_INTEGRATION', 'true').lower() == 'true'
+        enable_ai_features = os.getenv('ENABLE_AI_FEATURES', 'true').lower() == 'true'
+        enable_notifications = os.getenv('ENABLE_NOTIFICATIONS', 'true').lower() == 'true'
+        gmail_credentials_file = os.getenv('GMAIL_CREDENTIALS_FILE')
+    
+    config = FallbackConfig()
 
 # Simple audit logger if not available
 class AuditLogger:
