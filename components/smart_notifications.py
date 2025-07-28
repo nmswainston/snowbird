@@ -1,20 +1,20 @@
-
+# Removing the Hawaiian expression import and updating the success message to plain English.
 import streamlit as st
 import datetime
 from typing import List, Dict, Any
 
 class SmartNotificationSystem:
     """Intelligent notification system for Snowbird app"""
-    
+
     @staticmethod
     def get_priority_alerts() -> List[Dict[str, Any]]:
         """Generate priority alerts based on user data"""
         alerts = []
-        
+
         # Get current data
         states = st.session_state.get('states', {})
         tax_threshold = st.session_state.get('tax_threshold', 183)
-        
+
         for state, days in states.items():
             # High priority: Close to threshold
             if days > tax_threshold * 0.9:
@@ -25,7 +25,7 @@ class SmartNotificationSystem:
                     'message': f'Only {tax_threshold - days} days left before tax residency!',
                     'priority': 'high'
                 })
-            
+
             # Medium priority: Getting close
             elif days > tax_threshold * 0.75:
                 alerts.append({
@@ -35,7 +35,7 @@ class SmartNotificationSystem:
                     'message': f'{days} days logged. Consider planning your moves.',
                     'priority': 'medium'
                 })
-        
+
         # Budget alerts
         budgets = st.session_state.get('home_budgets', {})
         for home, budget in budgets.items():
@@ -48,23 +48,23 @@ class SmartNotificationSystem:
                     'message': f'{home}: ${total:,}/month - Consider optimization',
                     'priority': 'low'
                 })
-        
+
         # Sort by priority
         priority_order = {'high': 3, 'medium': 2, 'low': 1}
         alerts.sort(key=lambda x: priority_order.get(x['priority'], 0), reverse=True)
-        
+
         return alerts[:5]  # Top 5 alerts
-    
+
     @staticmethod
     def render_notification_banner():
         """Render notification banner at top of dashboard"""
         alerts = SmartNotificationSystem.get_priority_alerts()
-        
+
         if not alerts:
-            # Show positive message when no alerts
+            # Show positive message when no alerts with standard messaging
             st.success("🌊 Great job! You're staying compliant and on budget!")
             return
-        
+
         # Show alerts in compact banner
         for alert in alerts:
             if alert['type'] == 'danger':
@@ -73,15 +73,15 @@ class SmartNotificationSystem:
                 st.warning(f"{alert['icon']} **{alert['title']}**: {alert['message']}")
             else:
                 st.info(f"{alert['icon']} **{alert['title']}**: {alert['message']}")
-    
+
     @staticmethod
     def render_notification_sidebar():
         """Render notifications in sidebar"""
         with st.sidebar:
             st.markdown("### 🔔 Smart Alerts")
-            
+
             alerts = SmartNotificationSystem.get_priority_alerts()
-            
+
             if alerts:
                 for alert in alerts[:3]:  # Show top 3 in sidebar
                     st.markdown(f"""
@@ -102,3 +102,4 @@ def render_smart_notifications():
 def render_sidebar_notifications():
     """Render sidebar notifications"""
     SmartNotificationSystem.render_notification_sidebar()
+`

@@ -88,7 +88,7 @@ def main():
     </head>
     """, unsafe_allow_html=True)
 
-    # Render main header with Hawaiian vibes
+    # Render main header with enhanced styling
     render_main_header()
 
     # Add welcome banner
@@ -109,7 +109,7 @@ def main():
 
     # Dashboard now includes integrated quick actions
 
-    # Mobile-optimized navigation with Hawaiian expressions
+    # Mobile-optimized navigation with enhanced features
     import streamlit.components.v1 as components
 
     # Auto-detect mobile with better method

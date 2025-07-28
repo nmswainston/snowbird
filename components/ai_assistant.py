@@ -68,4 +68,4 @@ def get_ai_response(question: str, context: dict = None) -> str:
 
     except Exception as e:
         logger.error(f"Error getting AI response: {e}")
-        return "Bummer brah! 🏄‍♂️ Da waves stay choppy right now and I stay having trouble catching your question. Give um another shot in one minute, or holler at support if dis keeps happening. No worries though - we gonna get you sorted! Stay cool! 🤙"
+        return "I apologize, but I'm currently experiencing some technical difficulties. Please try again in a few minutes. If the problem persists, please contact support. We'll get it sorted out!"

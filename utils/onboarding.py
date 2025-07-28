@@ -8,6 +8,7 @@ to key features and helping them get started with the application.
 import streamlit as st
 from typing import Dict, List, Any
 import time
+from utils.hawaiian_features import StandardFeatures
 
 
 # Onboarding steps configuration
@@ -481,9 +482,10 @@ def render_onboarding_carousel():
                     st.session_state.onboarding_step += 1
                     st.rerun()
             else:
+                success_msg = StandardFeatures.get_success_message()
                 if st.button("Get Started", key="onboarding_finish", type="primary"):
                     st.session_state.onboarded = True
-                    st.success("🎉 Welcome to Snowbird! You're all set to start tracking your residency!")
+                    st.success(f"{success_msg} Welcome to Snowbird! You're all set to start tracking your residency!")
                     st.balloons()  # Celebration effect
                     # Scroll to top after onboarding completion
                     st.markdown("""

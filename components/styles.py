@@ -317,7 +317,7 @@ def apply_basic_styles():
     </style>
     """, unsafe_allow_html=True)
 
-    # Add mobile optimizations with Hawaiian flair
+    # Add mobile optimizations with enhanced styling
     st.markdown("""
     <style>
     /* Mobile-first responsive design with island vibes */
@@ -420,7 +420,7 @@ def apply_basic_styles():
         }
     }
 
-    /* Hawaiian-themed colors and animations */
+    /* Enhanced colors and animations */
     .hawaii-card {
         background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
         border: 1px solid #0ea5e9;

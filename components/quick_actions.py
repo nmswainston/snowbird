@@ -1,9 +1,9 @@
-
+# This script renders floating action buttons and a quick action panel in a Streamlit app.
 import streamlit as st
 
 def render_floating_actions():
     """Render floating action buttons for quick tasks"""
-    
+
     # Floating action button CSS
     st.markdown("""
     <style>
@@ -16,7 +16,7 @@ def render_floating_actions():
         flex-direction: column;
         gap: 10px;
     }
-    
+
     .fab {
         width: 56px;
         height: 56px;
@@ -31,27 +31,27 @@ def render_floating_actions():
         transition: all 0.3s ease;
         text-decoration: none;
     }
-    
+
     .fab:hover {
         transform: scale(1.1);
         box-shadow: 0 6px 20px rgba(0,0,0,0.25);
     }
-    
+
     .fab-primary {
         background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
         color: white;
     }
-    
+
     .fab-secondary {
         background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         color: white;
     }
-    
+
     .fab-info {
         background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
         color: white;
     }
-    
+
     @media (max-width: 768px) {
         .floating-actions {
             bottom: 80px; /* Account for mobile browser bars */
@@ -64,7 +64,7 @@ def render_floating_actions():
         }
     }
     </style>
-    
+
     <div class="floating-actions">
         <button class="fab fab-primary" onclick="document.querySelector('[data-testid=stSidebar] button:contains(📅)').click()" title="Quick Log Day">
             📅
@@ -79,53 +79,53 @@ def render_floating_actions():
     """, unsafe_allow_html=True)
 
 def render_quick_action_panel():
-    """Render quick action panel at top of dashboard"""
-    
+    """Render quick action panel at top of dashboard with enhanced styling"""
+
     st.markdown(f"### ⚡ Quick Actions")
-    
+
     # Make it mobile-responsive
     is_mobile = st.session_state.get('mobile_view', False)
-    
+
     if is_mobile:
         # Stack buttons vertically on mobile
         col1, col2 = st.columns(2)
-        
+
         with col1:
             if st.button("📅 Log Today", use_container_width=True, type="primary"):
                 st.session_state.quick_action = "log_day"
                 st.switch_page("📅 Day Tracker")
-            
+
             if st.button("🤖 Ask AI Assistant", use_container_width=True):
                 st.session_state.quick_action = "ask_ai"
                 st.switch_page("🤖 AI Assistant")
-        
+
         with col2:
             if st.button("💰 Check Budget", use_container_width=True):
                 st.session_state.quick_action = "check_budget"
                 st.switch_page("💰 Budgets")
-            
+
             if st.button("📊 Full Report", use_container_width=True):
                 st.session_state.quick_action = "view_report"
                 st.switch_page("📋 Reports")
     else:
         # Desktop layout - 4 columns
         col1, col2, col3, col4 = st.columns(4)
-        
+
         with col1:
             if st.button("📅 Log Today", use_container_width=True, type="primary"):
                 st.session_state.quick_action = "log_day"
                 st.switch_page("📅 Day Tracker")
-        
+
         with col2:
             if st.button("💰 Check Budget", use_container_width=True):
                 st.session_state.quick_action = "check_budget"
                 st.switch_page("💰 Budgets")
-        
+
         with col3:
             if st.button("🤖 Ask AI Assistant", use_container_width=True):
                 st.session_state.quick_action = "ask_ai"
                 st.switch_page("🤖 AI Assistant")
-        
+
         with col4:
             if st.button("📊 Full Report", use_container_width=True):
                 st.session_state.quick_action = "view_report"
