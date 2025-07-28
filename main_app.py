@@ -89,13 +89,12 @@ def main():
     render_main_header()
     
     # Add welcome banner
-    from utils.hawaii_expressions import da_kine_time_vibe
     if not st.session_state.get('onboarded', False):
         st.markdown(f"""
         <div style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); 
                     padding: 1rem; border-radius: 8px; text-align: center; margin-bottom: 1rem;">
             <p style="color: white; margin: 0; font-size: 1.1rem;">
-                🌺 Welcome to your Snowbird community! 🏄‍♂️
+                🏠 Welcome to your Snowbird Financial Assistant! 📊
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -1614,7 +1613,7 @@ def render_footer():
     st.markdown(f"""
     <div style="text-align: center; color: #64748B; font-size: 0.9rem; padding: 1.5rem;">
         <div style="margin-bottom: 1rem;">
-            <strong style="color: #12BDF2;">🌺 Snowbird Financial Assistant 🌺</strong>
+            <strong style="color: #12BDF2;">🏠 Snowbird Financial Assistant 📊</strong>
         </div>
         <div style="margin-bottom: 1rem;">
             <span style="margin: 0 1rem;">📍 Multi-State Tax Planning</span>
@@ -1622,10 +1621,10 @@ def render_footer():
             <span style="margin: 0 1rem;">🤖 AI-Powered Insights</span>
         </div>
         <div style="font-size: 0.8rem; color: #94A3B8;">
-            Built with care ❤️ and attention to detail 🌊 for seasonal residents everywhere<br>
-            <em>Helping snowbirds navigate their finances with confidence and ease! 🤙</em><br>
+            Built with care ❤️ and attention to detail 📊 for seasonal residents everywhere<br>
+            <em>Helping snowbirds navigate their finances with confidence and ease! 💼</em><br>
             <small style="color: #0ea5e9; font-style: italic;">
-                Thank you for choosing our platform! 🌺
+                Thank you for choosing our platform! 🌟
             </small>
         </div>
     </div>

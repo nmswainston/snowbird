@@ -1,123 +1,117 @@
 
 """
-Hawaiian Features - Da Kine implementation for Snowbird app
-Adds authentic Hawaiian/pidgin elements and island vibes
+Standard Features for Snowbird app
+Provides regular English expressions and messaging
 """
 
 import streamlit as st
 import random
 from typing import Dict, List
 
-class HawaiianFeatures:
-    """Da kine Hawaiian features for the Snowbird app"""
+class StandardFeatures:
+    """Standard features for the Snowbird app"""
     
-    # Hawaiian/Pidgin greetings and expressions (for island mode)
+    # Standard greetings and expressions
     GREETINGS = [
-        "Hello there! 🤙",
-        "How's it going? 🌺",
-        "Good to see you! 🏄‍♂️",
-        "Hey, what's up? 🌴",
+        "Hello there! 👋",
+        "How's it going? 😊",
+        "Good to see you! 👍",
+        "Hey, what's up? 🙂",
         "Good morning! ☀️",
-        "Hope you're having a great day! 🌊"
+        "Hope you're having a great day! 😊"
     ]
     
     RESPONSES = [
-        "Sounds great! 🤙",
-        "Perfect, looks good! 🏄‍♂️", 
-        "Excellent choice! 🌺",
-        "Nice work! 🤙",
-        "Looking solid! 🌴",
-        "That's wonderful! 🌊"
+        "Sounds great! 👍",
+        "Perfect, looks good! ✅", 
+        "Excellent choice! 🎯",
+        "Nice work! 👏",
+        "Looking good! 📈",
+        "That's wonderful! 🌟"
     ]
     
     SUCCESS_MESSAGES = [
-        "Excellent! Success! 🤙",
-        "Awesome! All set! 🏄‍♂️",
-        "Working perfectly! 🌺",
-        "Great! Good to go! 🌴",
+        "Excellent! Success! ✅",
+        "Awesome! All set! 🎉",
+        "Working perfectly! 👍",
+        "Great! Good to go! 🚀",
         "Perfect! All done! ✅",
-        "Success achieved! 🌊"
+        "Success achieved! 🎯"
     ]
     
-    # Island-themed financial terms
-    FINANCIAL_PIDGIN = {
-        "budget": "money kine",
-        "expenses": "spending da cash",
-        "savings": "saving da coins",
-        "tax": "government kine",
-        "residency": "where stay living",
-        "property": "da house",
-        "utilities": "light bill an dat",
-        "insurance": "protection kine",
-        "maintenance": "fix up da place"
+    # Standard financial terms
+    FINANCIAL_TERMS = {
+        "budget": "budget",
+        "expenses": "expenses",
+        "savings": "savings",
+        "tax": "tax",
+        "residency": "residency",
+        "property": "property",
+        "utilities": "utilities",
+        "insurance": "insurance",
+        "maintenance": "maintenance"
     }
     
-    # State nicknames Hawaiian style
-    STATE_NICKNAMES = {
-        "Arizona": "Da Desert Place 🌵",
-        "Minnesota": "Da Cold Place ❄️",
-        "California": "Da Mainland West 🏖️",
-        "Florida": "Da Other Warm Place 🐊",
-        "Hawaii": "Da Aina 🌺"
+    # Standard state references
+    STATE_REFERENCES = {
+        "Arizona": "Arizona 🌵",
+        "Minnesota": "Minnesota ❄️",
+        "California": "California 🏖️",
+        "Florida": "Florida 🌴",
+        "Hawaii": "Hawaii 🌺"
     }
     
     @staticmethod
     def get_random_greeting() -> str:
-        """Get a random Hawaiian greeting"""
-        return random.choice(HawaiianFeatures.GREETINGS)
+        """Get a random standard greeting"""
+        return random.choice(StandardFeatures.GREETINGS)
     
     @staticmethod
     def get_success_message() -> str:
         """Get a random success message"""
-        return random.choice(HawaiianFeatures.SUCCESS_MESSAGES)
+        return random.choice(StandardFeatures.SUCCESS_MESSAGES)
     
     @staticmethod
     def get_response() -> str:
         """Get a random positive response"""
-        return random.choice(HawaiianFeatures.RESPONSES)
+        return random.choice(StandardFeatures.RESPONSES)
     
     @staticmethod
-    def translate_to_pidgin(text: str) -> str:
-        """Translate financial terms to Hawaiian pidgin"""
-        for english, pidgin in HawaiianFeatures.FINANCIAL_PIDGIN.items():
-            text = text.replace(english, pidgin)
-        return text
+    def get_financial_term(term: str) -> str:
+        """Get standard financial term"""
+        return StandardFeatures.FINANCIAL_TERMS.get(term, term)
     
     @staticmethod
-    def get_state_nickname(state: str) -> str:
-        """Get Hawaiian-style nickname for state"""
-        return HawaiianFeatures.STATE_NICKNAMES.get(state, f"Da {state} Place 🏝️")
+    def get_state_reference(state: str) -> str:
+        """Get standard state reference"""
+        return StandardFeatures.STATE_REFERENCES.get(state, f"{state} 🏠")
     
     @staticmethod
-    def render_island_vibes_banner():
-        """Render island vibes banner"""
+    def render_welcome_banner():
+        """Render standard welcome banner"""
         st.markdown("""
-        <div style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 50%, #fff200 100%); 
+        <div style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); 
                     padding: 1rem; border-radius: 12px; text-align: center; margin-bottom: 1rem;
-                    box-shadow: 0 4px 15px rgba(255,107,53,0.3);">
+                    box-shadow: 0 4px 15px rgba(14,165,233,0.3);">
             <h3 style="color: white; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3);">
-                🌺 Island Vibes Mode Active 🤙
+                🏠 Snowbird Financial Assistant
             </h3>
-            <p style="color: #fff3cd; margin: 0.5rem 0 0 0; font-size: 0.9rem;">
-                Living da snowbird life with aloha spirit! 🏄‍♂️🌴
+            <p style="color: #dbeafe; margin: 0.5rem 0 0 0; font-size: 0.9rem;">
+                Managing your seasonal residence finances made easy! 📊
             </p>
         </div>
         """, unsafe_allow_html=True)
     
     @staticmethod
-    def render_pidgin_translator():
-        """Render pidgin translator widget"""
-        with st.expander("🗣️ Pidgin Translator - Da Kine Helper", expanded=False):
-            st.markdown("**Translate your financial terms to Hawaiian pidgin:**")
+    def render_financial_terms():
+        """Render financial terms reference"""
+        with st.expander("📚 Financial Terms Reference", expanded=False):
+            st.markdown("**Common terms used in the app:**")
             
-            english_text = st.text_input(
-                "Enter English text:",
-                placeholder="Enter budget, expenses, tax residency, etc."
-            )
-            
-            if english_text:
-                pidgin_text = HawaiianFeatures.translate_to_pidgin(english_text)
-                st.success(f"**Pidgin:** {pidgin_text}")
+            for english_term, definition in StandardFeatures.FINANCIAL_TERMS.items():
+                st.write(f"• **{english_term.title()}**: {definition}")
+                
+            st.info("💡 All terms are displayed in standard English throughout the app.")
     
     @staticmethod
     def render_surf_report_style_metrics(metric_name: str, value: str, delta: str = ""):
@@ -138,45 +132,39 @@ class HawaiianFeatures:
         </div>
         """, unsafe_allow_html=True)
 
-def enable_hawaiian_mode():
-    """Enable Hawaiian/pidgin mode for the app"""
-    if 'hawaiian_mode' not in st.session_state:
-        st.session_state.hawaiian_mode = False
+def enable_enhanced_features():
+    """Enable enhanced features for the app"""
+    if 'enhanced_mode' not in st.session_state:
+        st.session_state.enhanced_mode = False
     
     # Toggle button in sidebar
     with st.sidebar:
         st.markdown("---")
-        hawaiian_mode = st.toggle(
-            "🌺 Island Vibes Mode",
-            value=st.session_state.hawaiian_mode,
-            help="Enable Hawaiian pidgin and island styling"
+        enhanced_mode = st.toggle(
+            "✨ Enhanced Features",
+            value=st.session_state.enhanced_mode,
+            help="Enable additional features and enhanced styling"
         )
-        st.session_state.hawaiian_mode = hawaiian_mode
+        st.session_state.enhanced_mode = enhanced_mode
         
-        if hawaiian_mode:
-            st.success("Aloha! 🤙 Island mode active!")
-            st.markdown("**Da Kine Features:**")
-            st.write("🗣️ Pidgin translations")
-            st.write("🌺 Island-style greetings")
-            st.write("🏄‍♂️ Surf report metrics")
-            st.write("🌴 Hawaiian nicknames")
+        if enhanced_mode:
+            st.success("Enhanced features active! ✨")
+            st.markdown("**Available Features:**")
+            st.write("💬 Enhanced greetings")
+            st.write("📊 Advanced metrics")
+            st.write("🎯 Smart suggestions")
+            st.write("🏠 Property insights")
 
-def render_hawaiian_greeting():
-    """Render Hawaiian greeting if mode is enabled"""
-    if st.session_state.get('hawaiian_mode', False):
-        greeting = HawaiianFeatures.get_random_greeting()
-        st.success(greeting)
+def render_standard_greeting():
+    """Render standard greeting"""
+    greeting = StandardFeatures.get_random_greeting()
+    st.success(greeting)
 
-def render_island_success(message: str):
-    """Render success message with island flavor"""
-    if st.session_state.get('hawaiian_mode', False):
-        island_message = HawaiianFeatures.get_success_message()
-        st.success(f"{island_message} {message}")
-    else:
-        st.success(message)
+def render_success_message(message: str):
+    """Render success message"""
+    success_message = StandardFeatures.get_success_message()
+    st.success(f"{success_message} {message}")
 
-def get_hawaiian_state_name(state: str) -> str:
-    """Get Hawaiian-style state name if mode enabled"""
-    if st.session_state.get('hawaiian_mode', False):
-        return HawaiianFeatures.get_state_nickname(state)
-    return state
+def get_state_display_name(state: str) -> str:
+    """Get standard state display name"""
+    return StandardFeatures.get_state_reference(state)

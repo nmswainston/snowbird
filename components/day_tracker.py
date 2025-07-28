@@ -321,7 +321,7 @@ def render_day_tracker():
 def render_day_tracker():
     """Render the day tracking interface"""
     st.markdown('<h2><i data-lucide="calendar-days" class="icon"></i>Residency Day Tracker</h2>', unsafe_allow_html=True)
-    st.markdown("*Time to log your location and track your residency!* 🤙")
+    st.markdown("*Track your daily locations for accurate tax residency management.* 📊")
 
     # Horizontal divider after header for visual separation
     st.markdown("---")

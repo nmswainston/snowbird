@@ -39,7 +39,7 @@ def render_dashboard():
             Your complete seasonal residence overview
         </p>
         <p style="color: #0ea5e9; font-size: 1rem; font-style: italic;">
-            Ready to track your residency and finances! 🤙
+            Ready to track your residency and finances! 📊
         </p>
     </div>
     """, unsafe_allow_html=True)
