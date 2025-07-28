@@ -7,6 +7,7 @@ Provides decorators and context managers for robust error handling.
 import functools
 import time
 import traceback
+import sys
 from typing import Callable, Any, Optional, Dict, Union
 from contextlib import contextmanager
 
