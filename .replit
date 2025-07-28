@@ -16,7 +16,7 @@ run = ["sh", "-c", "streamlit run main.py --server.port $PORT --server.address 0
 deploymentTarget = "cloudrun"
 
 [workflows]
-runButton = "Snowbird App (Diagnostic)"
+runButton = "Snowbird Debug Mode"
 
 [[workflows.workflow]]
 name = "Run Streamlit App"
@@ -546,6 +546,48 @@ args = "python diagnostic_check.py"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "python start_app.py"
+
+[[workflows.workflow]]
+name = "Snowbird Debug Mode"
+author = 45618204
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pkill -f \"streamlit\" || true"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "sleep 2"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "echo \"🔍 Starting Streamlit in debug mode...\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -m streamlit run main.py --server.port 8501 --server.address 0.0.0.0 --server.headless true --server.enableCORS false --server.enableWebsocketCompression false --server.fileWatcherType none --browser.gatherUsageStats false --logger.level debug --server.maxMessageSize 200"
+
+[[workflows.workflow]]
+name = "Snowbird Debug Mode"
+author = 45618204
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "pkill -f \"streamlit\" || true"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "sleep 2"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "echo \"🔍 Starting Streamlit in debug mode...\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -m streamlit run main.py --server.port 8501 --server.address 0.0.0.0 --server.headless true --server.enableCORS false --server.enableWebsocketCompression false --server.fileWatcherType none --browser.gatherUsageStats false --logger.level debug --server.maxMessageSize 200"
 
 [[ports]]
 localPort = 5000
