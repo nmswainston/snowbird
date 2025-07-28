@@ -455,7 +455,7 @@ with tab2:
 
 # Tab 3: Budgets
 with tab3:
-    st.subheader("💰 Budget Management")
+    st.subheader("Budget Management")
 
     # Home budgets
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
@@ -637,7 +637,7 @@ with tab4:
 
 # Tab 5: Reports
 with tab5:
-    st.subheader("📊 Tax Residency Reports")
+    st.subheader("Tax Residency Reports")
 
     # Generate report
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
@@ -935,48 +935,3 @@ st.markdown("""
     <p><em>Built with ❄️ by Snowbird Financial Assistant</em></p>
 </div>
 """, unsafe_allow_html=True)
-
-# TODO: Future enhancements
-"""
-TODO - Future Development Roadmap:
-
-1. Google Calendar Integration:
-   - Sync bill due dates with Google Calendar
-   - Create travel events automatically
-   - Set migration reminders
-
-2. User Authentication & Multi-device Sync:
-   - Firebase Auth integration
-   - Cloud Firestore for data persistence
-   - Sync across devices
-
-3. Mobile App Development:
-   - Use CapacitorJS to convert to native mobile app
-   - Push notifications for bill reminders
-   - GPS-based location tracking
-
-4. Enhanced AI Features:
-   - Integration with tax preparation services
-   - Automated expense categorization
-   - Predictive analytics for optimal travel timing
-
-5. Financial Institution Integration:
-   - Bank account connectivity
-   - Automatic expense tracking
-   - Investment portfolio monitoring
-
-6. Advanced Reporting:
-   - PDF generation with charts
-   - Tax preparation export formats
-   - Year-over-year comparisons
-
-7. Social Features:
-   - Connect with other snowbirds
-   - Share travel routes and recommendations
-   - Community forums
-
-8. Smart Home Integration:
-   - IoT device management for both homes
-   - Automated temperature and security adjustments
-   - Energy usage monitoring
-"""
