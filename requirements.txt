@@ -19,3 +19,7 @@ Pillow
 streamlit-elements
 plotly
 altair
+streamlit-analytics
+psutil
+mixpanel
+streamlit-authenticator

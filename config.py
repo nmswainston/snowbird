@@ -118,23 +118,39 @@ class AppConfig(BaseSettings):
         description="Enable Gmail integration features",
         env="ENABLE_GMAIL_INTEGRATION"
     )
-
     enable_ai_features: bool = Field(
         default=True,
         description="Enable AI-powered features",
         env="ENABLE_AI_FEATURES"
     )
-
     enable_notifications: bool = Field(
         default=True,
         description="Enable notification system",
         env="ENABLE_NOTIFICATIONS"
     )
-
     enable_auto_logging: bool = Field(
         default=False,
         description="Enable automatic location logging",
         env="ENABLE_AUTO_LOGGING"
+    )
+    enable_analytics: bool = Field(
+        default=False,
+        description="Enable analytics tracking",
+        env="ENABLE_ANALYTICS"
+    )
+
+    # Analytics Configuration
+    mixpanel_token: Optional[str] = Field(
+        default="",
+        description="Mixpanel project token for analytics",
+        env="MIXPANEL_TOKEN"
+    )
+
+    # Admin Configuration
+    admin_password: str = Field(
+        default="snowbird_admin_2024",
+        description="Admin dashboard password",
+        env="ADMIN_PASSWORD"
     )
 
     # Security Settings
@@ -251,6 +267,7 @@ class AppConfig(BaseSettings):
             'ai_features': self.enable_ai_features and bool(self.openai_api_key),
             'notifications': self.enable_notifications,
             'auto_logging': self.enable_auto_logging,
+            'analytics': self.enable_analytics,
         }
 
     def is_production(self) -> bool:
@@ -266,6 +283,7 @@ class AppConfig(BaseSettings):
         return {
             'openai': self.openai_api_key,
             'gmail_credentials_file': self.gmail_credentials_file,
+            'mixpanel_token': self.mixpanel_token,
         }
 
     class Config:

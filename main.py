@@ -75,19 +75,24 @@ def main():
                 st.success("Session data cleared!")
                 st.rerun()
 
+    # Import analytics
+    from components.analytics import track_page_view, track_user_action, track_feature_usage
+
     # Create main navigation tabs
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
         "📊 Dashboard", 
         "📅 Day Tracker", 
         "🗺️ Auto-Track",
         "💰 Budgets", 
         "🤖 AI Assistant", 
         "📋 Reports",
-        "🎨 Themes"
+        "🎨 Themes",
+        "🔧 Admin"
     ])
 
     with tab1:
         # Dashboard - Overview of all key metrics
+        track_page_view("dashboard")
         st.markdown('**<i data-lucide="bar-chart-3" class="icon"></i>Dashboard Overview**', unsafe_allow_html=True)
 
         # Quick stats
@@ -127,12 +132,14 @@ def main():
 
     with tab2:
         # Day Tracker - Log location
+        track_page_view("day_tracker")
         st.markdown('**<i data-lucide="map-pin" class="icon"></i>Log Your Location**', unsafe_allow_html=True)
 
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
         location = st.radio("Where are you today?", ("Arizona", "Minnesota"))
         if st.button(f"Log a day in {location}"):
             st.session_state.states[location] += 1
+            track_user_action("log_day", {"location": location, "total_days": st.session_state.states[location]})
             st.success(f"Logged a day in {location}!")
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -153,6 +160,7 @@ def main():
 
     with tab3:
         # Auto-Tracking with Gmail Integration
+        track_page_view("auto_track")
         st.markdown('**<i data-lucide="search" class="icon"></i>Intelligent Location Detection**', unsafe_allow_html=True)
         st.markdown("""
         <div class="winter-card">
@@ -167,6 +175,7 @@ def main():
 
     with tab4:
         # Budgets
+        track_page_view("budgets")
         st.markdown('**<i data-lucide="dollar-sign" class="icon"></i>Budget Management**', unsafe_allow_html=True)
 
         # Home budgets
@@ -188,6 +197,7 @@ def main():
 
     with tab5:
         # AI Assistant
+        track_page_view("ai_assistant")
         st.markdown('**<i data-lucide="brain" class="icon"></i>Ask Snowbird AI**', unsafe_allow_html=True)
 
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
@@ -198,6 +208,7 @@ def main():
             question = st.text_input("Ask a financial question:")
             if st.button("Get AI Advice"):
                 if question.strip():
+                    track_feature_usage("ai_query", {"question_length": len(question)})
                     try:
                         response = openai.ChatCompletion.create(
                             model="gpt-4",
@@ -207,8 +218,10 @@ def main():
                             ]
                         )
                         st.session_state.chat_response = response['choices'][0]['message']['content']
+                        track_user_action("ai_response_success", {"question_length": len(question)})
                     except Exception as e:
                         st.session_state.chat_response = f"Error: {e}"
+                        track_user_action("ai_response_error", {"error": str(e)})
                 else:
                     st.warning("Please enter a question first.")
 
@@ -220,6 +233,7 @@ def main():
 
     with tab6:
         # Reports
+        track_page_view("reports")
         st.markdown('**<i data-lucide="file-text" class="icon"></i>Tax Residency Reports**', unsafe_allow_html=True)
 
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
@@ -248,6 +262,7 @@ def main():
 
     with tab7:
         # Themes
+        track_page_view("themes")
         st.markdown('**<i data-lucide="palette" class="icon"></i>Theme Customization**', unsafe_allow_html=True)
 
         from components.theme_selector import render_advanced_theme_selector, render_theme_customizer
@@ -257,6 +272,12 @@ def main():
         st.markdown('</div>', unsafe_allow_html=True)
 
         render_theme_customizer()
+
+    with tab8:
+        # Admin Dashboard
+        track_page_view("admin")
+        from components.admin_dashboard import render_admin_dashboard
+        render_admin_dashboard()
 
 if __name__ == "__main__":
     main()
