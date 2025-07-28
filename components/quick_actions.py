@@ -79,10 +79,9 @@ def render_floating_actions():
     """, unsafe_allow_html=True)
 
 def render_quick_action_panel():
-    """Render quick action panel at top of dashboard with Hawaiian vibes"""
+    """Render quick action panel at top of dashboard"""
     
-    from utils.hawaii_expressions import da_kine_greeting
-    st.markdown(f"### ⚡ Quick Actions - {da_kine_greeting()}")
+    st.markdown(f"### ⚡ Quick Actions")
     
     # Make it mobile-responsive
     is_mobile = st.session_state.get('mobile_view', False)
@@ -92,16 +91,16 @@ def render_quick_action_panel():
         col1, col2 = st.columns(2)
         
         with col1:
-            if st.button("📅 Log Da Kine", use_container_width=True, type="primary"):
+            if st.button("📅 Log Today", use_container_width=True, type="primary"):
                 st.session_state.quick_action = "log_day"
                 st.switch_page("📅 Day Tracker")
             
-            if st.button("🤖 Ask Bruddah AI", use_container_width=True):
+            if st.button("🤖 Ask AI Assistant", use_container_width=True):
                 st.session_state.quick_action = "ask_ai"
                 st.switch_page("🤖 AI Assistant")
         
         with col2:
-            if st.button("💰 Check Money", use_container_width=True):
+            if st.button("💰 Check Budget", use_container_width=True):
                 st.session_state.quick_action = "check_budget"
                 st.switch_page("💰 Budgets")
             
@@ -123,7 +122,7 @@ def render_quick_action_panel():
                 st.switch_page("💰 Budgets")
         
         with col3:
-            if st.button("🤖 Ask AI Kokua", use_container_width=True):
+            if st.button("🤖 Ask AI Assistant", use_container_width=True):
                 st.session_state.quick_action = "ask_ai"
                 st.switch_page("🤖 AI Assistant")
         

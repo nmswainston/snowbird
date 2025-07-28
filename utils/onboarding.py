@@ -421,7 +421,6 @@ def render_onboarding_carousel():
 
     with col2:
         # Modal container
-        from utils.hawaii_expressions import da_kine_greeting
         st.markdown(f"""
         <div class="onboarding-modal">
             <div class="onboarding-header">
@@ -484,8 +483,7 @@ def render_onboarding_carousel():
             else:
                 if st.button("Get Started", key="onboarding_finish", type="primary"):
                     st.session_state.onboarded = True
-                    from utils.hawaii_expressions import da_kine_success
-                    st.success(f"🌺 {da_kine_success()} Welcome to da ohana, bruddah! Let's track da kine! 🤙")
+                    st.success("🎉 Welcome to Snowbird! You're all set to start tracking your residency!")
                     st.balloons()  # Celebration effect
                     # Scroll to top after onboarding completion
                     st.markdown("""
