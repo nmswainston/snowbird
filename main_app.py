@@ -223,7 +223,17 @@ def render_settings_tab():
                 """)
             
             # Show connect button if credentials are available
-            if st.secrets.get("GOOGLE_CLIENT_ID") and st.secrets.get("GOOGLE_CLIENT_SECRET"):
+            # Check if secrets exist first to avoid StreamlitSecretNotFoundError
+            try:
+                has_google_credentials = (
+                    hasattr(st, 'secrets') and 
+                    st.secrets.get("GOOGLE_CLIENT_ID") and 
+                    st.secrets.get("GOOGLE_CLIENT_SECRET")
+                )
+            except Exception:
+                has_google_credentials = False
+            
+            if has_google_credentials:
                 if st.button("📅 Connect to Google Calendar", type="primary"):
                     auth_url = calendar_sync.get_auth_url()
                     if auth_url:
