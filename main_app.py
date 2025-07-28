@@ -879,7 +879,6 @@ def render_settings_tab():
         st.subheader("Feature Flags")
 
         # Gmail integration
-```python
         gmail_integration = st.checkbox(
             "Gmail Travel Detection (Beta)",
             value=st.session_state.get('gmail_integration', False),
