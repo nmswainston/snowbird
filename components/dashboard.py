@@ -472,6 +472,8 @@ def render_dashboard():
 
     st.markdown('</div>', unsafe_allow_html=True)
 
+    # Initialize SnowbirdData instance for status calculations
+    from utils.data_models import SnowbirdData
     snowbird_data = SnowbirdData()
 
     # Add more spacing
