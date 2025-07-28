@@ -223,6 +223,59 @@ def main():
     # Footer
     render_footer()
 
+def render_budgets_tab():
+    """Render the budget tracking tab"""
+    st.markdown('<h2><i data-lucide="dollar-sign" class="icon"></i>Budget Tracker</h2>', unsafe_allow_html=True)
+    
+    from components.budget_tracker import render_budget_tracker
+    render_budget_tracker()
+
+def render_properties_tab():
+    """Render the properties management tab"""
+    st.markdown('<h2><i data-lucide="home" class="icon"></i>Properties</h2>', unsafe_allow_html=True)
+    
+    from components.properties_manager import render_properties_manager
+    render_properties_manager()
+
+def render_ai_assistant_tab(openai_available, openai_client):
+    """Render the AI assistant tab"""
+    st.markdown('<h2><i data-lucide="bot" class="icon"></i>AI Assistant</h2>', unsafe_allow_html=True)
+    
+    if openai_available:
+        from components.ai_assistant import render_ai_assistant
+        render_ai_assistant(openai_client)
+    else:
+        st.info("🤖 AI Assistant requires OpenAI API key. Add your key to Replit Secrets to enable AI features.")
+
+def render_reports_tab():
+    """Render the reports tab"""
+    st.markdown('<h2><i data-lucide="bar-chart" class="icon"></i>Reports</h2>', unsafe_allow_html=True)
+    
+    from components.reports import render_reports
+    render_reports()
+
+def render_community_tab():
+    """Render the community tab"""
+    st.markdown('<h2><i data-lucide="users" class="icon"></i>Community</h2>', unsafe_allow_html=True)
+    
+    st.markdown("""
+    ### 🌺 Welcome to the Snowbird Community!
+    
+    Connect with other snowbirds, share tips, and get advice on managing your seasonal lifestyle.
+    """)
+    
+    # Community features placeholder
+    st.info("Community features coming soon! This will include forums, tips sharing, and seasonal advice.")
+
+def render_footer():
+    """Render the application footer"""
+    st.markdown("---")
+    st.markdown("""
+    <div style="text-align: center; padding: 1rem; color: #64748b; font-size: 0.9rem;">
+        🏠 Snowbird Financial Assistant | Built with ❤️ for seasonal residents
+    </div>
+    """, unsafe_allow_html=True)
+
 def render_settings_tab():
     """Render comprehensive settings/preferences tab"""
     st.markdown('<h2><i data-lucide="settings" class="icon"></i>Settings & Preferences</h2>', unsafe_allow_html=True)
