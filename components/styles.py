@@ -7,9 +7,153 @@ def load_custom_css():
     initialize_theme_system()
     ThemeManager.apply_theme_css()
     
+    # Apply light/dark theme toggle
+    apply_theme_toggle()
+    
     # Add accessibility improvements
     from utils.accessibility import add_accessibility_css
     add_accessibility_css()
+
+def apply_theme_toggle():
+    """Apply light/dark theme based on user selection"""
+    # Get theme from session state, default to Light
+    theme = st.session_state.get("theme", "Light")
+    
+    if theme == "Dark":
+        # Inject dark mode CSS
+        st.markdown("""
+        <style>
+        /* Dark theme override styles */
+        .stApp {
+            background-color: #121212 !important;
+            color: #eeeeee !important;
+        }
+        
+        body {
+            background-color: #121212 !important;
+            color: #eeeeee !important;
+        }
+        
+        .stButton>button {
+            background-color: #444444 !important;
+            border-color: #444444 !important;
+            color: #eeeeee !important;
+        }
+        
+        .stButton>button:hover {
+            background-color: #555555 !important;
+            border-color: #555555 !important;
+        }
+        
+        .winter-card {
+            background: #1e1e1e !important;
+            border: 1px solid #333333 !important;
+            color: #eeeeee !important;
+        }
+        
+        .stTextInput > div > div > input {
+            background-color: #2d2d2d !important;
+            border-color: #444444 !important;
+            color: #eeeeee !important;
+        }
+        
+        .stSelectbox > div > div {
+            background-color: #2d2d2d !important;
+            border-color: #444444 !important;
+            color: #eeeeee !important;
+        }
+        
+        .stDateInput > div > div > input {
+            background-color: #2d2d2d !important;
+            border-color: #444444 !important;
+            color: #eeeeee !important;
+        }
+        
+        .stNumberInput > div > div > input {
+            background-color: #2d2d2d !important;
+            border-color: #444444 !important;
+            color: #eeeeee !important;
+        }
+        
+        /* Sidebar dark theme */
+        .css-1d391kg {
+            background-color: #1a1a1a !important;
+        }
+        
+        /* Tabs dark theme */
+        .stTabs [data-baseweb="tab-list"] {
+            background-color: #2d2d2d !important;
+        }
+        
+        .stTabs [data-baseweb="tab"] {
+            background-color: #1e1e1e !important;
+            border-color: #444444 !important;
+            color: #eeeeee !important;
+        }
+        
+        .stTabs [aria-selected="true"] {
+            background-color: #444444 !important;
+            color: #eeeeee !important;
+        }
+        
+        /* Progress bars */
+        .stProgress > div > div {
+            background-color: #333333 !important;
+        }
+        
+        /* Metric cards */
+        [data-testid="metric-container"] {
+            background-color: #1e1e1e !important;
+            border: 1px solid #333333 !important;
+        }
+        
+        /* Headers and text */
+        h1, h2, h3, h4, h5, h6 {
+            color: #eeeeee !important;
+        }
+        
+        .stMarkdown {
+            color: #eeeeee !important;
+        }
+        
+        /* Success/warning/error messages */
+        .stSuccess {
+            background-color: #1a4a1a !important;
+            color: #90ee90 !important;
+        }
+        
+        .stWarning {
+            background-color: #4a4a1a !important;
+            color: #ffff90 !important;
+        }
+        
+        .stError {
+            background-color: #4a1a1a !important;
+            color: #ff9090 !important;
+        }
+        
+        .stInfo {
+            background-color: #1a1a4a !important;
+            color: #9090ff !important;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+def render_theme_toggle():
+    """Render theme toggle in sidebar"""
+    with st.sidebar:
+        st.markdown("### 🎨 Theme")
+        theme_option = st.radio(
+            "Choose theme:",
+            options=["Light", "Dark"],
+            index=0 if st.session_state.get("theme", "Light") == "Light" else 1,
+            key="theme_toggle"
+        )
+        
+        # Update session state when selection changes
+        if theme_option != st.session_state.get("theme", "Light"):
+            st.session_state["theme"] = theme_option
+            st.rerun()
 
 def render_main_header():
     """Render the enhanced sleek application header"""
