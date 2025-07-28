@@ -16,13 +16,23 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Add error boundary for React components
+# Add error boundary and fix React issues
 st.markdown("""
 <script>
+// Prevent React onClick handler conflicts
 window.addEventListener('error', function(e) {
-    console.log('Caught error:', e.error);
-    e.preventDefault();
-    return true;
+    if (e.error && e.error.message && e.error.message.includes('Minified React error')) {
+        console.log('React error caught and handled:', e.error.message);
+        e.preventDefault();
+        return true;
+    }
+});
+
+// Fix WebSocket reconnection issues
+window.addEventListener('beforeunload', function() {
+    if (window.streamlitConnection) {
+        window.streamlitConnection.close();
+    }
 });
 </script>
 """, unsafe_allow_html=True)
@@ -205,7 +215,7 @@ def main():
     with tab1:
         # Dashboard - Overview of all key metrics
         track_page_view("dashboard")
-        st.markdown('**<i data-lucide="bar-chart-3" class="icon"></i>Dashboard Overview**', unsafe_allow_html=True)
+        st.markdown('**📊 Dashboard Overview**', unsafe_allow_html=True)
 
         # Quick stats
         col1, col2, col3 = st.columns(3)
@@ -220,7 +230,7 @@ def main():
 
         # Tax residency status
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-        st.markdown('**<i data-lucide="alert-triangle" class="icon"></i>Tax Residency Status**', unsafe_allow_html=True)
+        st.markdown('**⚠️ Tax Residency Status**', unsafe_allow_html=True)
 
         col1, col2 = st.columns(2)
 
@@ -245,7 +255,7 @@ def main():
     with tab2:
         # Day Tracker - Log location
         track_page_view("day_tracker")
-        st.markdown('**<i data-lucide="map-pin" class="icon"></i>Log Your Location**', unsafe_allow_html=True)
+        st.markdown('**📍 Log Your Location**', unsafe_allow_html=True)
 
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
         location = st.radio("Where are you today?", ("Arizona", "Minnesota"))
@@ -267,7 +277,7 @@ def main():
 
         # Show current totals
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-        st.markdown('**<i data-lucide="calendar" class="icon"></i>Current Totals**', unsafe_allow_html=True)
+        st.markdown('**📅 Current Totals**', unsafe_allow_html=True)
 
         for state, days in st.session_state.states.items():
             remaining_days = TAX_THRESHOLD_DAYS - days
@@ -283,7 +293,7 @@ def main():
     with tab3:
         # Auto-Tracking with Gmail Integration
         track_page_view("auto_track")
-        st.markdown('**<i data-lucide="search" class="icon"></i>Intelligent Location Detection**', unsafe_allow_html=True)
+        st.markdown('**🔍 Intelligent Location Detection**', unsafe_allow_html=True)
         st.markdown("""
         <div class="winter-card">
         <p>✈️ <strong>Gmail Travel Analysis:</strong> Automatically detect travel from your email confirmations</p>
@@ -304,11 +314,11 @@ def main():
     with tab4:
         # Budgets
         track_page_view("budgets")
-        st.markdown('**<i data-lucide="dollar-sign" class="icon"></i>Budget Management**', unsafe_allow_html=True)
+        st.markdown('**💰 Budget Management**', unsafe_allow_html=True)
 
         # Home budgets
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-        st.markdown('**<i data-lucide="home" class="icon"></i>Home Maintenance Budget**', unsafe_allow_html=True)
+        st.markdown('**🏠 Home Maintenance Budget**', unsafe_allow_html=True)
         budget_home = st.selectbox("Select a home to view budget:", ["Arizona", "Minnesota"])
         budget = home_budgets[budget_home]
         st.subheader(f"{budget_home} Budget")
@@ -318,7 +328,7 @@ def main():
 
         # Seasonal cash flow
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-        st.markdown('**<i data-lucide="trending-up" class="icon"></i>Seasonal Cash Flow Plan**', unsafe_allow_html=True)
+        st.markdown('**📈 Seasonal Cash Flow Plan**', unsafe_allow_html=True)
         for k, v in seasonal_cash_flow.items():
             st.write(f"• {k}: ${v}/month")
         st.markdown('</div>', unsafe_allow_html=True)
@@ -326,7 +336,7 @@ def main():
     with tab5:
         # AI Assistant
         track_page_view("ai_assistant")
-        st.markdown('**<i data-lucide="brain" class="icon"></i>Ask Snowbird AI**', unsafe_allow_html=True)
+        st.markdown('**🤖 Ask Snowbird AI**', unsafe_allow_html=True)
 
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
         if not openai.api_key or openai.api_key.strip() == "":
@@ -362,7 +372,7 @@ def main():
     with tab6:
         # Reports
         track_page_view("reports")
-        st.markdown('**<i data-lucide="file-text" class="icon"></i>Tax Residency Reports**', unsafe_allow_html=True)
+        st.markdown('**📄 Tax Residency Reports**', unsafe_allow_html=True)
 
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
         st.markdown('**Annual Summary**', unsafe_allow_html=True)
@@ -392,7 +402,7 @@ def main():
         with tab7:
             # Themes
             track_page_view("themes")
-            st.markdown('**<i data-lucide="palette" class="icon"></i>Theme Customization**', unsafe_allow_html=True)
+            st.markdown('**🎨 Theme Customization**', unsafe_allow_html=True)
 
             try:
                 from components.theme_selector import render_advanced_theme_selector, render_theme_customizer

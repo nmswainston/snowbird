@@ -39,9 +39,10 @@ def render_status_badge(status: str, text: str):
     st.markdown(f'<span class="status-{status}">{text}</span>', unsafe_allow_html=True)
 
 def render_icon(name: str, size: str = "16", color: str = None):
-    """Render a Lucide icon"""
+    """Render a Lucide icon without React conflicts"""
     color_style = f'color: {color};' if color else ''
-    st.markdown(f'<i data-lucide="{name}" style="width: {size}px; height: {size}px; {color_style}"></i>', unsafe_allow_html=True)
+    # Use span instead of i to avoid React conflicts
+    st.markdown(f'<span class="lucide-icon" data-icon="{name}" style="width: {size}px; height: {size}px; {color_style}; display: inline-block;"></span>', unsafe_allow_html=True)
 """Basic styling for Snowbird app"""
 import streamlit as st
 
@@ -67,6 +68,21 @@ def load_custom_css():
         width: 16px;
         height: 16px;
         margin-right: 8px;
+    }
+    
+    .lucide-icon {
+        display: inline-block;
+        margin-right: 8px;
+    }
+    
+    /* Prevent React conflicts with icons */
+    [data-lucide]:not([data-rendered]) {
+        opacity: 0;
+    }
+    
+    [data-lucide][data-rendered] {
+        opacity: 1;
+        transition: opacity 0.2s ease;
     }
     </style>
     """, unsafe_allow_html=True)
