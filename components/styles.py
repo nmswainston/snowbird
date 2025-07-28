@@ -269,15 +269,15 @@ def apply_basic_styles():
     }
 }
 
-            .status-danger { 
-                color: var(--error);
-                font-weight: 700;
-                padding: 0.5rem 1rem;
-                background: color-mix(in srgb, var(--error) 15%, transparent);
-                border-radius: 12px;
-                border: 2px solid color-mix(in srgb, var(--error) 30%, transparent);
-                box-shadow: 0 0 20px color-mix(in srgb, var(--error) 20%, transparent);
-                backdrop-filter: blur(10px);
-            }
+    .status-danger { 
+        color: var(--error);
+        font-weight: 700;
+        padding: 0.5rem 1rem;
+        background: color-mix(in srgb, var(--error) 15%, transparent);
+        border-radius: 12px;
+        border: 2px solid color-mix(in srgb, var(--error) 30%, transparent);
+        box-shadow: 0 0 20px color-mix(in srgb, var(--error) 20%, transparent);
+        backdrop-filter: blur(10px);
+    }
     </style>
     """, unsafe_allow_html=True)
