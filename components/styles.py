@@ -61,6 +61,26 @@ def load_custom_css():
     """Load custom CSS styles"""
     st.markdown("""
     <style>
+    /* Light-blue accent for CTAs - consistent branding */
+    .stButton>button {
+        background-color: #AEDFF7 !important;
+        border-color: #AEDFF7 !important;
+        color: #1E293B !important;
+        font-weight: 600 !important;
+    }
+    
+    .stButton>button:hover {
+        background-color: #8FD0F0 !important;
+        border-color: #8FD0F0 !important;
+        transform: translateY(-1px) !important;
+        box-shadow: 0 4px 8px rgba(174, 223, 247, 0.3) !important;
+    }
+    
+    .stButton>button:active {
+        background-color: #6FC1E8 !important;
+        transform: translateY(0) !important;
+    }
+    
     .winter-card {
         background: #f8fafc;
         padding: 1.5rem;
