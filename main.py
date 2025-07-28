@@ -16,6 +16,17 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Add error boundary for React components
+st.markdown("""
+<script>
+window.addEventListener('error', function(e) {
+    console.log('Caught error:', e.error);
+    e.preventDefault();
+    return true;
+});
+</script>
+""", unsafe_allow_html=True)
+
 # Initialize Firebase authentication with error handling
 try:
     from components.auth_components import check_authentication, render_logout_button
@@ -129,17 +140,21 @@ def main():
     # Import analytics
     from components.analytics import track_page_view, track_user_action, track_feature_usage
 
-    # Create main navigation tabs
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
-        "📊 Dashboard", 
-        "📅 Day Tracker", 
-        "🗺️ Auto-Track",
-        "💰 Budgets", 
-        "🤖 AI Assistant", 
-        "📋 Reports",
-        "🎨 Themes",
-        "🔧 Admin"
-    ])
+    # Create main navigation tabs with error handling
+    try:
+        tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+            "📊 Dashboard", 
+            "📅 Day Tracker", 
+            "🗺️ Auto-Track",
+            "💰 Budgets", 
+            "🤖 AI Assistant", 
+            "📋 Reports",
+            "🎨 Themes",
+            "🔧 Admin"
+        ])
+    except Exception as e:
+        st.error(f"Error creating tabs: {e}")
+        st.stop()
 
     with tab1:
         # Dashboard - Overview of all key metrics
@@ -231,8 +246,12 @@ def main():
         </div>
         """, unsafe_allow_html=True)
 
-        from components.auto_tracker import render_auto_tracker
-        render_auto_tracker()
+        try:
+            from components.auto_tracker import render_auto_tracker
+            render_auto_tracker()
+        except Exception as e:
+            st.error(f"Auto-tracker temporarily unavailable: {e}")
+            st.info("Manual location logging is still available in the Day Tracker tab.")
 
     with tab4:
         # Budgets
@@ -326,19 +345,27 @@ def main():
         track_page_view("themes")
         st.markdown('**<i data-lucide="palette" class="icon"></i>Theme Customization**', unsafe_allow_html=True)
 
-        from components.theme_selector import render_advanced_theme_selector, render_theme_customizer
+        try:
+            from components.theme_selector import render_advanced_theme_selector, render_theme_customizer
 
-        st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-        render_advanced_theme_selector()
-        st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown('<div class="winter-card">', unsafe_allow_html=True)
+            render_advanced_theme_selector()
+            st.markdown('</div>', unsafe_allow_html=True)
 
-        render_theme_customizer()
+            render_theme_customizer()
+        except Exception as e:
+            st.error(f"Theme customization temporarily unavailable: {e}")
+            st.info("Using default theme.")
 
     with tab8:
         # Admin Dashboard
         track_page_view("admin")
-        from components.admin_dashboard import render_admin_dashboard
-        render_admin_dashboard()
+        try:
+            from components.admin_dashboard import render_admin_dashboard
+            render_admin_dashboard()
+        except Exception as e:
+            st.error(f"Admin dashboard temporarily unavailable: {e}")
+            st.info("Core functionality remains available in other tabs.")
 
 if __name__ == "__main__":
     main()
