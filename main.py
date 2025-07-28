@@ -2,6 +2,7 @@
 Snowbird Financial Assistant - Main Application
 """
 import streamlit as st
+import traceback
 from components.styles import load_custom_css
 from utils.accessibility import AccessibilityManager
 from utils.performance import PerformanceOptimizer, monitor_memory_usage
