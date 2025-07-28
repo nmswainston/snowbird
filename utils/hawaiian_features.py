@@ -11,32 +11,32 @@ from typing import Dict, List
 class HawaiianFeatures:
     """Da kine Hawaiian features for the Snowbird app"""
     
-    # Hawaiian/Pidgin greetings and expressions
+    # Hawaiian/Pidgin greetings and expressions (for island mode)
     GREETINGS = [
-        "Aloha brah! 🤙",
-        "Howzit going, cuz? 🌺",
-        "Shoots, bruddah! 🏄‍♂️",
-        "Eh, wassup? 🌴",
-        "Aloha kakahiaka! ☀️",
-        "Good vibes, yeah? 🌊"
+        "Hello there! 🤙",
+        "How's it going? 🌺",
+        "Good to see you! 🏄‍♂️",
+        "Hey, what's up? 🌴",
+        "Good morning! ☀️",
+        "Hope you're having a great day! 🌊"
     ]
     
     RESPONSES = [
-        "Rajah dat! 🤙",
-        "Shoots, sounds good! 🏄‍♂️", 
-        "Da kine, perfect! 🌺",
-        "Chee hoo! Nice one! 🤙",
-        "Solid, bruddah! 🌴",
-        "Ono! Looking good! 🌊"
+        "Sounds great! 🤙",
+        "Perfect, looks good! 🏄‍♂️", 
+        "Excellent choice! 🌺",
+        "Nice work! 🤙",
+        "Looking solid! 🌴",
+        "That's wonderful! 🌊"
     ]
     
     SUCCESS_MESSAGES = [
-        "Broke da mouth! Success! 🤙",
-        "Chee hoo! All set! 🏄‍♂️",
-        "Da kine working perfect! 🌺",
-        "Rajah! Good to go! 🌴",
-        "Shoots! All pau! ✅",
-        "Aloha spirit activated! 🌊"
+        "Excellent! Success! 🤙",
+        "Awesome! All set! 🏄‍♂️",
+        "Working perfectly! 🌺",
+        "Great! Good to go! 🌴",
+        "Perfect! All done! ✅",
+        "Success achieved! 🌊"
     ]
     
     # Island-themed financial terms

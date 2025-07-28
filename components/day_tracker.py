@@ -319,10 +319,9 @@ def render_day_tracker():
         st.session_state.recent_property_changes = False
 
 def render_day_tracker():
-    """Render the day tracking interface with Hawaiian vibes"""
-    from utils.hawaii_expressions import da_kine_greeting
+    """Render the day tracking interface"""
     st.markdown('<h2><i data-lucide="calendar-days" class="icon"></i>Residency Day Tracker</h2>', unsafe_allow_html=True)
-    st.markdown(f"*{da_kine_greeting()} Time to log da kine!* 🤙")
+    st.markdown("*Time to log your location and track your residency!* 🤙")
 
     # Horizontal divider after header for visual separation
     st.markdown("---")

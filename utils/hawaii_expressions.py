@@ -9,42 +9,42 @@ from typing import List, Dict
 class HawaiiExpressions:
     """Hawaiian and local pidgin expressions for the Snowbird app"""
 
-    # Da kine greetings and positive vibes
+    # Friendly greetings and positive vibes
     GREETINGS = [
-        "Aloha brah! 🤙",
-        "Shoots, howzit! 🌺", 
-        "What's da buggah? 🏄‍♂️",
-        "Eh, how you stay? 🌊",
-        "Rajah dat! 🌴",
-        "Chee-hoo! 🏖️"
+        "Hello there! 🤙",
+        "Hi, how's it going! 🌺", 
+        "What's happening? 🏄‍♂️",
+        "Hey, how are you? 🌊",
+        "Great to see you! 🌴",
+        "Welcome back! 🏖️"
     ]
 
-    # Success messages with local flavor
+    # Success messages with positive flavor
     SUCCESS_MESSAGES = [
-        "Shoots! Das da kine! ✨",
-        "Rajah! All pau! 🎉",
-        "Broke da mouth good! 🤙",
-        "Stay good to go! 🏄‍♂️",
-        "No worries, bruddah! 😎",
-        "Das how we roll! 🌊"
+        "Excellent! That's perfect! ✨",
+        "Great! All done! 🎉",
+        "Outstanding work! 🤙",
+        "All good to go! 🏄‍♂️",
+        "No worries, all set! 😎",
+        "That's how it's done! 🌊"
     ]
 
-    # Error messages with aloha spirit
+    # Error messages with helpful spirit
     ERROR_MESSAGES = [
-        "Shoots, someting stay pilau... 😅",
-        "Eh, da kine stay broke! 🔧",
-        "No make like dat! Try again! 💪",
-        "Wot da heck? No can! 🤔",
-        "Auwe! Someting went sideways! 🌀",
-        "Eh, stay all hamajang! Let's fix! 🛠️"
+        "Oops, something went wrong... 😅",
+        "Looks like there's an issue! 🔧",
+        "Let's try that again! 💪",
+        "Hmm, that didn't work! 🤔",
+        "Something went sideways! 🌀",
+        "Let's get this fixed! 🛠️"
     ]
 
     # Loading and waiting messages
     LOADING_MESSAGES = [
-        "Hang loose, loading da kine... 🏄‍♂️",
-        "Stay patient, bruddah... 🌊",
-        "Almost pau, just small kine wait... ⏰",
-        "Getting da goods ready... 📦",
+        "Please wait, loading... 🏄‍♂️",
+        "Just a moment... 🌊",
+        "Almost done, small wait... ⏰",
+        "Getting things ready... 📦",
         "Making da magic happen... ✨",
         "Chill out, almost done... 😎"
     ]

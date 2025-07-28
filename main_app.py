@@ -88,14 +88,14 @@ def main():
     # Render main header with Hawaiian vibes
     render_main_header()
     
-    # Add Hawaiian greeting banner
+    # Add welcome banner
     from utils.hawaii_expressions import da_kine_time_vibe
     if not st.session_state.get('onboarded', False):
         st.markdown(f"""
         <div style="background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); 
                     padding: 1rem; border-radius: 8px; text-align: center; margin-bottom: 1rem;">
             <p style="color: white; margin: 0; font-size: 1.1rem;">
-                🌺 {da_kine_time_vibe()} Welcome to your Snowbird ohana! 🏄‍♂️
+                🌺 Welcome to your Snowbird community! 🏄‍♂️
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -123,25 +123,25 @@ def main():
     mobile_view = st.session_state.get('mobile_view', False) or st.session_state.get('force_mobile_tabs', False)
     
     if mobile_view:
-        # Shorter labels for mobile with Hawaiian flair
+        # Shorter labels for mobile
         tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
-            "🏠 Hale", 
+            "🏠 Home", 
             "📅 Log", 
-            "💰 Money", 
+            "💰 Budget", 
             "🏡 Props",
             "🤖 AI", 
             "📊 Report",
             "⚙️ Setup",
-            "🌺 Ohana"
+            "🌺 Community"
         ])
     else:
-        # Full labels for desktop with island vibes
+        # Full labels for desktop
         tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
             "🏠 Dashboard", 
             "📅 Day Tracker", 
             "💰 Budget Tracker", 
             "🏡 Properties",
-            "🤖 AI Kokua", 
+            "🤖 AI Assistant", 
             "📊 Reports",
             "⚙️ Settings",
             "🌺 Community"
@@ -1609,8 +1609,7 @@ def render_community_tab():
     """)
 
 def render_footer():
-    """Render application footer with Hawaiian vibes"""
-    from utils.hawaii_expressions import da_kine_success
+    """Render application footer"""
     st.markdown("---")
     st.markdown(f"""
     <div style="text-align: center; color: #64748B; font-size: 0.9rem; padding: 1.5rem;">
@@ -1623,10 +1622,10 @@ def render_footer():
             <span style="margin: 0 1rem;">🤖 AI-Powered Insights</span>
         </div>
         <div style="font-size: 0.8rem; color: #94A3B8;">
-            Built with aloha spirit ❤️ and island vibes 🌊 for seasonal residents everywhere<br>
-            <em>Helping snowbirds navigate da kine with confidence and style! 🤙</em><br>
+            Built with care ❤️ and attention to detail 🌊 for seasonal residents everywhere<br>
+            <em>Helping snowbirds navigate their finances with confidence and ease! 🤙</em><br>
             <small style="color: #0ea5e9; font-style: italic;">
-                Mahalo for choosing our ohana! 🌺
+                Thank you for choosing our platform! 🌺
             </small>
         </div>
     </div>

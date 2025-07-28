@@ -5,10 +5,9 @@ from utils.data_models import SnowbirdData
 def render_dashboard():
     """Render the enhanced premium dashboard with responsive metrics grid"""
     
-    # Show loading skeleton while data loads with Hawaiian vibes
+    # Show loading skeleton while data loads
     if 'dashboard_loaded' not in st.session_state:
-        from utils.hawaii_expressions import da_kine_loading
-        st.markdown(f"### 🌊 {da_kine_loading()}")
+        st.markdown(f"### 🌊 Loading your dashboard...")
         
         # Skeleton loading animation
         st.markdown("""
@@ -30,8 +29,6 @@ def render_dashboard():
         st.rerun()
     
     # Main dashboard header with larger font and better spacing
-    # Import Hawaiian expressions for da kine vibes
-    from utils.hawaii_expressions import da_kine_time_vibe, da_kine_greeting
     
     st.markdown(f"""
     <div style="text-align: center; margin-bottom: 2rem;">
@@ -42,7 +39,7 @@ def render_dashboard():
             Your complete seasonal residence overview
         </p>
         <p style="color: #0ea5e9; font-size: 1rem; font-style: italic;">
-            {da_kine_time_vibe()} Ready to track da kine! 🤙
+            Ready to track your residency and finances! 🤙
         </p>
     </div>
     """, unsafe_allow_html=True)
