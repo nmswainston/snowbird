@@ -56,9 +56,10 @@ def main():
     render_main_header()
 
     # Create main navigation tabs
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "📊 Dashboard", 
         "📅 Day Tracker", 
+        "🗺️ Auto-Track",
         "💰 Budgets", 
         "🤖 AI Assistant", 
         "📋 Reports"
@@ -130,6 +131,11 @@ def main():
         st.markdown('</div>', unsafe_allow_html=True)
 
     with tab3:
+        # Auto-Tracking
+        from components.auto_tracker import render_auto_tracker
+        render_auto_tracker()
+
+    with tab4:
         # Budgets
         st.markdown('**<i data-lucide="dollar-sign" class="icon"></i>Budget Management**', unsafe_allow_html=True)
         
@@ -150,7 +156,7 @@ def main():
             st.write(f"• {k}: ${v}/month")
         st.markdown('</div>', unsafe_allow_html=True)
 
-    with tab4:
+    with tab5:
         # AI Assistant
         st.markdown('**<i data-lucide="brain" class="icon"></i>Ask Snowbird AI**', unsafe_allow_html=True)
         
@@ -182,7 +188,7 @@ def main():
         
         st.markdown('</div>', unsafe_allow_html=True)
 
-    with tab5:
+    with tab6:
         # Reports
         st.markdown('**<i data-lucide="file-text" class="icon"></i>Tax Residency Reports**', unsafe_allow_html=True)
         
