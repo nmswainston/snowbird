@@ -65,3 +65,7 @@ args = "streamlit run main.py --server.port 8501 --server.address 0.0.0.0 --serv
 [[ports]]
 localPort = 5000
 externalPort = 80
+
+[[ports]]
+localPort = 8501
+externalPort = 3000
