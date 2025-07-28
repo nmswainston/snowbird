@@ -41,10 +41,10 @@ window.addEventListener('beforeunload', function() {
 try:
     from components.auth_components import check_authentication, render_logout_button
     from utils.profile_sync import initialize_user_session, save_user_session, get_profile_sync
-    
+
     # Check authentication first
     user = check_authentication()
-    
+
     # Initialize user session with profile data
     initialize_user_session()
     FIREBASE_AVAILABLE = True
@@ -52,17 +52,17 @@ except ImportError as e:
     st.warning("⚠️ Firebase authentication not available. Running in local mode.")
     user = {"uid": "local_user", "email": "local@demo.com"}
     FIREBASE_AVAILABLE = False
-    
+
     # Define stub functions
     def render_logout_button():
         st.sidebar.markdown("**👤 Demo User (Local Mode)**")
-    
+
     def initialize_user_session():
         pass
-        
+
     def save_user_session():
         return True
-        
+
     def get_profile_sync():
         class StubSync:
             def sync_location_data(self, uid, data):
@@ -147,10 +147,39 @@ def main():
     # Render styled header
     render_main_header()
 
+    # Add PWA meta tags
+    st.markdown("""
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <meta name="theme-color" content="#A0D8F1">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        <meta name="apple-mobile-web-app-title" content="Snowbird">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="application-name" content="Snowbird">
+        <meta name="msapplication-TileColor" content="#A0D8F1">
+        <meta name="msapplication-config" content="/static/browserconfig.xml">
+
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/static/manifest.json">
+
+        <!-- Icons -->
+        <link rel="icon" type="image/png" sizes="192x192" href="/static/icon-192.png">
+        <link rel="icon" type="image/png" sizes="512x512" href="/static/icon-512.png">
+        <link rel="apple-touch-icon" href="/static/icon-192.png">
+
+        <!-- Splash screens for iOS -->
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+        <!-- Load PWA utilities -->
+        <script src="/static/pwa-utils.js" defer></script>
+    </head>
+    """, unsafe_allow_html=True)
+
     # Add user profile and logout in sidebar
     with st.sidebar:
         render_logout_button()
-        
+
         with st.expander("👤 User Profile"):
             if FIREBASE_AVAILABLE:
                 from components.auth_components import render_user_profile
@@ -158,7 +187,7 @@ def main():
             else:
                 st.markdown("**Demo User (Local Mode)**")
                 st.text_input("Email", value="local@demo.com", disabled=True)
-        
+
         with st.expander("🔒 Privacy & Security"):
             st.markdown(get_privacy_notice())
 
@@ -166,7 +195,7 @@ def main():
                 SessionSecurity.clear_sensitive_data()
                 st.success("Session data cleared!")
                 st.rerun()
-                
+
             if st.button("Save Profile Data"):
                 if FIREBASE_AVAILABLE:
                     if save_user_session():
@@ -175,17 +204,17 @@ def main():
                         st.error("❌ Failed to save profile data")
                 else:
                     st.success("✅ Profile data saved locally!")
-        
+
         with st.expander("❓ Help & Support"):
             st.markdown("**Need help getting started?**")
             render_onboarding_trigger()
-            
+
             st.markdown("**Quick Tips:**")
             st.markdown("• Log your location daily to track residency")
             st.markdown("• Monitor the 183-day threshold closely")
             st.markdown("• Set up budgets for both homes")
             st.markdown("• Use AI assistant for financial questions")
-            
+
             st.markdown("**Documentation:**")
             st.markdown("📚 [Full Documentation](https://github.com/yourusername/snowbird-app/wiki)")
             st.markdown("🐛 [Report Issues](https://github.com/yourusername/snowbird-app/issues)")
@@ -261,7 +290,7 @@ def main():
         location = st.radio("Where are you today?", ("Arizona", "Minnesota"))
         if st.button(f"Log a day in {location}"):
             st.session_state.states[location] += 1
-            
+
             # Sync with user profile if Firebase is available
             if FIREBASE_AVAILABLE:
                 sync = get_profile_sync()

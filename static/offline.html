@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snowbird - Offline</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #A0D8F1 0%, #87CEEB 100%);
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .offline-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        h1 {
+            margin-bottom: 0.5rem;
+            color: #2c5aa0;
+        }
+        
+        p {
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+        
+        .retry-btn {
+            background: #2c5aa0;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        
+        .retry-btn:hover {
+            background: #1e3f73;
+        }
+    </style>
+</head>
+<body>
+    <div class="offline-icon">❄️</div>
+    <h1>You're Offline</h1>
+    <p>Snowbird needs an internet connection to function properly.<br>
+    Please check your connection and try again.</p>
+    <button class="retry-btn" onclick="location.reload()">Try Again</button>
+    
+    <script>
+        // Auto-retry when connection is restored
+        window.addEventListener('online', function() {
+            location.reload();
+        });
+    </script>
+</body>
+</html>

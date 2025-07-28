@@ -84,6 +84,48 @@ def load_custom_css():
         opacity: 1;
         transition: opacity 0.2s ease;
     }
+    
+    /* PWA-specific styles */
+    .pwa-standalone {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    @media (display-mode: standalone) {
+        body {
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Hide Streamlit's hamburger menu in standalone mode */
+        .css-1rs6os .css-17ziqus {
+            display: none;
+        }
+    }
+    
+    /* Install button styling */
+    #pwa-install-btn {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    /* Mobile-first responsive design */
+    @media (max-width: 768px) {
+        .winter-card {
+            margin: 0.5rem 0;
+            padding: 1rem;
+        }
+        
+        .main-title {
+            font-size: 1.5rem;
+        }
+    }
     </style>
     """, unsafe_allow_html=True)
 
