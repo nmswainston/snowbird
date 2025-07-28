@@ -1,6 +1,6 @@
 
 [theme]
-# Day mode (default)
+# Winter theme with day/night mode support
 primaryColor = "#12BDF2"
 backgroundColor = "#FFFFFF"
 secondaryBackgroundColor = "#F0F4F8"
@@ -11,3 +11,11 @@ font = "sans serif"
 headless = true
 port = 5000
 address = "0.0.0.0"
+fileWatcherType = "none"
+
+[browser]
+gatherUsageStats = false
+
+[client]
+caching = true
+showErrorDetails = true
