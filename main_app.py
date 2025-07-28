@@ -92,7 +92,7 @@ def main():
 def render_settings_tab():
     """Render comprehensive settings/preferences tab"""
     st.markdown('<h2><i data-lucide="settings" class="icon"></i>Settings & Preferences</h2>', unsafe_allow_html=True)
-    
+
     # Create tabs for different settings categories
     settings_tabs = st.tabs([
         "⚙️ General", 
@@ -102,10 +102,10 @@ def render_settings_tab():
         "📊 Data Management",
         "🔧 Advanced"
     ])
-    
+
     with settings_tabs[0]:  # General Settings
         st.subheader("Tax Residency Settings")
-        
+
         col1, col2 = st.columns(2)
         with col1:
             tax_threshold = st.number_input(
@@ -116,7 +116,7 @@ def render_settings_tab():
                 help="Number of days that determines tax residency"
             )
             st.session_state.tax_threshold = tax_threshold
-            
+
         with col2:
             fiscal_year_start = st.selectbox(
                 "Fiscal Year Start",
@@ -125,7 +125,7 @@ def render_settings_tab():
                 help="When your tax year begins"
             )
             st.session_state.fiscal_year_start = fiscal_year_start
-        
+
         st.subheader("Location Settings")
         primary_residence = st.selectbox(
             "Primary Residence State",
@@ -133,7 +133,7 @@ def render_settings_tab():
             index=st.session_state.get('primary_residence_index', 0)
         )
         st.session_state.primary_residence = primary_residence
-        
+
         # Time zone setting
         timezone = st.selectbox(
             "Time Zone",
@@ -142,14 +142,14 @@ def render_settings_tab():
             help="Your preferred timezone for date calculations"
         )
         st.session_state.timezone = timezone
-    
+
     with settings_tabs[1]:  # Email & Notifications
         from components.email_settings import render_email_settings
         render_email_settings()
-        
+
         st.divider()
         st.subheader("Notification Preferences")
-        
+
         # Weekly summary
         weekly_summary = st.checkbox(
             "Weekly Summary Emails",
@@ -157,7 +157,7 @@ def render_settings_tab():
             help="Receive weekly summaries of your residency status"
         )
         st.session_state.weekly_summary = weekly_summary
-        
+
         # Threshold warnings
         threshold_warnings = st.checkbox(
             "Threshold Warning Alerts",
@@ -165,7 +165,7 @@ def render_settings_tab():
             help="Get notified when approaching tax residency thresholds"
         )
         st.session_state.threshold_warnings = threshold_warnings
-        
+
         # Warning days before threshold
         if threshold_warnings:
             warning_days = st.slider(
@@ -175,14 +175,14 @@ def render_settings_tab():
                 value=st.session_state.get('warning_days', 14)
             )
             st.session_state.warning_days = warning_days
-    
+
     with settings_tabs[2]:  # Theme & Display
         from components.theme_selector import render_theme_selector
         render_theme_selector()
-        
+
         st.divider()
         st.subheader("Display Preferences")
-        
+
         # Date format
         date_format = st.selectbox(
             "Date Format",
@@ -190,7 +190,7 @@ def render_settings_tab():
             index=0
         )
         st.session_state.date_format = date_format
-        
+
         # Chart preferences
         chart_style = st.selectbox(
             "Chart Style",
@@ -198,7 +198,7 @@ def render_settings_tab():
             index=0
         )
         st.session_state.chart_style = chart_style
-        
+
         # Dashboard layout
         dashboard_layout = st.radio(
             "Dashboard Layout",
@@ -207,10 +207,10 @@ def render_settings_tab():
             horizontal=True
         )
         st.session_state.dashboard_layout = dashboard_layout
-    
+
     with settings_tabs[3]:  # Privacy & Security
         st.subheader("Privacy Settings")
-        
+
         # Data collection
         analytics_enabled = st.checkbox(
             "Enable Usage Analytics",
@@ -218,7 +218,7 @@ def render_settings_tab():
             help="Help improve the app by sharing anonymous usage data"
         )
         st.session_state.analytics_enabled = analytics_enabled
-        
+
         # Auto-save
         auto_save = st.checkbox(
             "Auto-save Changes",
@@ -226,7 +226,7 @@ def render_settings_tab():
             help="Automatically save your changes"
         )
         st.session_state.auto_save = auto_save
-        
+
         # Session timeout
         session_timeout = st.selectbox(
             "Session Timeout",
@@ -234,34 +234,34 @@ def render_settings_tab():
             index=2
         )
         st.session_state.session_timeout = session_timeout
-        
+
         st.subheader("Data Security")
         st.info("🔒 All your data is encrypted and stored securely. We never share your personal information.")
-        
+
         # Show security status
         if st.button("🔍 Check Security Status"):
             st.success("✅ All security checks passed")
             st.write("- Data encryption: Active")
             st.write("- Secure connections: Enabled") 
             st.write("- Authentication: Valid")
-    
+
     with settings_tabs[4]:  # Data Management
         st.subheader("Data Export & Backup")
-        
+
         col1, col2 = st.columns(2)
-        
+
         with col1:
             if st.button("📄 Export All Data"):
                 try:
                     import json
                     from datetime import datetime
-                    
+
                     export_data = {
                         "export_date": datetime.now().isoformat(),
                         "settings": dict(st.session_state),
                         "version": "1.0"
                     }
-                    
+
                     st.download_button(
                         label="⬇️ Download Export File",
                         data=json.dumps(export_data, indent=2),
@@ -271,7 +271,7 @@ def render_settings_tab():
                     st.success("✅ Export prepared!")
                 except Exception as e:
                     st.error(f"Export failed: {e}")
-        
+
         with col2:
             if st.button("🗑️ Clear All Data"):
                 if st.button("⚠️ Confirm Delete", type="secondary"):
@@ -281,19 +281,19 @@ def render_settings_tab():
                             del st.session_state[key]
                     st.success("✅ All data cleared!")
                     st.rerun()
-        
+
         st.subheader("Import Data")
         uploaded_file = st.file_uploader(
             "Import Settings",
             type=['json'],
             help="Upload a previously exported settings file"
         )
-        
+
         if uploaded_file is not None:
             try:
                 import json
                 data = json.load(uploaded_file)
-                
+
                 if st.button("📥 Import Settings"):
                     # Import settings
                     if 'settings' in data:
@@ -302,13 +302,13 @@ def render_settings_tab():
                                 st.session_state[key] = value
                     st.success("✅ Settings imported successfully!")
                     st.rerun()
-                    
+
             except Exception as e:
                 st.error(f"Import failed: {e}")
-    
+
     with settings_tabs[5]:  # Advanced
         st.subheader("Advanced Configuration")
-        
+
         # Debug mode
         debug_mode = st.checkbox(
             "Enable Debug Mode",
@@ -316,7 +316,7 @@ def render_settings_tab():
             help="Show additional debugging information"
         )
         st.session_state.debug_mode = debug_mode
-        
+
         # Performance settings
         st.subheader("Performance")
         cache_enabled = st.checkbox(
@@ -325,10 +325,10 @@ def render_settings_tab():
             help="Cache data to improve performance"
         )
         st.session_state.cache_enabled = cache_enabled
-        
+
         # Feature flags
         st.subheader("Feature Flags")
-        
+
         # Gmail integration
         gmail_integration = st.checkbox(
             "Gmail Travel Detection (Beta)",
@@ -336,7 +336,7 @@ def render_settings_tab():
             help="Automatically detect travel from Gmail"
         )
         st.session_state.gmail_integration = gmail_integration
-        
+
         # AI features
         ai_features = st.checkbox(
             "AI Assistant (Beta)",
@@ -344,13 +344,13 @@ def render_settings_tab():
             help="Enable AI-powered insights and suggestions"
         )
         st.session_state.ai_features = ai_features
-        
+
         st.subheader("System Information")
-        
+
         if st.button("📊 Show System Info"):
             try:
                 from utils.config import settings
-                
+
                 st.write("**Application Version**: 1.0.0")
                 st.write(f"**Environment**: {settings.ENVIRONMENT}")
                 st.write(f"**Debug Mode**: {settings.DEBUG}")
@@ -358,10 +358,10 @@ def render_settings_tab():
                 st.write(f"- Gmail Integration: {bool(settings.GMAIL_CREDENTIALS_FILE)}")
                 st.write(f"- AI Features: {bool(settings.OPENAI_API_KEY)}")
                 st.write(f"- Email Notifications: {bool(settings.SMTP_USERNAME)}")
-                
+
             except Exception as e:
                 st.error(f"Could not load system info: {e}")
-        
+
         # Reset to defaults
         st.subheader("Reset Settings")
         if st.button("🔄 Reset to Defaults", type="secondary"):
@@ -377,16 +377,16 @@ def render_settings_tab():
                         del st.session_state[key]
                 st.success("✅ Settings reset to defaults!")
                 st.rerun()
-    
+
     # Save settings button
     st.divider()
     col1, col2, col3 = st.columns([1, 1, 1])
-    
+
     with col2:
         if st.button("💾 Save All Settings", type="primary", use_container_width=True):
             # In a real app, this would save to database
             st.success("✅ All settings saved successfully!")
-            st.balloons()nage account settings here")
+            st.balloons()
 
 def render_budgets_tab():
     """Render budgets management tab"""
