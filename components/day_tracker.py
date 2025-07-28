@@ -55,7 +55,17 @@ def render_day_tracker():
             date_obj = datetime.datetime.fromisoformat(log['date']).date()
             st.markdown(f'<i data-lucide="calendar" class="icon"></i>{date_obj.strftime("%b %d, %Y")} - **{log["state"]}**', unsafe_allow_html=True)
     else:
-        st.write("No activity logged yet. Start by logging your current location!")
+        # Enhanced empty state with visual snowflake illustration
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            # Center-aligned snowflake visual with styling
+            st.markdown("""
+            <div style="text-align: center; padding: 2rem 0;">
+                <div style="font-size: 4rem; color: #AEDFF7; margin-bottom: 1rem;">❄️</div>
+                <p style="color: #64748b; font-size: 1.1rem; margin-bottom: 0.5rem;">No activity yet—log your first day!</p>
+                <p style="color: #94a3b8; font-size: 0.9rem;">Start tracking your snowbird journey above ↑</p>
+            </div>
+            """, unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
     
