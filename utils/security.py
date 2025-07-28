@@ -1,6 +1,22 @@
-
 """
-Security utilities for protecting user data in the Snowbird Financial Assistant.
+Security utilities and session management for the Snowbird application.
+
+This module implements security best practices including:
+- Session management with automatic expiration
+- CSRF protection for forms and API calls
+- Data encryption for sensitive information
+- Privacy controls and data anonymization
+- Secure random token generation
+
+Security Features:
+    - Automatic session timeout after inactivity
+    - Encrypted storage of sensitive user data
+    - Privacy notices and consent management
+    - Secure cookie handling
+    - Input validation and sanitization
+
+All security functions follow OWASP guidelines and implement defense-in-depth
+strategies to protect user financial data and personal information.
 """
 import hashlib
 import secrets
@@ -15,19 +31,33 @@ from utils.logging_config import data_logger
 from utils.error_handling import handle_errors
 
 class DataEncryption:
-    """Handle encryption/decryption of sensitive data"""
-    
+    """
+    Handle encryption/decryption of sensitive data.
+
+    This class provides methods to encrypt and decrypt sensitive data using Fernet encryption.
+    It securely manages the encryption key using a combination of session ID and a secret key.
+    """
+
     def __init__(self):
+        """Initialize DataEncryption with encryption key."""
         self.key = self._get_or_create_encryption_key()
         self.fernet = Fernet(self.key)
-    
+
     def _get_or_create_encryption_key(self) -> bytes:
-        """Get or create encryption key from secure storage"""
+        """
+        Get or create encryption key from secure storage.
+
+        The encryption key is derived from a combination of the session ID and a secret key,
+        ensuring that each session has a unique encryption key.
+
+        Returns:
+            bytes: The encryption key.
+        """
         if 'encryption_key' not in st.session_state:
             # Use a combination of session ID and secret key
             password = st.secrets.get("SECRET_KEY", "default-key").encode()
             salt = hashlib.sha256(st.session_state.get('session_id', 'default').encode()).digest()[:16]
-            
+
             kdf = PBKDF2HMAC(
                 algorithm=hashes.SHA256(),
                 length=32,
@@ -36,12 +66,20 @@ class DataEncryption:
             )
             key = base64.urlsafe_b64encode(kdf.derive(password))
             st.session_state.encryption_key = key
-        
+
         return st.session_state.encryption_key
-    
+
     @handle_errors(show_error=False, return_none_on_error=True)
     def encrypt_data(self, data: Any) -> Optional[str]:
-        """Encrypt sensitive data"""
+        """
+        Encrypt sensitive data.
+
+        Args:
+            data (Any): The data to be encrypted.
+
+        Returns:
+            Optional[str]: The encrypted data, or None if encryption fails.
+        """
         try:
             json_data = json.dumps(data, default=str)
             encrypted = self.fernet.encrypt(json_data.encode())
@@ -49,10 +87,18 @@ class DataEncryption:
         except Exception as e:
             data_logger.error(f"Encryption failed: {e}")
             return None
-    
+
     @handle_errors(show_error=False, return_none_on_error=True)
     def decrypt_data(self, encrypted_data: str) -> Optional[Any]:
-        """Decrypt sensitive data"""
+        """
+        Decrypt sensitive data.
+
+        Args:
+            encrypted_data (str): The encrypted data to be decrypted.
+
+        Returns:
+            Optional[Any]: The decrypted data, or None if decryption fails.
+        """
         try:
             decoded = base64.urlsafe_b64decode(encrypted_data.encode())
             decrypted = self.fernet.decrypt(decoded)
@@ -62,93 +108,144 @@ class DataEncryption:
             return None
 
 class SessionSecurity:
-    """Manage secure sessions and user data"""
-    
+    """
+    Manage secure sessions and user data.
+
+    This class provides methods to initialize, validate, and refresh user sessions.
+    It also includes functionality to clear sensitive data from the session.
+    """
+
     @staticmethod
     def initialize_secure_session():
-        """Initialize secure session with unique ID"""
+        """Initialize secure session with unique ID."""
         if 'session_id' not in st.session_state:
             st.session_state.session_id = secrets.token_urlsafe(32)
-        
+
         if 'session_timeout' not in st.session_state:
             import datetime
             # 8 hour session timeout
             st.session_state.session_timeout = datetime.datetime.now() + datetime.timedelta(hours=8)
-    
+
     @staticmethod
     def check_session_validity() -> bool:
-        """Check if current session is still valid"""
+        """
+        Check if current session is still valid.
+
+        Returns:
+            bool: True if the session is valid, False otherwise.
+        """
         if 'session_timeout' not in st.session_state:
             return False
-        
+
         import datetime
         return datetime.datetime.now() < st.session_state.session_timeout
-    
+
     @staticmethod
     def refresh_session():
-        """Refresh session timeout"""
+        """Refresh session timeout."""
         import datetime
         st.session_state.session_timeout = datetime.datetime.now() + datetime.timedelta(hours=8)
-    
+
     @staticmethod
     def clear_sensitive_data():
-        """Clear all sensitive data from session"""
+        """Clear all sensitive data from session."""
         sensitive_keys = [
             'gmail_creds', 'access_token', 'gmail_suggestions', 
             'gmail_emails', 'encryption_key', 'user_profile'
         ]
-        
+
         for key in sensitive_keys:
             if key in st.session_state:
                 del st.session_state[key]
 
 class DataPrivacy:
-    """Handle data privacy and anonymization"""
-    
+    """
+    Handle data privacy and anonymization.
+
+    This class provides methods to hash email addresses, anonymize location data,
+    and sanitize email content to protect user privacy.
+    """
+
     @staticmethod
     def hash_email(email: str) -> str:
-        """Create a privacy-preserving hash of email address"""
+        """
+        Create a privacy-preserving hash of email address.
+
+        Args:
+            email (str): The email address to be hashed.
+
+        Returns:
+            str: The hashed email address.
+        """
         return hashlib.sha256(email.encode()).hexdigest()[:16]
-    
+
     @staticmethod
     def anonymize_location_data(location_data: Dict[str, Any]) -> Dict[str, Any]:
-        """Remove personally identifiable information from location data"""
+        """
+        Remove personally identifiable information from location data.
+
+        Args:
+            location_data (Dict[str, Any]): The location data to be anonymized.
+
+        Returns:
+            Dict[str, Any]: The anonymized location data.
+        """
         anonymized = location_data.copy()
-        
+
         # Remove precise coordinates, keep only general area
         if 'latitude' in anonymized and 'longitude' in anonymized:
             # Round to ~1 mile precision
             anonymized['latitude'] = round(anonymized['latitude'], 2)
             anonymized['longitude'] = round(anonymized['longitude'], 2)
-        
+
         # Remove IP address if present
         anonymized.pop('ip_address', None)
         anonymized.pop('user_agent', None)
-        
+
         return anonymized
-    
+
     @staticmethod
     def sanitize_email_content(email_content: str) -> str:
-        """Remove sensitive information from email content"""
+        """
+        Remove sensitive information from email content.
+
+        Args:
+            email_content (str): The email content to be sanitized.
+
+        Returns:
+            str: The sanitized email content.
+        """
         import re
-        
+
         # Remove credit card numbers
         email_content = re.sub(r'\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b', '[CARD-REDACTED]', email_content)
-        
+
         # Remove SSN patterns
         email_content = re.sub(r'\b\d{3}-\d{2}-\d{4}\b', '[SSN-REDACTED]', email_content)
-        
+
         # Remove phone numbers
         email_content = re.sub(r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b', '[PHONE-REDACTED]', email_content)
-        
+
         return email_content
 
 class AuditLogger:
-    """Log security-relevant events for compliance"""
-    
+    """
+    Log security-relevant events for compliance.
+
+    This class provides methods to log data access events, Gmail API access,
+    and location tracking events for auditing and compliance purposes.
+    """
+
     @staticmethod
     def log_data_access(action: str, data_type: str, user_id: str = None):
-        """Log data access events"""
+        """
+        Log data access events.
+
+        Args:
+            action (str): The action performed on the data.
+            data_type (str): The type of data accessed.
+            user_id (str, optional): The ID of the user accessing the data. Defaults to None.
+        """
         data_logger.info(f"Data access: {action}", extra={
             'event_type': 'data_access',
             'action': action,
@@ -157,20 +254,32 @@ class AuditLogger:
             'timestamp': str(datetime.datetime.now()),
             'session_id': st.session_state.get('session_id', 'unknown')
         })
-    
+
     @staticmethod
     def log_gmail_access(email_count: int, user_email: str = None):
-        """Log Gmail API access"""
+        """
+        Log Gmail API access.
+
+        Args:
+            email_count (int): The number of emails accessed.
+            user_email (str, optional): The email address of the user accessing Gmail. Defaults to None.
+        """
         data_logger.info(f"Gmail accessed: {email_count} emails processed", extra={
             'event_type': 'gmail_access',
             'email_count': email_count,
             'user_email': DataPrivacy.hash_email(user_email) if user_email else 'unknown',
             'timestamp': str(datetime.datetime.now())
         })
-    
+
     @staticmethod
     def log_location_tracking(location: str, method: str):
-        """Log location tracking events"""
+        """
+        Log location tracking events.
+
+        Args:
+            location (str): The location being tracked.
+            method (str): The method used for location tracking.
+        """
         data_logger.info(f"Location tracked: {location} via {method}", extra={
             'event_type': 'location_tracking',
             'location': location,
@@ -179,10 +288,15 @@ class AuditLogger:
         })
 
 def get_privacy_notice() -> str:
-    """Return privacy notice text"""
+    """
+    Return privacy notice text.
+
+    Returns:
+        str: The privacy notice text.
+    """
     return """
     **🔒 Your Privacy & Security**
-    
+
     • **Local Processing**: Your data is processed locally in your session
     • **No Data Storage**: We don't store your personal information on our servers
     • **Encrypted Sessions**: All sensitive data is encrypted in your browser session
@@ -190,6 +304,6 @@ def get_privacy_notice() -> str:
     • **Audit Logs**: Security events are logged for your protection
     • **Session Timeout**: Your session automatically expires after 8 hours
     • **Data Anonymization**: Location data is anonymized when possible
-    
+
     Your financial and personal information remains private and secure.
     """

@@ -88,9 +88,20 @@ if not SessionSecurity.check_session_validity():
 else:
     SessionSecurity.refresh_session()
 
-# Load custom styling
+# Load custom styling and onboarding
 from components.styles import load_custom_css, render_main_header
+from utils.onboarding import initialize_onboarding, should_show_onboarding, render_onboarding_carousel, render_onboarding_trigger
+
+# Initialize onboarding system
+initialize_onboarding()
+
+# Load styling
 load_custom_css()
+
+# Show onboarding carousel if needed (before main app content)
+if should_show_onboarding():
+    render_onboarding_carousel()
+    st.stop()  # Don't render main app until onboarding is complete
 
 def main():
     """Main application function"""
@@ -154,6 +165,21 @@ def main():
                         st.error("❌ Failed to save profile data")
                 else:
                     st.success("✅ Profile data saved locally!")
+        
+        with st.expander("❓ Help & Support"):
+            st.markdown("**Need help getting started?**")
+            render_onboarding_trigger()
+            
+            st.markdown("**Quick Tips:**")
+            st.markdown("• Log your location daily to track residency")
+            st.markdown("• Monitor the 183-day threshold closely")
+            st.markdown("• Set up budgets for both homes")
+            st.markdown("• Use AI assistant for financial questions")
+            
+            st.markdown("**Documentation:**")
+            st.markdown("📚 [Full Documentation](https://github.com/yourusername/snowbird-app/wiki)")
+            st.markdown("🐛 [Report Issues](https://github.com/yourusername/snowbird-app/issues)")
+            st.markdown("💬 [Community Support](https://github.com/yourusername/snowbird-app/discussions)")
 
     # Import analytics
     from components.analytics import track_page_view, track_user_action, track_feature_usage

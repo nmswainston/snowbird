@@ -1,6 +1,18 @@
-
 """
-Data models and validation for the Snowbird Financial Assistant.
+Data models and structures for the Snowbird Financial Assistant.
+
+This module defines Pydantic data models that represent the core business
+entities in the Snowbird application, including user profiles, location tracking,
+budget management, and tax residency calculations.
+
+Key Classes:
+    - SnowbirdData: Main data container for user information
+    - LocationEntry: Individual location log entries
+    - BudgetCategory: Budget tracking for different expense types
+    - TaxResidencyStatus: Tax compliance status calculations
+
+The models provide data validation, serialization, and type safety throughout
+the application, ensuring consistent data handling and API contracts.
 """
 
 from typing import Dict, List, Any, Optional
@@ -56,10 +68,21 @@ class SnowbirdData:
     """Data management class for Snowbird app"""
 
     def __init__(self):
+        """
+        Initializes the SnowbirdData class with default values.
+        """
         self.tax_threshold = 183
 
     def get_tax_status(self, days: int, threshold: int = None):
-        """Get tax residency status for a state"""
+        """Get tax residency status for a state
+
+        Args:
+            days (int): Number of days spent in the state.
+            threshold (int, optional): Tax residency threshold. Defaults to None.
+
+        Returns:
+            tuple: A tuple containing tax status and its severity.
+        """
         if threshold is None:
             threshold = self.tax_threshold
 
@@ -74,7 +97,15 @@ class SnowbirdData:
             return "SAFE", "status-safe"
 
     def add_day_log(self, state: str, date_str: str = None, auto_logged: bool = False):
-        """Add a day to the log"""
+        """Add a day to the log
+        Args:
+            state (str): The state to add the day to.
+            date_str (str, optional): The date to add. Defaults to None.
+            auto_logged (bool, optional): If the log was automatically added. Defaults to False.
+
+        Returns:
+            tuple: (success, message)
+        """
         import streamlit as st
 
         if date_str is None:
@@ -99,7 +130,11 @@ class SnowbirdData:
         return True, f"Logged {date_str} in {state}" + (" (auto)" if auto_logged else "")
 
     def generate_report_data(self):
-        """Generate comprehensive report data"""
+        """Generate comprehensive report data
+
+        Returns:
+            dict: Report data
+        """
         import streamlit as st
 
         today = datetime.date.today()

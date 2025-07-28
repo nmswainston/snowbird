@@ -1,7 +1,28 @@
 
 """
 Analytics integration for the Snowbird application.
-Tracks user interactions and application usage metrics.
+
+This module provides comprehensive user behavior tracking and application
+metrics collection while maintaining user privacy and data protection.
+
+Analytics Capabilities:
+    - Page view tracking across application sections
+    - User action logging (anonymized)
+    - Feature usage statistics
+    - Performance monitoring
+    - Error tracking and reporting
+    - A/B testing support for UI improvements
+
+Privacy-First Design:
+    - No personally identifiable information (PII) collected
+    - Local-first data storage with optional cloud sync
+    - User-controlled analytics preferences
+    - GDPR and CCPA compliant data handling
+    - Transparent data usage policies
+
+The analytics system helps improve the user experience by identifying
+popular features, common user journeys, and areas for optimization
+without compromising user privacy or financial data security.
 """
 
 import streamlit as st
