@@ -1,0 +1,47 @@
+Enhance the Snowbird Streamlit app to support three user experience levels—New, In‑Between, and Expert—and adapt the UI, features, and help content dynamically.
+
+Requirements:
+
+1. **Experience-Level Selector & Onboarding Wizard**  
+   - In Settings (or on first launch), prompt the user: “What’s your snowbird experience?” with options New, In‑Between, Expert.  
+   - Save choice in `st.session_state["experience_level"]`.  
+   - If first time, show a 3‑step onboarding wizard:  
+     1. Log your first day  
+     2. Track your progress  
+     3. Ask Snowbird AI for tips  
+   - After completion, mark `st.session_state["onboarded"] = True`.
+
+2. **Guided “Quick Start” Dashboard for New Users**  
+   - When `experience_level == "New"`, show only three large buttons: Log Today, View Progress, Ask AI for Tips.  
+   - Hide advanced sections (bulk operations, reports, expert analytics).
+
+3. **Contextual Tooltips & Help Hub**  
+   - Add “❓” icons next to key terms (residency, HOA, threshold) that show one‑sentence definitions in `st.tooltip()`.  
+   - Create a “Snowbird 101” page with brief articles or embedded videos on tax basics, dual-home tips, and packing checklists.
+
+4. **Starter Templates for Budgets & Checklists**  
+   - If `experience_level == "New"`, pre-load budget categories with suggested values in `home_budgets`.  
+   - Provide a default checklist under “Seasonal Checklist” for Leaving/Arriving tasks.
+
+5. **Progressive Disclosure for In‑Between Users**  
+   - When `experience_level == "In‑Between"`, reveal next-tier features one at a time (bulk logging, CSV export, custom checklists) via a weekly unlock or after they log X days.  
+   - Show a banner: “New feature unlocked: Bulk Logging! Try it now.”
+
+6. **Expert Mode & Advanced Analytics**  
+   - When `experience_level == "Expert"`, enable an “Expert Mode” section by default.  
+   - Add deep‑dive analytics: Year‑over‑year graphs, budget variance charts (use `pandas` + `matplotlib`).  
+   - Implement one‑click bulk operations: “Log March 2025 in Arizona” UI with date-range picker.
+
+7. **Public API & Webhooks**  
+   - Create a FastAPI endpoint (`api.py`) that returns JSON for `/logs` and `/budgets`.  
+   - Add a “Configure Webhook” form for users to register a callback URL and fire JSON payloads on new logs or threshold alerts.
+
+8. **Dynamic Feature Gating**  
+   - Build a helper `require_experience(min_level)` to hide or disable UI elements based on `experience_level`.  
+   - Ensure all new and existing features use this helper.
+
+9. **Comment & Document**  
+   - Comment every major change with a short description.  
+   - Update README with a “User Experience Levels” section describing each mode.
+
+The result should be a fully dynamic Snowbird app that adapts its UI, tools, and guidance to match a user’s experience level.  
