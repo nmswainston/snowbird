@@ -573,8 +573,8 @@ def render_dashboard():
         st.markdown("<br>", unsafe_allow_html=True)  # Add spacing between states
 
         # Add spacing after state breakdown
-    st.markdown("---")
-    st.markdown("<br><br>", unsafe_allow_html=True)
+        st.markdown("---")
+        st.markdown("<br><br>", unsafe_allow_html=True)
 
     # Widget: Financial Summary - render only if enabled
     if st.session_state.widgets.get("financial_summary", True):
