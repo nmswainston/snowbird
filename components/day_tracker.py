@@ -44,26 +44,28 @@ def render_day_tracker():
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # Bulk operations
+    # Bulk operations - wrapped in expander to reduce visual noise
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-    st.markdown('**<i data-lucide="settings" class="icon"></i>Bulk Operations**', unsafe_allow_html=True)
+    
+    with st.expander("⚙️ Bulk Operations"):
+        st.caption("Advanced: adjust multiple days at once.")
+        
+        col1, col2 = st.columns(2)
 
-    col1, col2 = st.columns(2)
+        with col1:
+            bulk_state = st.selectbox("State for bulk operation:", list(st.session_state.states.keys()), key="bulk_state")
+            bulk_days = st.number_input("Set total days:", min_value=0, max_value=365, value=st.session_state.states[bulk_state])
 
-    with col1:
-        bulk_state = st.selectbox("State for bulk operation:", list(st.session_state.states.keys()), key="bulk_state")
-        bulk_days = st.number_input("Set total days:", min_value=0, max_value=365, value=st.session_state.states[bulk_state])
+            if st.button("Update Total Days"):
+                st.session_state.states[bulk_state] = bulk_days
+                st.success(f"Updated {bulk_state} to {bulk_days} days")
+                st.rerun()
 
-        if st.button("Update Total Days"):
-            st.session_state.states[bulk_state] = bulk_days
-            st.success(f"Updated {bulk_state} to {bulk_days} days")
-            st.rerun()
-
-    with col2:
-        if st.button("Clear All Logs", type="secondary"):
-            st.session_state.day_log = []
-            st.session_state.states = {state: 0 for state in st.session_state.states.keys()}
-            st.success("All logs cleared!")
-            st.rerun()
+        with col2:
+            if st.button("Clear All Logs", type="secondary"):
+                st.session_state.day_log = []
+                st.session_state.states = {state: 0 for state in st.session_state.states.keys()}
+                st.success("All logs cleared!")
+                st.rerun()
 
     st.markdown('</div>', unsafe_allow_html=True)
