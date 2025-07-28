@@ -239,20 +239,21 @@ def render_onboarding_carousel():
     }
     
     .onboarding-nav .stButton > button {
-        min-width: 180px !important;
-        width: auto !important;
-        max-width: none !important;
-        padding: 1rem 2.5rem !important;
-        font-size: 0.9rem !important;
+        min-width: 200px !important;
+        width: 200px !important;
+        max-width: 200px !important;
+        padding: 1.1rem 2rem !important;
+        font-size: 0.85rem !important;
         font-weight: 600 !important;
         border-radius: 12px !important;
         white-space: nowrap !important;
         text-overflow: clip !important;
-        overflow: visible !important;
-        line-height: 1.2 !important;
-        letter-spacing: 0.02em !important;
-        height: auto !important;
-        min-height: 52px !important;
+        overflow: hidden !important;
+        line-height: 1.3 !important;
+        letter-spacing: 0.01em !important;
+        height: 56px !important;
+        min-height: 56px !important;
+        max-height: 56px !important;
         border: 2px solid transparent !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         position: relative !important;
@@ -264,6 +265,7 @@ def render_onboarding_carousel():
         word-break: keep-all !important;
         flex-shrink: 0 !important;
         flex-grow: 0 !important;
+        text-align: center !important;
     }
     
     /* Previous button - secondary styling */
@@ -372,14 +374,18 @@ def render_onboarding_carousel():
         }
         
         .onboarding-nav .stButton > button {
-            width: 100% !important;
-            min-width: 160px !important;
-            font-size: 0.85rem !important;
-            padding: 1rem 2rem !important;
-            min-height: 54px !important;
+            width: 180px !important;
+            min-width: 180px !important;
+            max-width: 180px !important;
+            font-size: 0.8rem !important;
+            padding: 1rem 1.5rem !important;
+            height: 52px !important;
+            min-height: 52px !important;
+            max-height: 52px !important;
             word-break: keep-all !important;
-            overflow: visible !important;
+            overflow: hidden !important;
             flex-shrink: 0 !important;
+            text-align: center !important;
         }
         
         .onboarding-modal {
