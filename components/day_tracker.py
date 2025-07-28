@@ -33,7 +33,9 @@ def render_day_tracker():
         if st.button("Log Today", type="primary"):
             success, message = snowbird_data.add_day_log(current_location, custom_date.isoformat())
             if success:
-                st.success(message)
+                # Enhanced feedback confirmation with clear, specific messaging
+                formatted_date = custom_date.strftime("%Y-%m-%d")
+                st.success(f"✅ Logged {current_location} for {formatted_date}")
                 st.rerun()
             else:
                 st.warning(message)
@@ -75,14 +77,16 @@ def render_day_tracker():
 
             if st.button("Update Total Days"):
                 st.session_state.states[bulk_state] = bulk_days
-                st.success(f"Updated {bulk_state} to {bulk_days} days")
+                # Enhanced feedback confirmation for bulk operations
+                st.success(f"✅ Updated {bulk_state} total to {bulk_days} days")
                 st.rerun()
 
         with col2:
             if st.button("Clear All Logs", type="secondary"):
                 st.session_state.day_log = []
                 st.session_state.states = {state: 0 for state in st.session_state.states.keys()}
-                st.success("All logs cleared!")
+                # Enhanced feedback confirmation for data clearing
+                st.success("✅ All logs and counts have been cleared")
                 st.rerun()
 
     st.markdown('</div>', unsafe_allow_html=True)
