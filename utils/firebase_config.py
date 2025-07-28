@@ -28,8 +28,8 @@ class FirebaseConfig:
         try:
             # Initialize Firebase Admin SDK if not already done
             if not firebase_admin._apps:
-                # Try to get service account from Streamlit secrets
-                service_account_info = st.secrets.get("firebase_service_account", {})
+                # Try to get service account from settings
+                service_account_info = settings.FIREBASE_SERVICE_ACCOUNT
                 
                 if service_account_info:
                     # Convert to proper format if needed
@@ -51,7 +51,7 @@ class FirebaseConfig:
             self.db = firestore.client()
             
             # Initialize Pyrebase for client-side auth
-            firebase_config = st.secrets.get("firebase_config", {})
+            firebase_config = settings.FIREBASE_CONFIG
             if firebase_config:
                 self.firebase_app = pyrebase.initialize_app(firebase_config)
                 self.auth_config = self.firebase_app.auth()

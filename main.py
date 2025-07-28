@@ -111,8 +111,8 @@ else:
 # Initialize feature flags system first
 from utils.feature_flags import feature_flags, is_feature_enabled, feature_gate
 
-# Initialize configuration
-from config import config
+# Initialize configuration from utils/config.py
+from utils.config import settings
 
 # Initialize security
 from utils.security import SessionSecurity, get_privacy_notice
@@ -149,11 +149,8 @@ def main():
     import datetime
     import openai
 
-    # Load your OpenAI API key from Streamlit secrets (safely)
-    try:
-        openai.api_key = st.secrets.get("OPENAI_API_KEY", "")
-    except Exception:
-        openai.api_key = ""
+    # Load your OpenAI API key from settings
+    openai.api_key = settings.OPENAI_API_KEY
 
     # State data
     states = {"Arizona": 0, "Minnesota": 0}
@@ -166,7 +163,7 @@ def main():
         "Healthcare": 400,
         "Supplemental Insurance": 200
     }
-    TAX_THRESHOLD_DAYS = 183
+    TAX_THRESHOLD_DAYS = settings.TAX_THRESHOLD
 
     # Session state init
     if "states" not in st.session_state:
@@ -468,7 +465,7 @@ def main():
         st.markdown('**🤖 Ask Snowbird AI**', unsafe_allow_html=True)
 
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
-        if not openai.api_key or openai.api_key.strip() == "":
+        if not settings.OPENAI_API_KEY or settings.OPENAI_API_KEY.strip() == "":
             st.info("💡 To enable AI features, add your OPENAI_API_KEY to Replit Secrets in the Tools panel.")
             st.text_area("Ask a financial question:", disabled=True, placeholder="Add OpenAI API key to enable this feature")
         else:

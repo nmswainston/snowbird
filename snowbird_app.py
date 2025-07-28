@@ -3,8 +3,9 @@ import datetime
 import openai
 import os
 
-# Load your OpenAI API key from Streamlit secrets
-openai.api_key = st.secrets.get("OPENAI_API_KEY", "")
+# Load your OpenAI API key from settings
+from utils.config import settings
+openai.api_key = settings.OPENAI_API_KEY
 
 # State data
 states = {"Arizona": 0, "Minnesota": 0}
