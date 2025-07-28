@@ -1,4 +1,14 @@
+"""
+Snowbird Financial Assistant - Main Application
+"""
+
 import streamlit as st
+import datetime
+import pandas as pd
+from typing import Dict, List
+import traceback
+import threading
+import time
 from components.session_state import initialize_session_state
 from components.styles import load_custom_css, render_main_header
 from components.dashboard import render_dashboard
@@ -18,11 +28,16 @@ st.set_page_config(
 def main():
     """Main application function"""
     try:
-        # Initialize session state
-        initialize_session_state()
+        # Start API server in background thread if not already running
+        if 'api_server_started' not in st.session_state:
+            start_api_server()
+            st.session_state.api_server_started = True
 
         # Load custom CSS
         load_custom_css()
+
+        # Initialize session state
+        initialize_session_state()
 
         # Start health monitoring
         from utils.health_monitor import health_monitor
@@ -1004,5 +1019,34 @@ def render_sidebar():
     from components.styles import render_theme_toggle
     render_theme_toggle()
 
+def start_api_server():
+    """Start the FastAPI server in a background thread"""
+    def run_server():
+        try:
+            from api import run_api_server
+            # Run API server on port 8000 (different from Streamlit's port)
+            run_api_server(host="0.0.0.0", port=8000)
+        except Exception as e:
+            from utils.logging_config import data_logger
+            data_logger.error(f"API server failed to start: {e}")
+
+    # Start server in daemon thread so it doesn't prevent app shutdown
+    api_thread = threading.Thread(target=run_server, daemon=True)
+    api_thread.start()
+
+    # Give the server a moment to start
+    time.sleep(2)
+
+    # Show API info in sidebar
+    with st.sidebar:
+        st.markdown("---")
+        st.markdown("🔗 **REST API Available**")
+        st.markdown("API running on port 8000")
+        st.markdown("- `GET /logs` - View logs")
+        st.markdown("- `GET /budgets` - View budgets") 
+        st.markdown("- `POST /logs` - Add log entry")
+        st.markdown("- `/docs` - API documentation")
+
+# Run the main application
 if __name__ == "__main__":
     main()
