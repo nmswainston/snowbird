@@ -15,32 +15,116 @@ from pathlib import Path
 # Add the current directory to the Python path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-# Initialize logging first
+# Initialize logging first with fallback handling
 try:
     from utils.logging_config import app_logger, log_user_action, log_error
     from utils.error_handling import (
         handle_errors, safe_operation, error_boundary, 
         ErrorDisplay, SnowbirdError, ConfigurationError
     )
-    from config import config
-    
-    # Log application startup
-    app_logger.logger.info(f"Starting Snowbird Financial Assistant v{config.app_version}")
-    app_logger.logger.info(f"Environment: {config.environment}, Debug: {config.debug}")
-    
+    logging_available = True
 except ImportError as e:
     # Fallback logging if our custom logger fails
     import logging
     logging.basicConfig(level=logging.INFO)
     logging.error(f"Failed to initialize custom logging: {e}")
+    logging_available = False
     
     # Define dummy functions to prevent errors
     def log_user_action(*args, **kwargs): pass
     def log_error(*args, **kwargs): pass
+    def handle_errors(show_error=True, fallback_message="An error occurred", log_error_details=True, return_none_on_error=False):
+        def decorator(func):
+            def wrapper(*args, **kwargs):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    if show_error:
+                        st.error(f"⚠️ {fallback_message}")
+                    if return_none_on_error:
+                        return None
+                    else:
+                        raise
+            return wrapper
+        return decorator
+    
+    def safe_operation(operation_name="Operation"):
+        def decorator(func):
+            def wrapper(*args, **kwargs):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    st.error(f"❌ {operation_name} failed.")
+                    return None
+            return wrapper
+        return decorator
+    
+    def error_boundary(operation_name="Operation", show_spinner=True):
+        from contextlib import contextmanager
+        @contextmanager
+        def boundary():
+            try:
+                if show_spinner:
+                    with st.spinner(f"{operation_name}..."):
+                        yield
+                else:
+                    yield
+            except Exception as e:
+                st.error(f"❌ {operation_name} failed: {str(e)}")
+                raise
+        return boundary()
+    
     class ErrorDisplay:
         @staticmethod
         def generic_error(error, show_details=False):
             st.error(f"Error: {str(error)}")
+        @staticmethod
+        def configuration_error(error):
+            st.error(f"Configuration Error: {str(error)}")
+        @staticmethod
+        def api_error(error, service_name="Service"):
+            st.error(f"{service_name} Error: {str(error)}")
+        @staticmethod
+        def data_error(error):
+            st.error(f"Data Error: {str(error)}")
+    
+    class SnowbirdError(Exception):
+        pass
+    class ConfigurationError(SnowbirdError):
+        pass
+
+# Try to load config
+try:
+    from config import config
+    config_available = True
+except ImportError as e:
+    config_available = False
+    # Create a basic config object
+    class BasicConfig:
+        def __init__(self):
+            self.debug = True
+            self.environment = "development"
+            self.app_version = "1.0.0"
+            self.tax_threshold = 183
+            self.enable_ai_features = True
+            self.enable_gmail_integration = True
+            self.openai_api_key = ""
+        
+        def is_development(self):
+            return True
+        
+        def is_production(self):
+            return False
+    
+    config = BasicConfig()
+
+# Log application startup if logging is available
+if logging_available and config_available:
+    try:
+        app_logger.logger.info(f"Starting Snowbird Financial Assistant v{config.app_version}")
+        app_logger.logger.info(f"Environment: {config.environment}, Debug: {config.debug}")
+    except:
+        pass
 
 @handle_errors(show_error=True, fallback_message="Failed to start application")
 def initialize_application():
@@ -56,12 +140,15 @@ def initialize_application():
     
     # Validate configuration
     try:
-        from utils.config_manager import validate_required_config
-        validation_results = validate_required_config()
-        
-        failed_validations = [k for k, v in validation_results.items() if not v]
-        if failed_validations:
-            st.warning(f"Configuration issues detected: {', '.join(failed_validations)}")
+        if config_available:
+            from utils.config_manager import validate_required_config
+            validation_results = validate_required_config()
+            
+            failed_validations = [k for k, v in validation_results.items() if not v]
+            if failed_validations:
+                st.warning(f"Configuration issues detected: {', '.join(failed_validations)}")
+        else:
+            st.info("Using basic configuration - some features may be limited.")
             
     except Exception as e:
         log_error(e, {'operation': 'config_validation'})
