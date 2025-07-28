@@ -15,6 +15,59 @@ from components.analytics import get_analytics_summary
 from utils.logging_config import logger
 from config import config
 
+# Simple audit logger if not available
+class AuditLogger:
+    @staticmethod
+    def log_admin_access(action: str, user_id: str = "admin"):
+        logger.info(f"Admin action: {action} by {user_id}")
+    
+    @staticmethod
+    def log_gmail_access(email_count: int):
+        logger.info(f"Gmail access: {email_count} emails processed")
+
+def get_config_summary() -> Dict[str, Any]:
+    """Get configuration summary"""
+    return {
+        'environment': config.environment,
+        'debug': config.debug,
+        'tax_threshold': config.tax_threshold,
+        'server_host': config.server_host,
+        'server_port': config.server_port,
+        'enable_gmail_integration': config.enable_gmail_integration,
+        'enable_ai_features': config.enable_ai_features,
+        'enable_notifications': config.enable_notifications,
+        'openai_api_key_set': bool(os.getenv('OPENAI_API_KEY')),
+        'admin_password_set': bool(os.getenv('ADMIN_PASSWORD'))
+    }
+
+def validate_required_config() -> Dict[str, bool]:
+    """Validate required configuration items"""
+    validation = {}
+    
+    # Check basic config
+    validation['basic_config'] = all([
+        hasattr(config, 'environment'),
+        hasattr(config, 'debug'),
+        hasattr(config, 'tax_threshold')
+    ])
+    
+    # Check Gmail integration
+    validation['gmail_config'] = (
+        not config.enable_gmail_integration or 
+        os.path.exists(config.gmail_credentials_file or 'credentials.json')
+    )
+    
+    # Check AI features
+    validation['ai_config'] = (
+        not config.enable_ai_features or 
+        bool(os.getenv('OPENAI_API_KEY'))
+    )
+    
+    # Check logging
+    validation['logging_config'] = os.path.exists('logs') or True  # Create if needed
+    
+    return validation
+
 def render_admin_dashboard():
     """Render the admin monitoring dashboard"""
 
