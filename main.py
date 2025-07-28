@@ -23,8 +23,11 @@ def main():
     import datetime
     import openai
 
-    # Load your OpenAI API key from Streamlit secrets
-    openai.api_key = st.secrets.get("OPENAI_API_KEY", "")
+    # Load your OpenAI API key from Streamlit secrets (safely)
+    try:
+        openai.api_key = st.secrets.get("OPENAI_API_KEY", "")
+    except Exception:
+        openai.api_key = ""
 
     # State data
     states = {"Arizona": 0, "Minnesota": 0}
@@ -78,19 +81,27 @@ def main():
 
     # Ask the AI
     st.header("🤖 Ask Snowbird AI")
-    question = st.text_input("Ask a financial question:")
-    if st.button("Get AI Advice"):
-        try:
-            response = openai.ChatCompletion.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": "You are a friendly AI financial assistant for seasonal residents (snowbirds)."},
-                    {"role": "user", "content": question}
-                ]
-            )
-            st.session_state.chat_response = response['choices'][0]['message']['content']
-        except Exception as e:
-            st.session_state.chat_response = f"Error: {e}"
+    
+    if not openai.api_key or openai.api_key.strip() == "":
+        st.info("💡 To enable AI features, add your OPENAI_API_KEY to Replit Secrets in the Tools panel.")
+        st.text_area("Ask a financial question:", disabled=True, placeholder="Add OpenAI API key to enable this feature")
+    else:
+        question = st.text_input("Ask a financial question:")
+        if st.button("Get AI Advice"):
+            if question.strip():
+                try:
+                    response = openai.ChatCompletion.create(
+                        model="gpt-4",
+                        messages=[
+                            {"role": "system", "content": "You are a friendly AI financial assistant for seasonal residents (snowbirds)."},
+                            {"role": "user", "content": question}
+                        ]
+                    )
+                    st.session_state.chat_response = response['choices'][0]['message']['content']
+                except Exception as e:
+                    st.session_state.chat_response = f"Error: {e}"
+            else:
+                st.warning("Please enter a question first.")
 
     if st.session_state.chat_response:
         st.markdown("**AI Response:**")
