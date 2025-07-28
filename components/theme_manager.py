@@ -726,6 +726,26 @@ class ThemeManager:
         """
 
         st.markdown(css, unsafe_allow_html=True)
+                    }
+                });
+
+                if (shouldUpdate) {
+                    setTimeout(initializeIcons, 100);
+                }
+            });
+
+            observer.observe(document.body, { 
+                childList: true, 
+                subtree: true,
+                attributes: false 
+            });
+
+            // Add smooth scrolling
+            document.documentElement.style.scrollBehavior = 'smooth';
+        </script>
+        """
+
+        st.markdown(css, unsafe_allow_html=True)
 
     @staticmethod
     def render_theme_selector():
