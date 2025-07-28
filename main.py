@@ -112,22 +112,7 @@ else:
 from utils.feature_flags import feature_flags, is_feature_enabled, feature_gate
 
 # Initialize configuration
-try:
-    from config import config
-except ImportError:
-    # Create a basic config object if config.py is missing
-    class BasicConfig:
-        def __init__(self):
-            self.debug = True
-            self.environment = "development"
-            self.tax_threshold = 183
-            self.enable_ai_features = True
-            self.enable_gmail_integration = False
-            self.enable_notifications = False
-            self.openai_api_key = ""
-            self.server_host = "0.0.0.0"
-            self.server_port = 8501
-    config = BasicConfig()
+from config import config
 
 # Initialize security
 from utils.security import SessionSecurity, get_privacy_notice

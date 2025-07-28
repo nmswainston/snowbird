@@ -16,7 +16,7 @@ run = ["sh", "-c", "streamlit run main.py --server.port $PORT --server.address 0
 deploymentTarget = "cloudrun"
 
 [workflows]
-runButton = "Snowbird App (PWA Optimized)"
+runButton = "Snowbird App (Stable)"
 
 [[workflows.workflow]]
 name = "Run Streamlit App"
