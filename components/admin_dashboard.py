@@ -30,7 +30,7 @@ except ImportError as e:
         enable_ai_features = os.getenv('ENABLE_AI_FEATURES', 'true').lower() == 'true'
         enable_notifications = os.getenv('ENABLE_NOTIFICATIONS', 'true').lower() == 'true'
         gmail_credentials_file = os.getenv('GMAIL_CREDENTIALS_FILE')
-    
+
     config = FallbackConfig()
 
 # Simple audit logger if not available
@@ -38,7 +38,7 @@ class AuditLogger:
     @staticmethod
     def log_admin_access(action: str, user_id: str = "admin"):
         logger.info(f"Admin action: {action} by {user_id}")
-    
+
     @staticmethod
     def log_gmail_access(email_count: int):
         logger.info(f"Gmail access: {email_count} emails processed")
@@ -61,29 +61,29 @@ def get_config_summary() -> Dict[str, Any]:
 def validate_required_config() -> Dict[str, bool]:
     """Validate required configuration items"""
     validation = {}
-    
+
     # Check basic config
     validation['basic_config'] = all([
         hasattr(config, 'environment'),
         hasattr(config, 'debug'),
         hasattr(config, 'tax_threshold')
     ])
-    
+
     # Check Gmail integration
     validation['gmail_config'] = (
         not config.enable_gmail_integration or 
         os.path.exists(config.gmail_credentials_file or 'credentials.json')
     )
-    
+
     # Check AI features
     validation['ai_config'] = (
         not config.enable_ai_features or 
         bool(os.getenv('OPENAI_API_KEY'))
     )
-    
+
     # Check logging
     validation['logging_config'] = os.path.exists('logs') or True  # Create if needed
-    
+
     return validation
 
 def render_admin_dashboard():
@@ -248,7 +248,7 @@ def render_system_health():
         st.write(f"**Threads**: {process.num_threads()}")
 
         st.markdown('</div>', unsafe_allow_html=True)
-        
+
         # Application health checks
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
         st.markdown('**Application Health**', unsafe_allow_html=True)
@@ -286,7 +286,7 @@ def render_user_activity():
         st.write(f"**{key}**: {value}")
 
     st.markdown('</div>', unsafe_allow_html=True)
-    
+
     # Recent log entries
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
     st.markdown('**Recent Log Entries**', unsafe_allow_html=True)
@@ -297,7 +297,7 @@ def render_user_activity():
             with open(log_file, 'r') as f:
                 lines = f.readlines()
                 recent_lines = lines[-20:] if len(lines) > 20 else lines
-                
+
             for line in reversed(recent_lines):
                 if line.strip():
                     st.text(line.strip())
@@ -326,28 +326,28 @@ def render_configuration_status():
             st.write(f"**{key.replace('_', ' ').title()}**: {value}")
 
     st.markdown('</div>', unsafe_allow_html=True)
-    
+
     # Configuration validation
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
     st.markdown('**Configuration Validation**', unsafe_allow_html=True)
-    
+
     validation_results = validate_required_config()
-    
+
     for component, is_valid in validation_results.items():
         if is_valid:
             st.success(f"✅ {component.replace('_', ' ').title()}: Valid")
         else:
             st.error(f"❌ {component.replace('_', ' ').title()}: Invalid")
-    
+
     st.markdown('</div>', unsafe_allow_html=True)
-    
+
     # Environment variables
     if st.checkbox("Show Environment Variables (Sensitive)"):
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
         st.markdown('**Environment Variables**', unsafe_allow_html=True)
-        
+
         sensitive_vars = ['OPENAI_API_KEY', 'ADMIN_PASSWORD', 'SMTP_PASSWORD']
-        
+
         for key, value in os.environ.items():
             if key.startswith(('SNOWBIRD_', 'OPENAI_', 'GMAIL_', 'SMTP_', 'ADMIN_')):
                 if key in sensitive_vars and value:
@@ -355,7 +355,7 @@ def render_configuration_status():
                 else:
                     display_value = value or "(not set)"
                 st.write(f"**{key}**: {display_value}")
-        
+
         st.markdown('</div>', unsafe_allow_html=True)
 
 def run_health_checks() -> Dict[str, Dict[str, str]]:
