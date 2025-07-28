@@ -16,6 +16,7 @@ from components.day_tracker import render_day_tracker
 from utils.auth import check_openai_availability
 from utils.data_models import SnowbirdData
 from utils.onboarding import render_onboarding_carousel, should_show_onboarding, render_onboarding_trigger
+from utils.hawaiian_features import enable_hawaiian_mode, render_hawaiian_greeting, HawaiianFeatures
 
 # Configure Streamlit
 st.set_page_config(
@@ -87,6 +88,12 @@ def main():
 
     # Render main header
     render_main_header()
+    
+    # Enable Hawaiian/Island vibes mode
+    enable_hawaiian_mode()
+    
+    # Show Hawaiian greeting if enabled
+    render_hawaiian_greeting()
 
     # Show onboarding tour for first-time users
     if should_show_onboarding():
@@ -733,6 +740,13 @@ def render_settings_tab():
         )
         st.session_state.cache_enabled = cache_enabled
 
+        # Hawaiian/Pidgin Features
+        st.subheader("🌺 Island Features")
+        
+        if st.session_state.get('hawaiian_mode', False):
+            from utils.hawaiian_features import HawaiianFeatures
+            HawaiianFeatures.render_pidgin_translator()
+        
         # Feature flags
         st.subheader("Feature Flags")
 
