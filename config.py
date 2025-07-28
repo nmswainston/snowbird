@@ -1,13 +1,13 @@
 import os
 from typing import Dict, Any, List, Optional
-from pydantic import BaseSettings, Field, validator, EmailStr
-from pydantic_settings import BaseSettings as PydanticBaseSettings
+from pydantic import Field, validator, EmailStr
+from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
 load_dotenv()
 
-class AppConfig(PydanticBaseSettings):
+class AppConfig(BaseSettings):
     """
     Application configuration using Pydantic BaseSettings.
     Automatically loads from environment variables and validates types.
