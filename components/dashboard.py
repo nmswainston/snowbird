@@ -532,55 +532,58 @@ def render_dashboard():
 
     # Widget: State-by-State Breakdown - render only if enabled
     if st.session_state.widgets.get("state_breakdown", True):
-        st.markdown('<h3><i data-lucide="map-pin" class="icon"></i>🗺️ State-by-State Breakdown</h3>', unsafe_allow_html=True)
+        st.markdown('<h3><i data-lucide="map-pin" class="icon"></i>🗺️ State-by-State Breakdown</h3>', unsafe_allow_html=True>
         ```python
         st.markdown("<br>", unsafe_allow_html=True)
 
-    for state, days in st.session_state.states.items():
-        status_text, status_class = snowbird_data.get_tax_status(days, st.session_state.tax_threshold)
-        progress = min(days / st.session_state.tax_threshold, 1.0)
-        days_remaining = max(0, st.session_state.tax_threshold - days)
+        # Initialize SnowbirdData for tax status calculations
+        snowbird_data = SnowbirdData()
 
-        # Enhanced state card with better styling
-        state_icon = "🌵" if "Arizona" in state else "❄️" if "Minnesota" in state else "🏠"
+        for state, days in st.session_state.states.items():
+            status_text, status_class = snowbird_data.get_tax_status(days, st.session_state.tax_threshold)
+            progress = min(days / st.session_state.tax_threshold, 1.0)
+            days_remaining = max(0, st.session_state.tax_threshold - days)
 
-        st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%); 
-                    padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; 
-                    border-left: 4px solid {'#4CAF50' if status_text == 'SAFE' else '#FF9800' if status_text in ['CAUTION', 'CRITICAL'] else '#F44336'};">
-            <h4 style="margin-bottom: 1rem; color: #333;">
-                {state_icon} {state}
-            </h4>
-        </div>
-        """, unsafe_allow_html=True)
+            # Enhanced state card with better styling
+            state_icon = "🌵" if "Arizona" in state else "❄️" if "Minnesota" in state else "🏠"
 
-        # Two-column layout for state details
-        state_col1, state_col2 = st.columns([2, 1])
+            st.markdown(f"""
+            <div style="background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%); 
+                        padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; 
+                        border-left: 4px solid {'#4CAF50' if status_text == 'SAFE' else '#FF9800' if status_text in ['CAUTION', 'CRITICAL'] else '#F44336'};">
+                <h4 style="margin-bottom: 1rem; color: #333;">
+                    {state_icon} {state}
+                </h4>
+            </div>
+            """, unsafe_allow_html=True)
 
-        with state_col1:
-            # Progress bar with enhanced styling
-            st.progress(progress, text=f"{days} of {st.session_state.tax_threshold} days ({progress*100:.1f}%)")
+            # Two-column layout for state details
+            state_col1, state_col2 = st.columns([2, 1])
 
-            # Status message with appropriate styling
-            if status_text == "SAFE":
-                st.success(f"✅ **{status_text}** - {days_remaining} days remaining until threshold")
-            elif status_text in ["CAUTION", "CRITICAL"]:
-                st.warning(f"⚠️ **{status_text}** - Only {days_remaining} days remaining!")
-            else:
-                st.error(f"🚨 **{status_text}** - Tax residency established")
+            with state_col1:
+                # Progress bar with enhanced styling
+                st.progress(progress, text=f"{days} of {st.session_state.tax_threshold} days ({progress*100:.1f}%)")
 
-        with state_col2:
-            # Enhanced metric display
-            delta_text = f"+{days_remaining} safe days" if days_remaining > 0 else "Over threshold!"
-            delta_color = "normal" if days_remaining > 0 else "inverse"
-            st.metric(
-                "Days Logged", 
-                days, 
-                delta=delta_text,
-                delta_color=delta_color
-            )
+                # Status message with appropriate styling
+                if status_text == "SAFE":
+                    st.success(f"✅ **{status_text}** - {days_remaining} days remaining until threshold")
+                elif status_text in ["CAUTION", "CRITICAL"]:
+                    st.warning(f"⚠️ **{status_text}** - Only {days_remaining} days remaining!")
+                else:
+                    st.error(f"🚨 **{status_text}** - Tax residency established")
 
-        st.markdown("<br>", unsafe_allow_html=True)  # Add spacing between states
+            with state_col2:
+                # Enhanced metric display
+                delta_text = f"+{days_remaining} safe days" if days_remaining > 0 else "Over threshold!"
+                delta_color = "normal" if days_remaining > 0 else "inverse"
+                st.metric(
+                    "Days Logged", 
+                    days, 
+                    delta=delta_text,
+                    delta_color=delta_color
+                )
+
+            st.markdown("<br>", unsafe_allow_html=True)  # Add spacing between states
 
         # Add spacing after state breakdown
         st.markdown("---")
