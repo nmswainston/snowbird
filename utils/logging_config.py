@@ -14,7 +14,12 @@ from pathlib import Path
 from loguru import logger
 import structlog
 import sentry_sdk
-from sentry_sdk.integrations.streamlit import StreamlitIntegration
+try:
+    from sentry_sdk.integrations.streamlit import StreamlitIntegration
+    STREAMLIT_INTEGRATION_AVAILABLE = True
+except ImportError:
+    StreamlitIntegration = None
+    STREAMLIT_INTEGRATION_AVAILABLE = False
 
 from config import config
 
@@ -86,9 +91,13 @@ class SnowbirdLogger:
         sentry_dsn = os.getenv("SENTRY_DSN")
 
         if sentry_dsn and config.is_production():
+            integrations = []
+            if STREAMLIT_INTEGRATION_AVAILABLE:
+                integrations.append(StreamlitIntegration())
+            
             sentry_sdk.init(
                 dsn=sentry_dsn,
-                integrations=[StreamlitIntegration()],
+                integrations=integrations,
                 traces_sample_rate=0.1,
                 environment=config.environment,
                 release=config.app_version,
