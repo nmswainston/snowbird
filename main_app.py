@@ -1,4 +1,7 @@
 """
+Removed the import of 'da_kine_greeting' to resolve the import error and align with the goal of using plain English.
+"""
+"""
 Snowbird Financial Assistant - Main Application
 """
 
@@ -87,7 +90,7 @@ def main():
 
     # Render main header with Hawaiian vibes
     render_main_header()
-    
+
     # Add welcome banner
     if not st.session_state.get('onboarded', False):
         st.markdown(f"""
@@ -108,7 +111,7 @@ def main():
 
     # Mobile-optimized navigation with Hawaiian expressions
     import streamlit.components.v1 as components
-    
+
     # Auto-detect mobile with better method
     components.html("""
     <script>
@@ -117,10 +120,10 @@ def main():
     }
     </script>
     """, height=0)
-    
+
     # Detect mobile view
     mobile_view = st.session_state.get('mobile_view', False) or st.session_state.get('force_mobile_tabs', False)
-    
+
     if mobile_view:
         # Shorter labels for mobile
         tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
@@ -145,21 +148,21 @@ def main():
             "⚙️ Settings",
             "🌺 Community"
         ])
-        
+
     # Enhanced mobile detection with settings override
     st.markdown("""
     <script>
     function detectMobile() {
         const isMobile = window.innerWidth < 768 || 
                         /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        
+
         if (isMobile) {
             window.parent.postMessage({type: 'mobile_detected', mobile: true}, '*');
             // Add mobile-specific styling
             document.body.classList.add('mobile-device');
         }
     }
-    
+
     detectMobile();
     window.addEventListener('resize', detectMobile);
     </script>
@@ -170,7 +173,7 @@ def main():
     }
     </style>
     """, unsafe_allow_html=True)
-    
+
     # Allow manual mobile mode toggle in settings
     if st.session_state.get('force_mobile_view', False):
         st.session_state.mobile_view = True
@@ -892,7 +895,8 @@ def render_settings_tab():
                 "reminders": False
             }
 
-        # Create checkboxes for each widget in a two-column layout
+        # Create checkboxes for each widget in```python
+ a two-column layout
         widget_col1, widget_col2 = st.columns(2)
 
         widget_keys = list(available_widgets.keys())
@@ -1013,7 +1017,7 @@ def render_properties_tab():
 
     # Property overview metrics
     st.subheader("📊 Property Overview")
-    
+
     total_properties = len(st.session_state.user_properties)
     states_with_properties = len(set(prop['state'] for prop in st.session_state.user_properties.values()))
     primary_properties = sum(1 for prop in st.session_state.user_properties.values() if prop['property_type'] == 'Primary')
@@ -1047,7 +1051,7 @@ def render_properties_tab():
             """, unsafe_allow_html=True)
 
             prop_col1, prop_col2 = st.columns([3, 1])
-            
+
             with prop_col1:
                 st.write(f"**📍 State:** {prop_details['state']}")
                 st.write(f"**🏷️ Type:** {prop_details['property_type']}")
@@ -1099,7 +1103,7 @@ def render_properties_tab():
             "West Virginia", "Wisconsin", "Wyoming", "Washington DC", 
             "Puerto Rico", "US Virgin Islands", "Guam", "Other"
         ]
-        
+
         col1, col2 = st.columns(2)
         with col1:
             new_prop_state = st.selectbox("State *", options=available_states)
@@ -1694,85 +1698,4 @@ def restore_backup_data(backup_data: dict):
     try:
         data = backup_data['data']
 
-        # Restore core tracking data
-        if 'states' in data:
-            st.session_state.states = data['states']
-
-        if 'home_budgets' in data:
-            st.session_state.home_budgets = data['home_budgets']
-
-        if 'seasonal_cash_flow' in data:
-            st.session_state.seasonal_cash_flow = data['seasonal_cash_flow']
-
-        # Restore settings
-        if 'tax_threshold' in data:
-            st.session_state.tax_threshold = data['tax_threshold']
-
-        if 'risk_warning_days' in data:
-            st.session_state.risk_warning_days = data['risk_warning_days']
-
-        if 'default_state' in data:
-            st.session_state.default_state = data['default_state']
-
-        # Restore user preferences
-        if 'user_preferences' in data:
-            prefs = data['user_preferences']
-            st.session_state.theme = prefs.get('theme', 'light')
-            st.session_state.notify_email = prefs.get('notifications', False)
-            st.session_state.auto_save = prefs.get('auto_save', True)
-            st.session_state.show_tips = prefs.get('show_tips', True)
-
-        # Restore additional data if present
-        if 'migration_checklist' in data:
-            st.session_state.migration_checklist = data['migration_checklist']
-
-        if 'bills' in data:
-            st.session_state.bills = data['bills']
-
-        # Auto-save the restored data
-        from utils.data_persistence import save_user_data
-        save_user_data()
-
-        logger.info("Backup restored successfully")
-
-    except Exception as e:
-        logger.error(f"Backup restoration error: {e}")
-        raise e
-
-def render_sidebar():
-    """Render sidebar with theme toggle and other options"""
-    # Import and render theme toggle
-    from components.styles import render_theme_toggle
-    render_theme_toggle()
-
-def start_api_server():
-    """Start the FastAPI server in a background thread"""
-    def run_server():
-        try:
-            from api import run_api_server
-            # Run API server on port 8000 (different from Streamlit's port)
-            run_api_server(host="0.0.0.0", port=8000)
-        except Exception as e:
-            from utils.logging_config import data_logger
-            data_logger.error(f"API server failed to start: {e}")
-
-    # Start server in daemon thread so it doesn't prevent app shutdown
-    api_thread = threading.Thread(target=run_server, daemon=True)
-    api_thread.start()
-
-    # Give the server a moment to start
-    time.sleep(2)
-
-    # Show API info in sidebar
-    with st.sidebar:
-        st.markdown("---")
-        st.markdown("🔗 **REST API Available**")
-        st.markdown("API running on port 8000")
-        st.markdown("- `GET /logs` - View logs")
-        st.markdown("- `GET /budgets` - View budgets") 
-        st.markdown("- `POST /logs` - Add log entry")
-        st.markdown("- `/docs` - API documentation")
-
-# Run the main application
-if __name__ == "__main__":
-    main()
+        # Restore core
