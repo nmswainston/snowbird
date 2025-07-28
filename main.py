@@ -15,6 +15,29 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Add onboarding modal for first-time users
+if "first_visit" not in st.session_state:
+    st.session_state.first_visit = True
+
+if st.session_state.first_visit:
+    # Welcome modal simulation using sidebar
+    with st.sidebar:
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, #12BDF2 0%, #E3F4FD 100%); 
+                    padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+            <h3 style="color: white; text-align: center; margin-bottom: 1rem;">
+                ❄️ Welcome to Snowbird! ❄️
+            </h3>
+            <p style="color: white; text-align: center; font-size: 0.9rem;">
+                Your complete seasonal financial assistant for managing dual-state living
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button("🚀 Get Started", type="primary", use_container_width=True):
+            st.session_state.first_visit = False
+            st.rerun()
+
 # Winter-themed CSS with Lucide icons
 st.markdown("""
 <style>
@@ -214,6 +237,35 @@ st.markdown("""
         .winter-card { padding: 1rem; margin: 0.5rem 0; }
         h2 { font-size: 1.3rem !important; }
         h3 { font-size: 1.1rem !important; }
+        
+        /* Touch-friendly button sizing */
+        .stButton > button {
+            min-height: 44px !important;
+            padding: 0.8rem 1.5rem !important;
+            font-size: 1rem !important;
+        }
+        
+        /* Larger touch targets for mobile */
+        .stSelectbox, .stTextInput, .stNumberInput {
+            min-height: 44px !important;
+        }
+        
+        /* Improved spacing for mobile */
+        .stTabs [data-baseweb="tab"] {
+            padding: 0.8rem 1rem !important;
+            font-size: 0.85rem !important;
+        }
+        
+        /* Better metric display on mobile */
+        .stMetric {
+            text-align: center !important;
+            padding: 0.5rem !important;
+        }
+        
+        /* Responsive columns stack on mobile */
+        .stColumns > div {
+            margin-bottom: 1rem !important;
+        }
     }
 
     /* Alert styling */
@@ -647,16 +699,50 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Navigation tabs
+# Quick action buttons for mobile users
+st.markdown('<div class="winter-card">', unsafe_allow_html=True)
+st.markdown('**<i data-lucide="zap" class="icon"></i>Quick Actions**', unsafe_allow_html=True)
+
+quick_col1, quick_col2, quick_col3, quick_col4 = st.columns(4)
+
+with quick_col1:
+    if st.button("📍 Log Today", type="primary", use_container_width=True):
+        # Quick log for today
+        today_location = st.selectbox("Quick log location:", list(st.session_state.states.keys()), key="quick_location")
+        if st.button("✅ Confirm", key="quick_confirm"):
+            success, message = add_day_log(today_location)
+            if success:
+                st.success(message)
+                st.rerun()
+
+with quick_col2:
+    remaining_days = {}
+    for state, days in st.session_state.states.items():
+        remaining_days[state] = max(0, st.session_state.tax_threshold - days)
+    safest_state = min(remaining_days.keys(), key=lambda x: remaining_days[x])
+    st.metric("Safest Location", safest_state, f"{remaining_days[safest_state]} days left")
+
+with quick_col3:
+    total_monthly_budget = sum(sum(budget.values()) for budget in st.session_state.home_budgets.values())
+    st.metric("Monthly Budget", f"${total_monthly_budget:,}")
+
+with quick_col4:
+    days_until_risk = min(remaining_days.values())
+    risk_color = "🟢" if days_until_risk > 30 else "🟡" if days_until_risk > 14 else "🔴"
+    st.metric("Risk Level", f"{risk_color} {days_until_risk} days")
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# Navigation tabs with emojis for better mobile UX
 tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
-    "Dashboard", 
-    "Day Tracker", 
-    "Budgets", 
-    "AI Assistant", 
-    "Reports", 
-    "Migration Checklist",
-    "Bill Tracker",
-    "Gmail Integration"
+    "📊 Dashboard", 
+    "📅 Day Tracker", 
+    "💰 Budgets", 
+    "🤖 AI Assistant", 
+    "📋 Reports", 
+    "✅ Checklist",
+    "💳 Bills",
+    "📧 Gmail"
 ])
 
 # Tab 1: Dashboard
@@ -682,22 +768,33 @@ with tab1:
 
     st.markdown('</div>', unsafe_allow_html=True)
 
-    # State residency status
+    # State residency status with enhanced visuals
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
     st.markdown('<h3><i data-lucide="map-pin" class="icon"></i>State Residency Status</h3>', unsafe_allow_html=True)
 
     for state, days in st.session_state.states.items():
         status_text, status_class = get_tax_status(days, st.session_state.tax_threshold)
         progress = min(days / st.session_state.tax_threshold, 1.0)
+        days_remaining = max(0, st.session_state.tax_threshold - days)
 
-        col1, col2, col3 = st.columns([2, 1, 1])
-        with col1:
-            st.write(f"**{state}**")
+        # Enhanced mobile-friendly layout
+        state_col1, state_col2 = st.columns([3, 1])
+        with state_col1:
+            # State icon based on name
+            state_icon = "🌵" if "Arizona" in state else "❄️" if "Minnesota" in state else "🏠"
+            st.write(f"**{state_icon} {state}**")
             st.progress(progress, text=f"{days}/{st.session_state.tax_threshold} days ({progress*100:.1f}%)")
-        with col2:
-            st.metric("Days", days)
-        with col3:
-            st.markdown(f'<span class="{status_class}"><i data-lucide="alert-circle" class="icon"></i>{status_text}</span>', unsafe_allow_html=True)
+            
+            # Visual status indicator
+            if status_text == "SAFE":
+                st.success(f"✅ {status_text} - {days_remaining} days remaining")
+            elif status_text in ["CAUTION", "CRITICAL"]:
+                st.warning(f"⚠️ {status_text} - {days_remaining} days remaining")
+            else:
+                st.error(f"🚨 {status_text} - Tax residency established")
+        
+        with state_col2:
+            st.metric("Current Days", days, delta=f"+{days_remaining} safe" if days_remaining > 0 else "⚠️ Over limit")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -895,7 +992,28 @@ with tab4:
         # AI Chat interface
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
 
-        # Quick questions
+        # Smart suggestions based on current status
+        st.markdown('**<i data-lucide="lightbulb" class="icon"></i>Smart Suggestions:**', unsafe_allow_html=True)
+        
+        # Generate contextual suggestions
+        suggestions = []
+        for state, days in st.session_state.states.items():
+            remaining = st.session_state.tax_threshold - days
+            if remaining <= 30:
+                suggestions.append(f"⚠️ You have only {remaining} days left in {state} before tax residency risk")
+            elif remaining <= 60:
+                suggestions.append(f"📅 Consider planning your {state} departure - {remaining} days remaining")
+        
+        if not suggestions:
+            suggestions = [
+                "✅ Your residency status looks good! Focus on budget optimization",
+                "💡 Consider setting up automatic bill reminders for both homes"
+            ]
+        
+        for suggestion in suggestions[:2]:  # Show max 2 suggestions
+            st.info(suggestion)
+
+        # Quick questions with better mobile layout
         st.markdown('**<i data-lucide="help-circle" class="icon"></i>Quick Questions:**', unsafe_allow_html=True)
         quick_questions = [
             "How many more days can I safely stay in Arizona this year?",
@@ -905,11 +1023,10 @@ with tab4:
             "What financial preparations should I make before traveling?"
         ]
 
-        question_cols = st.columns(2)
+        # Better mobile layout for questions
         for i, question in enumerate(quick_questions):
-            with question_cols[i % 2]:
-                if st.button(question, key=f"quick_{i}", use_container_width=True):
-                    st.session_state.current_question = question
+            if st.button(question, key=f"quick_{i}", use_container_width=True):
+                st.session_state.current_question = question
 
         # Custom question input
         custom_question = st.text_area("Or ask your own question:", 
@@ -1476,13 +1593,60 @@ with tab8:
             
             st.markdown('</div>', unsafe_allow_html=True)
 
-# Footer with TODO notes
+# Coming Soon Features Section
+st.markdown("---")
+st.markdown('<div class="winter-card">', unsafe_allow_html=True)
+st.markdown('<h3><i data-lucide="rocket" class="icon"></i>Coming Soon Features</h3>', unsafe_allow_html=True)
+
+coming_soon_col1, coming_soon_col2 = st.columns(2)
+
+with coming_soon_col1:
+    st.markdown("""
+    **📱 Mobile & Integration:**
+    - 📅 Google Calendar sync for automatic location detection
+    - 🔔 Push notifications for tax risk alerts
+    - 📱 Native mobile app (iOS/Android)
+    - 🏦 Banking integration with Plaid API
+    """)
+
+with coming_soon_col2:
+    st.markdown("""
+    **⚡ Smart Features:**
+    - 🤖 AI-powered expense categorization
+    - 📊 Advanced tax optimization recommendations
+    - 📧 Automated email reports to your CPA
+    - ☁️ Multi-device cloud sync
+    """)
+
+# Feedback section
+st.markdown('**<i data-lucide="message-square" class="icon"></i>Have feedback or feature requests?**', unsafe_allow_html=True)
+feedback_col1, feedback_col2 = st.columns([3, 1])
+
+with feedback_col1:
+    feedback = st.text_input("Share your suggestions:", placeholder="What features would help you most?")
+
+with feedback_col2:
+    if st.button("📤 Submit", disabled=True, help="Feature coming soon!"):
+        st.success("Thank you for your feedback!")
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+# Enhanced Footer
 st.markdown("---")
 st.markdown("""
-<div style="text-align: center; color: #64748B; font-size: 0.9rem; padding: 1rem;">
-    <p><strong><i data-lucide="rocket" class="icon"></i>Coming Soon:</strong></p>
-    <p><i data-lucide="calendar" class="icon"></i>Google Calendar Integration • <i data-lucide="shield" class="icon"></i>Multi-device Sync • <i data-lucide="smartphone" class="icon"></i>Mobile App (CapacitorJS) • <i data-lucide="database" class="icon"></i>Banking Integration (Plaid)</p>
-    <p><em>Built with <i data-lucide="snowflake" class="icon"></i> by Snowbird Financial Assistant</em></p>
+<div style="text-align: center; color: #64748B; font-size: 0.9rem; padding: 1.5rem;">
+    <div style="margin-bottom: 1rem;">
+        <strong style="color: #12BDF2;">❄️ Snowbird Financial Assistant ❄️</strong>
+    </div>
+    <div style="margin-bottom: 1rem;">
+        <span style="margin: 0 1rem;">📍 Multi-State Tax Planning</span>
+        <span style="margin: 0 1rem;">💰 Budget Management</span>
+        <span style="margin: 0 1rem;">🤖 AI-Powered Insights</span>
+    </div>
+    <div style="font-size: 0.8rem; color: #94A3B8;">
+        Built with ❤️ and ❄️ for seasonal residents everywhere<br>
+        <em>Helping snowbirds fly south (and north) with confidence</em>
+    </div>
 </div>
 
 <script>
