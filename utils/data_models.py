@@ -1,3 +1,4 @@
+
 """
 Data models and validation for the Snowbird Financial Assistant.
 """
@@ -9,7 +10,7 @@ import json
 from pydantic import BaseModel, Field, validator, ValidationError
 from utils.error_handling import DataValidationError, validate_data
 from utils.logging_config import data_logger
-```import datetime
+import datetime
 from typing import Dict, List, Any
 
 # Default data structures
@@ -79,6 +80,10 @@ class SnowbirdData:
         if date_str is None:
             date_str = datetime.date.today().isoformat()
 
+        # Initialize day_log if it doesn't exist
+        if 'day_log' not in st.session_state:
+            st.session_state.day_log = []
+
         # Check if already logged
         existing = next((log for log in st.session_state.day_log if log['date'] == date_str), None)
         if existing:
@@ -100,6 +105,10 @@ class SnowbirdData:
         today = datetime.date.today()
         year_start = datetime.date(today.year, 1, 1)
 
+        # Initialize day_log if it doesn't exist
+        if 'day_log' not in st.session_state:
+            st.session_state.day_log = []
+
         # Filter logs for current year
         current_year_logs = [
             log for log in st.session_state.day_log 
@@ -119,6 +128,6 @@ class SnowbirdData:
             'year': today.year,
             'total_days': st.session_state.states,
             'monthly_breakdown': monthly_data,
-            'threshold': st.session_state.tax_threshold,
+            'threshold': getattr(st.session_state, 'tax_threshold', 183),
             'generated_date': today.isoformat()
         }
