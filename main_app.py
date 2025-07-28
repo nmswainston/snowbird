@@ -56,7 +56,7 @@ def main():
     # Render main header
     render_main_header()
 
-    # Dashboard now includes integrated quick actionsactions()
+    # Dashboard now includes integrated quick actions
 
     # Main navigation tabs
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
@@ -106,8 +106,6 @@ def render_settings_tab():
 
     st.subheader("Account Settings")
     st.info("Manage account settings here")
-
-rkdown('</div>', unsafe_allow_html=True)
 
 def render_budgets_tab():
     """Render budgets management tab"""
