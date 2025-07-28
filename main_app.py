@@ -503,6 +503,147 @@ def render_settings_tab():
                     st.success("✅ All data cleared!")
                     st.rerun()
 
+        # Backup and Restore Section
+        st.markdown("---")
+        st.subheader("🔄 Backup & Restore")
+        
+        col1_backup, col2_backup = st.columns(2)
+        
+        with col1_backup:
+            st.markdown("**💾 Create Backup**")
+            if st.button("📦 Backup Data", type="primary"):
+                try:
+                    from utils.backup_manager import backup_manager
+                    
+                    # Create comprehensive backup with timestamp
+                    backup_data = {
+                        'timestamp': datetime.now().isoformat(),
+                        'version': '1.0.0',
+                        'app_version': 'Snowbird v2.0',
+                        'data': {
+                            'states': dict(st.session_state.get('states', {})),
+                            'home_budgets': dict(st.session_state.get('home_budgets', {})),
+                            'seasonal_cash_flow': dict(st.session_state.get('seasonal_cash_flow', {})),
+                            'tax_threshold': st.session_state.get('tax_threshold', 183),
+                            'risk_warning_days': st.session_state.get('risk_warning_days', 14),
+                            'default_state': st.session_state.get('default_state', 'Arizona'),
+                            'user_preferences': {
+                                'theme': st.session_state.get('theme', 'light'),
+                                'notifications': st.session_state.get('notify_email', False),
+                                'auto_save': st.session_state.get('auto_save', True),
+                                'show_tips': st.session_state.get('show_tips', True)
+                            },
+                            'migration_checklist': dict(st.session_state.get('migration_checklist', {})),
+                            'bills': dict(st.session_state.get('bills', {}))
+                        }
+                    }
+                    
+                    # Create zip file with backup data
+                    import zipfile
+                    import io
+                    
+                    zip_buffer = io.BytesIO()
+                    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                    
+                    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+                        # Add main backup file
+                        backup_json = json.dumps(backup_data, indent=2, default=str)
+                        zip_file.writestr(f"snowbird_backup_{timestamp}.json", backup_json)
+                        
+                        # Add metadata file
+                        metadata = {
+                            'backup_date': backup_data['timestamp'],
+                            'total_days_az': backup_data['data']['states'].get('Arizona', 0),
+                            'total_days_mn': backup_data['data']['states'].get('Minnesota', 0),
+                            'backup_size': len(backup_json),
+                            'checksum': str(hash(backup_json))
+                        }
+                        zip_file.writestr("backup_metadata.json", json.dumps(metadata, indent=2))
+                    
+                    zip_buffer.seek(0)
+                    
+                    st.download_button(
+                        label="⬇️ Download Backup ZIP",
+                        data=zip_buffer.getvalue(),
+                        file_name=f"snowbird_backup_{timestamp}.zip",
+                        mime="application/zip",
+                        help="Download your complete Snowbird data backup"
+                    )
+                    st.success("✅ Backup created successfully!")
+                    
+                except Exception as e:
+                    st.error(f"❌ Backup failed: {str(e)}")
+                    logger.error(f"Backup creation error: {e}")
+
+        with col2_backup:
+            st.markdown("**📥 Restore Backup**")
+            uploaded_backup = st.file_uploader(
+                "Choose backup file",
+                type=['zip', 'json'],
+                help="Upload a backup ZIP or JSON file to restore your data",
+                key="backup_restore"
+            )
+            
+            if uploaded_backup is not None:
+                if st.button("🔄 Restore Data", type="secondary"):
+                    try:
+                        # Validate and restore backup
+                        restore_success = False
+                        
+                        if uploaded_backup.name.endswith('.zip'):
+                            # Handle ZIP backup
+                            import zipfile
+                            import io
+                            
+                            zip_data = io.BytesIO(uploaded_backup.read())
+                            
+                            with zipfile.ZipFile(zip_data, 'r') as zip_file:
+                                # List contents for validation
+                                file_list = zip_file.namelist()
+                                
+                                # Look for backup JSON file
+                                backup_files = [f for f in file_list if f.startswith('snowbird_backup_') and f.endswith('.json')]
+                                
+                                if not backup_files:
+                                    st.error("❌ Invalid backup ZIP: No backup file found")
+                                else:
+                                    # Extract and validate backup data
+                                    backup_content = zip_file.read(backup_files[0]).decode('utf-8')
+                                    backup_data = json.loads(backup_content)
+                                    
+                                    # Validate backup structure
+                                    if validate_backup_data(backup_data):
+                                        restore_backup_data(backup_data)
+                                        restore_success = True
+                                    else:
+                                        st.error("❌ Invalid backup format")
+                        
+                        elif uploaded_backup.name.endswith('.json'):
+                            # Handle JSON backup (legacy support)
+                            backup_content = uploaded_backup.read().decode('utf-8')
+                            backup_data = json.loads(backup_content)
+                            
+                            if validate_backup_data(backup_data):
+                                restore_backup_data(backup_data)
+                                restore_success = True
+                            else:
+                                st.error("❌ Invalid backup format")
+                        
+                        if restore_success:
+                            st.success("✅ Data restored successfully!")
+                            st.info("🔄 Please refresh the page to see restored data")
+                            # Auto-refresh after short delay
+                            time.sleep(2)
+                            st.rerun()
+                            
+                    except json.JSONDecodeError:
+                        st.error("❌ Invalid JSON format in backup file")
+                    except zipfile.BadZipFile:
+                        st.error("❌ Invalid ZIP file format")
+                    except Exception as e:
+                        st.error(f"❌ Restore failed: {str(e)}")
+                        logger.error(f"Backup restore error: {e}")
+
         st.subheader("Import Data")
         uploaded_file = st.file_uploader(
             "Import Settings",
@@ -1187,6 +1328,115 @@ def render_footer():
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+def validate_backup_data(backup_data: dict) -> bool:
+    """
+    Validate backup data structure and integrity
+    
+    Args:
+        backup_data (dict): The backup data to validate
+        
+    Returns:
+        bool: True if backup is valid, False otherwise
+    """
+    try:
+        # Check required top-level keys
+        required_keys = ['timestamp', 'version', 'data']
+        if not all(key in backup_data for key in required_keys):
+            return False
+        
+        # Check data structure
+        data = backup_data['data']
+        
+        # Validate states data
+        if 'states' in data:
+            states = data['states']
+            if not isinstance(states, dict):
+                return False
+            # Check that all values are numeric
+            for state, days in states.items():
+                if not isinstance(days, (int, float)) or days < 0:
+                    return False
+        
+        # Validate budgets data
+        if 'home_budgets' in data:
+            budgets = data['home_budgets']
+            if not isinstance(budgets, dict):
+                return False
+            # Check budget structure
+            for state, budget in budgets.items():
+                if not isinstance(budget, dict):
+                    return False
+                for category, amount in budget.items():
+                    if not isinstance(amount, (int, float)) or amount < 0:
+                        return False
+        
+        # Validate threshold
+        if 'tax_threshold' in data:
+            threshold = data['tax_threshold']
+            if not isinstance(threshold, (int, float)) or threshold <= 0 or threshold > 365:
+                return False
+        
+        return True
+        
+    except Exception as e:
+        logger.error(f"Backup validation error: {e}")
+        return False
+
+def restore_backup_data(backup_data: dict):
+    """
+    Restore backup data to session state
+    
+    Args:
+        backup_data (dict): The validated backup data to restore
+    """
+    try:
+        data = backup_data['data']
+        
+        # Restore core tracking data
+        if 'states' in data:
+            st.session_state.states = data['states']
+        
+        if 'home_budgets' in data:
+            st.session_state.home_budgets = data['home_budgets']
+        
+        if 'seasonal_cash_flow' in data:
+            st.session_state.seasonal_cash_flow = data['seasonal_cash_flow']
+        
+        # Restore settings
+        if 'tax_threshold' in data:
+            st.session_state.tax_threshold = data['tax_threshold']
+        
+        if 'risk_warning_days' in data:
+            st.session_state.risk_warning_days = data['risk_warning_days']
+        
+        if 'default_state' in data:
+            st.session_state.default_state = data['default_state']
+        
+        # Restore user preferences
+        if 'user_preferences' in data:
+            prefs = data['user_preferences']
+            st.session_state.theme = prefs.get('theme', 'light')
+            st.session_state.notify_email = prefs.get('notifications', False)
+            st.session_state.auto_save = prefs.get('auto_save', True)
+            st.session_state.show_tips = prefs.get('show_tips', True)
+        
+        # Restore additional data if present
+        if 'migration_checklist' in data:
+            st.session_state.migration_checklist = data['migration_checklist']
+        
+        if 'bills' in data:
+            st.session_state.bills = data['bills']
+        
+        # Auto-save the restored data
+        from utils.data_persistence import save_user_data
+        save_user_data()
+        
+        logger.info("Backup restored successfully")
+        
+    except Exception as e:
+        logger.error(f"Backup restoration error: {e}")
+        raise e
 
 def render_sidebar():
     """Render sidebar with theme toggle and other options"""
