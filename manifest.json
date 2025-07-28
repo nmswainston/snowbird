@@ -1,0 +1,50 @@
+
+{
+  "name": "Snowbird Financial Assistant",
+  "short_name": "Snowbird",
+  "description": "Your seasonal financial assistant for multi-state living",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#E3F4FD",
+  "theme_color": "#12BDF2",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "generated-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "generated-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["finance", "productivity", "travel"],
+  "shortcuts": [
+    {
+      "name": "Log Location",
+      "short_name": "Log",
+      "description": "Quickly log your current location",
+      "url": "/?action=log",
+      "icons": [
+        {
+          "src": "generated-icon.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Check Status",
+      "short_name": "Status",
+      "description": "View residency status",
+      "url": "/?action=status",
+      "icons": [
+        {
+          "src": "generated-icon.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

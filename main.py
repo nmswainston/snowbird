@@ -6,6 +6,11 @@ import json
 import csv
 from io import StringIO
 import pandas as pd
+import threading
+import time
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import smtplib
 
 # Configure Streamlit for deployment with winter theme
 st.set_page_config(
@@ -14,6 +19,44 @@ st.set_page_config(
     page_icon="🏠",
     initial_sidebar_state="expanded"
 )
+
+# Add PWA meta tags and service worker
+st.markdown("""
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#12BDF2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Snowbird">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="/generated-icon.png">
+</head>
+
+<script>
+// Register service worker for PWA features
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/sw.js').then(function(registration) {
+            console.log('ServiceWorker registered successfully');
+        }, function(err) {
+            console.log('ServiceWorker registration failed: ', err);
+        });
+    });
+}
+
+// Handle URL parameters for shortcuts
+const urlParams = new URLSearchParams(window.location.search);
+const action = urlParams.get('action');
+
+if (action === 'log') {
+    // Scroll to day tracker or trigger quick log
+    localStorage.setItem('quickAction', 'log');
+} else if (action === 'status') {
+    // Scroll to dashboard
+    localStorage.setItem('quickAction', 'status');
+}
+</script>
+""", unsafe_allow_html=True)
 
 # Add onboarding modal for first-time users
 if "first_visit" not in st.session_state:
@@ -611,6 +654,75 @@ default_migration_checklist = [
     {"task": "Pack seasonal clothes", "category": "Personal", "completed": False}
 ]
 
+# Notification system functions
+def send_reminder_email(user_email, message, subject="Snowbird Reminder"):
+    """Send email reminder to user"""
+    try:
+        smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com")
+        smtp_port = int(os.getenv("SMTP_PORT", "587"))
+        smtp_username = os.getenv("SMTP_USERNAME", "")
+        smtp_password = os.getenv("SMTP_PASSWORD", "")
+        
+        if not all([smtp_username, smtp_password, user_email]):
+            return False, "Email configuration incomplete"
+        
+        msg = MIMEMultipart()
+        msg['From'] = smtp_username
+        msg['To'] = user_email
+        msg['Subject'] = subject
+        
+        msg.attach(MIMEText(message, 'plain'))
+        
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()
+        server.login(smtp_username, smtp_password)
+        text = msg.as_string()
+        server.sendmail(smtp_username, user_email, text)
+        server.quit()
+        
+        return True, "Email sent successfully"
+    except Exception as e:
+        return False, f"Email error: {str(e)}"
+
+def check_residency_alerts():
+    """Check for residency alerts and send notifications"""
+    alerts = []
+    
+    for state, days in st.session_state.states.items():
+        remaining = st.session_state.tax_threshold - days
+        
+        if remaining <= 7:
+            alerts.append(f"🚨 URGENT: Only {remaining} days left in {state} before tax residency risk!")
+        elif remaining <= 30:
+            alerts.append(f"⚠️ WARNING: {remaining} days remaining in {state} before tax risk")
+        elif remaining <= 60:
+            alerts.append(f"📅 NOTICE: {remaining} days remaining in {state}")
+    
+    return alerts
+
+def schedule_daily_check():
+    """Background task to check daily for alerts"""
+    def daily_checker():
+        while True:
+            try:
+                # Check if it's 9 AM
+                now = datetime.datetime.now()
+                if now.hour == 9 and now.minute == 0:
+                    alerts = check_residency_alerts()
+                    
+                    if alerts and 'user_email' in st.session_state:
+                        message = "Daily Snowbird Status Update:\n\n" + "\n".join(alerts)
+                        send_reminder_email(st.session_state.user_email, message)
+                
+                time.sleep(60)  # Check every minute
+            except Exception as e:
+                print(f"Background checker error: {e}")
+                time.sleep(300)  # Wait 5 minutes on error
+    
+    # Start background thread
+    thread = threading.Thread(target=daily_checker, daemon=True)
+    thread.start()
+
 # Session state initialization
 if "states" not in st.session_state:
     st.session_state.states = default_states.copy()
@@ -642,7 +754,7 @@ def get_tax_status(days, threshold):
     else:
         return "SAFE", "status-safe"
 
-def add_day_log(state, date_str=None):
+def add_day_log(state, date_str=None, auto_logged=False):
     """Add a day to the log"""
     if date_str is None:
         date_str = datetime.date.today().isoformat()
@@ -655,10 +767,94 @@ def add_day_log(state, date_str=None):
     st.session_state.day_log.append({
         'date': date_str,
         'state': state,
-        'timestamp': datetime.datetime.now().isoformat()
+        'timestamp': datetime.datetime.now().isoformat(),
+        'auto_logged': auto_logged
     })
     st.session_state.states[state] += 1
-    return True, f"Logged {date_str} in {state}"
+    return True, f"Logged {date_str} in {state}" + (" (auto)" if auto_logged else "")
+
+def auto_log_weekends():
+    """Automatically log weekends at last known location"""
+    if not st.session_state.get('auto_weekend', False):
+        return []
+    
+    logged_days = []
+    
+    # Get last logged location
+    if st.session_state.day_log:
+        last_log = sorted(st.session_state.day_log, key=lambda x: x['date'])[-1]
+        last_state = last_log['state']
+        
+        # Check for missing weekends
+        today = datetime.date.today()
+        for i in range(7):  # Check last 7 days
+            check_date = today - datetime.timedelta(days=i)
+            
+            # If it's a weekend and not logged
+            if check_date.weekday() >= 5:  # Saturday or Sunday
+                date_str = check_date.isoformat()
+                existing = next((log for log in st.session_state.day_log if log['date'] == date_str), None)
+                
+                if not existing:
+                    success, message = add_day_log(last_state, date_str, auto_logged=True)
+                    if success:
+                        logged_days.append(message)
+    
+    return logged_days
+
+def detect_location_from_ip():
+    """Attempt to detect location from IP address (basic)"""
+    try:
+        import requests
+        response = requests.get('http://ip-api.com/json/', timeout=5)
+        data = response.json()
+        
+        if data['status'] == 'success':
+            region = data.get('region', '').lower()
+            
+            # Simple state detection
+            if 'arizona' in region or 'az' in region:
+                return 'Arizona'
+            elif 'minnesota' in region or 'mn' in region:
+                return 'Minnesota'
+        
+        return None
+    except:
+        return None
+
+def smart_daily_check():
+    """Perform smart daily checks and auto-logging"""
+    auto_logged = []
+    
+    # Auto-log weekends
+    weekend_logs = auto_log_weekends()
+    auto_logged.extend(weekend_logs)
+    
+    # Check if today needs logging
+    today = datetime.date.today().isoformat()
+    existing = next((log for log in st.session_state.day_log if log['date'] == today), None)
+    
+    if not existing:
+        # Try to detect location
+        detected_state = detect_location_from_ip()
+        
+        if detected_state and detected_state in st.session_state.states:
+            # Show suggestion instead of auto-logging
+            st.info(f"🤖 Smart detection suggests you're in {detected_state} today. Would you like to log this?")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button(f"✅ Yes, log {detected_state}", key="confirm_auto_log"):
+                    success, message = add_day_log(detected_state, today, auto_logged=True)
+                    if success:
+                        st.success(message)
+                        st.rerun()
+            
+            with col2:
+                if st.button("❌ No, I'll log manually", key="decline_auto_log"):
+                    st.session_state.auto_suggestion_declined = today
+    
+    return auto_logged
 
 def generate_report_data():
     """Generate comprehensive report data"""
@@ -734,7 +930,7 @@ with quick_col4:
 st.markdown('</div>', unsafe_allow_html=True)
 
 # Navigation tabs with emojis for better mobile UX
-tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
     "📊 Dashboard", 
     "📅 Day Tracker", 
     "💰 Budgets", 
@@ -742,7 +938,8 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "📋 Reports", 
     "✅ Checklist",
     "💳 Bills",
-    "📧 Gmail"
+    "📧 Gmail",
+    "🔔 Alerts"
 ])
 
 # Tab 1: Dashboard
@@ -1630,6 +1827,185 @@ with feedback_col2:
         st.success("Thank you for your feedback!")
 
 st.markdown('</div>', unsafe_allow_html=True)
+
+# Tab 9: Notification Settings
+with tab9:
+    st.markdown('<h2><i data-lucide="bell" class="icon"></i>Smart Alerts & Notifications</h2>', unsafe_allow_html=True)
+    
+    # Email notifications
+    st.markdown('<div class="winter-card">', unsafe_allow_html=True)
+    st.markdown('**<i data-lucide="mail" class="icon"></i>Email Notifications**', unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        user_email = st.text_input("Your email address:", 
+                                 value=st.session_state.get('user_email', ''),
+                                 help="We'll send you residency alerts and reminders")
+        
+        if user_email:
+            st.session_state.user_email = user_email
+        
+        # Notification preferences
+        st.markdown('**Alert Frequency:**')
+        alert_frequency = st.selectbox("Send alerts:", 
+                                     ["Daily", "Weekly", "Only when critical", "Never"])
+        
+        st.session_state.alert_frequency = alert_frequency
+        
+        # Alert thresholds
+        st.markdown('**Alert Thresholds:**')
+        critical_days = st.number_input("Critical alert (days remaining):", min_value=1, max_value=30, value=7)
+        warning_days = st.number_input("Warning alert (days remaining):", min_value=1, max_value=60, value=30)
+        
+        st.session_state.critical_threshold = critical_days
+        st.session_state.warning_threshold = warning_days
+    
+    with col2:
+        # Current alerts
+        st.markdown('**<i data-lucide="alert-triangle" class="icon"></i>Current Status:**')
+        current_alerts = check_residency_alerts()
+        
+        if current_alerts:
+            for alert in current_alerts:
+                if "URGENT" in alert:
+                    st.error(alert)
+                elif "WARNING" in alert:
+                    st.warning(alert)
+                else:
+                    st.info(alert)
+        else:
+            st.success("✅ No active alerts - you're in good shape!")
+        
+        # Test notification
+        if st.button("📧 Send Test Email") and user_email:
+            success, message = send_reminder_email(
+                user_email, 
+                "This is a test notification from your Snowbird Financial Assistant. If you received this, email notifications are working correctly!",
+                "Test Notification - Snowbird App"
+            )
+            if success:
+                st.success("Test email sent successfully!")
+            else:
+                st.error(f"Failed to send test email: {message}")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Browser notifications
+    st.markdown('<div class="winter-card">', unsafe_allow_html=True)
+    st.markdown('**<i data-lucide="smartphone" class="icon"></i>Browser Notifications**', unsafe_allow_html=True)
+    
+    # JavaScript for browser notifications
+    st.markdown("""
+    <script>
+    function requestNotificationPermission() {
+        if ('Notification' in window) {
+            Notification.requestPermission().then(function(permission) {
+                if (permission === 'granted') {
+                    new Notification('Snowbird Notifications Enabled!', {
+                        body: 'You will now receive browser alerts for tax residency updates.',
+                        icon: '/favicon.ico'
+                    });
+                }
+            });
+        }
+    }
+    
+    function scheduleNotificationCheck() {
+        setInterval(function() {
+            // Check if we need to show any alerts
+            const storedAlerts = localStorage.getItem('snowbird_alerts');
+            if (storedAlerts && Notification.permission === 'granted') {
+                const alerts = JSON.parse(storedAlerts);
+                alerts.forEach(function(alert) {
+                    if (alert.timestamp > Date.now() - 24*60*60*1000) { // Within 24 hours
+                        new Notification('Snowbird Alert', {
+                            body: alert.message,
+                            icon: '/favicon.ico'
+                        });
+                    }
+                });
+            }
+        }, 60000); // Check every minute
+    }
+    
+    // Auto-start notification checking if permission already granted
+    if (Notification.permission === 'granted') {
+        scheduleNotificationCheck();
+    }
+    </script>
+    """, unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("""
+        **Enable browser notifications to get:**
+        - Daily location reminders
+        - Tax residency warnings
+        - Bill due date alerts
+        - Travel day suggestions
+        """)
+        
+        if st.button("🔔 Enable Browser Notifications", type="primary"):
+            st.markdown('<script>requestNotificationPermission(); scheduleNotificationCheck();</script>', unsafe_allow_html=True)
+            st.success("Check your browser for notification permission request!")
+    
+    with col2:
+        # Notification history
+        st.markdown('**<i data-lucide="history" class="icon"></i>Recent Notifications:**')
+        
+        # Store notification history in session state
+        if 'notification_history' not in st.session_state:
+            st.session_state.notification_history = []
+        
+        if st.session_state.notification_history:
+            for notif in st.session_state.notification_history[-5:]:
+                st.caption(f"{notif['timestamp']}: {notif['message']}")
+        else:
+            st.caption("No recent notifications")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Automation features
+    st.markdown('<div class="winter-card">', unsafe_allow_html=True)
+    st.markdown('**<i data-lucide="zap" class="icon"></i>Smart Automation**', unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown('**Auto-logging Features:**')
+        auto_weekend = st.checkbox("Auto-log weekends at last location", 
+                                  value=st.session_state.get('auto_weekend', False))
+        auto_travel = st.checkbox("Auto-detect travel from Gmail", 
+                                value=st.session_state.get('auto_travel', False))
+        auto_bills = st.checkbox("Auto-import bills from Gmail", 
+                               value=st.session_state.get('auto_bills', False))
+        
+        st.session_state.auto_weekend = auto_weekend
+        st.session_state.auto_travel = auto_travel
+        st.session_state.auto_bills = auto_bills
+    
+    with col2:
+        st.markdown('**Reminder Schedule:**')
+        daily_reminder = st.time_input("Daily check-in reminder:", value=datetime.time(9, 0))
+        weekly_report = st.selectbox("Weekly report day:", 
+                                   ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"])
+        
+        st.session_state.daily_reminder = daily_reminder
+        st.session_state.weekly_report = weekly_report
+    
+    # Save settings
+    if st.button("💾 Save Notification Settings", type="primary"):
+        st.success("Notification settings saved successfully!")
+        
+        # Add to notification history
+        st.session_state.notification_history.append({
+            'timestamp': datetime.datetime.now().strftime('%Y-%m-%d %H:%M'),
+            'message': 'Notification settings updated'
+        })
+    
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # Enhanced Footer
 st.markdown("---")
