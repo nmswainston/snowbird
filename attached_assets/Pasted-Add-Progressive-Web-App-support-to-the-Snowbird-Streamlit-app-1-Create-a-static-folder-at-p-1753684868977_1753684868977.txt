@@ -1,0 +1,62 @@
+Add Progressive Web App support to the Snowbird Streamlit app.
+
+1. Create a `/static/` folder at project root.
+
+2. In `/static/manifest.json`, add:
+   {
+     "name": "Snowbird",
+     "short_name": "Snowbird",
+     "start_url": "/",
+     "display": "standalone",
+     "background_color": "#FFFFFF",
+     "theme_color": "#A0D8F1",
+     "icons": [
+       {
+         "src": "/static/icon-192.png",
+         "sizes": "192x192",
+         "type": "image/png"
+       },
+       {
+         "src": "/static/icon-512.png",
+         "sizes": "512x512",
+         "type": "image/png"
+       }
+     ]
+   }
+
+3. Add your app icons (`icon-192.png` and `icon-512.png`) into `/static/`.
+
+4. In `/static/sw.js`, add a service worker with basic caching:
+   const CACHE_NAME = "snowbird-cache-v1";
+   const ASSETS = [ "/", "/main.py", "/static/icon-192.png", "/static/icon-512.png" ];
+   self.addEventListener("install", event => {
+     event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+   });
+   self.addEventListener("fetch", event => {
+     event.respondWith(caches.match(event.request).then(r => r || fetch(event.request)));
+   });
+
+5. In `main.py` at the top, inject PWA tags and register the service worker:
+   import streamlit as st
+
+   PWA_INJECT = """
+   <link rel="manifest" href="/static/manifest.json">
+   <script>
+     if ("serviceWorker" in navigator) {
+       window.addEventListener("load", () => {
+         navigator.serviceWorker.register("/static/sw.js");
+       });
+     }
+   </script>
+   """
+   st.markdown(PWA_INJECT, unsafe_allow_html=True)
+
+6. Update `README.md` with a PWA section:
+   ## Progressive Web App
+
+   - Files in `/static/` are served statically  
+   - Manifest `manifest.json` defines app name, icons, theme  
+   - Service worker `sw.js` caches core assets for offline  
+   - Users can install Snowbird to their home screen and use offline  
+
+Result: a PWA‑enabled Snowbird app that users can install on mobile, work offline for core screens, and sport a home‑screen icon.
