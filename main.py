@@ -377,20 +377,24 @@ except ImportError as e:
     </script>
     """, unsafe_allow_html=True)
 
+    # Import configuration
+    from config import config
+    from utils.config_manager import get_config_summary, validate_required_config, validator
+    
     # Try to load OpenAI, handle if not available or no API key
     try:
         from openai import OpenAI
-        api_key = os.getenv("OPENAI_API_KEY", "")
-        if api_key and api_key.strip():
+        if config.enable_ai_features and config.openai_api_key and config.openai_api_key.strip():
             try:
-                client = OpenAI(api_key=api_key)
+                client = OpenAI(api_key=config.openai_api_key)
                 openai_available = True
             except Exception:
                 openai_available = False
                 st.warning("OpenAI API key configured but invalid. AI features disabled.")
         else:
             openai_available = False
-            st.info("To enable AI features, add your OPENAI_API_KEY to Replit Secrets.")
+            if config.enable_ai_features:
+                st.info("To enable AI features, add your OPENAI_API_KEY to environment variables or Replit Secrets.")
     except ImportError:
         openai_available = False
         st.info("OpenAI library not available. AI chat features will be disabled.")
@@ -404,7 +408,9 @@ except ImportError as e:
         import base64
         import email
         import re
-        gmail_available = True
+        gmail_available = config.enable_gmail_integration
+        if not gmail_available:
+            st.info("Gmail integration is disabled in configuration.")
     except ImportError:
         gmail_available = False
         st.info("Gmail API libraries not available. Gmail features will be disabled.")
@@ -767,7 +773,7 @@ except ImportError as e:
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
     if "tax_threshold" not in st.session_state:
-        st.session_state.tax_threshold = 183
+        st.session_state.tax_threshold = config.tax_threshold
 
     # Helper functions
     def get_tax_status(days, threshold):
