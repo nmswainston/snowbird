@@ -362,6 +362,142 @@ def render_settings_tab():
             except Exception as e:
                 st.error(f"Could not load system info: {e}")
 
+        # Widget Configuration Section
+        st.subheader("Dashboard Widget Configuration")
+        st.write("Choose which widgets to display on your dashboard:")
+        
+        # Available widgets with descriptions
+        available_widgets = {
+            "quick_location_logger": {
+                "name": "📍 Quick Location Logger",
+                "description": "Fast location logging with dropdown and button"
+            },
+            "key_metrics": {
+                "name": "📊 Key Metrics Overview", 
+                "description": "Arizona/Minnesota days and tax threshold progress"
+            },
+            "tax_progress": {
+                "name": "📈 Tax Residency Progress",
+                "description": "Visual progress bars and risk assessment"
+            },
+            "quick_insights": {
+                "name": "✨ Quick Insights",
+                "description": "Tax optimization score and recommendations"
+            },
+            "status_overview": {
+                "name": "📋 Detailed Status Overview",
+                "description": "Total days logged and risk levels"
+            },
+            "state_breakdown": {
+                "name": "🗺️ State-by-State Breakdown",
+                "description": "Individual state residency status and progress"
+            },
+            "financial_summary": {
+                "name": "💰 Financial Summary",
+                "description": "Monthly budgets and seasonal expenses"
+            },
+            "ai_tips": {
+                "name": "🤖 AI Tips",
+                "description": "Smart recommendations and planning advice"
+            },
+            "expense_sparkline": {
+                "name": "📈 Expense Sparkline",
+                "description": "Mini charts showing spending trends"
+            },
+            "reminders": {
+                "name": "🔔 Reminders",
+                "description": "Important dates and threshold warnings"
+            }
+        }
+        
+        # Initialize widgets session state with defaults if not set
+        if 'widgets' not in st.session_state:
+            # Default selection - core widgets enabled by default
+            st.session_state.widgets = {
+                "quick_location_logger": True,
+                "key_metrics": True,
+                "tax_progress": True,
+                "quick_insights": True,
+                "status_overview": True,
+                "state_breakdown": True,
+                "financial_summary": True,
+                "ai_tips": False,  # Optional widgets disabled by default
+                "expense_sparkline": False,
+                "reminders": False
+            }
+        
+        # Create checkboxes for each widget in a two-column layout
+        widget_col1, widget_col2 = st.columns(2)
+        
+        widget_keys = list(available_widgets.keys())
+        mid_point = len(widget_keys) // 2
+        
+        # First column of widgets
+        with widget_col1:
+            for widget_key in widget_keys[:mid_point]:
+                widget_info = available_widgets[widget_key]
+                current_state = st.session_state.widgets.get(widget_key, True)
+                
+                new_state = st.checkbox(
+                    widget_info["name"],
+                    value=current_state,
+                    key=f"widget_checkbox_{widget_key}",
+                    help=widget_info["description"]
+                )
+                st.session_state.widgets[widget_key] = new_state
+        
+        # Second column of widgets  
+        with widget_col2:
+            for widget_key in widget_keys[mid_point:]:
+                widget_info = available_widgets[widget_key]
+                current_state = st.session_state.widgets.get(widget_key, True)
+                
+                new_state = st.checkbox(
+                    widget_info["name"],
+                    value=current_state,
+                    key=f"widget_checkbox_{widget_key}",
+                    help=widget_info["description"]
+                )
+                st.session_state.widgets[widget_key] = new_state
+        
+        # Widget selection helper buttons
+        st.write("")
+        widget_btn_col1, widget_btn_col2, widget_btn_col3 = st.columns(3)
+        
+        with widget_btn_col1:
+            if st.button("✅ Select All Widgets", use_container_width=True):
+                for widget_key in available_widgets.keys():
+                    st.session_state.widgets[widget_key] = True
+                st.rerun()
+        
+        with widget_btn_col2:
+            if st.button("❌ Deselect All", use_container_width=True):
+                for widget_key in available_widgets.keys():
+                    st.session_state.widgets[widget_key] = False
+                st.rerun()
+        
+        with widget_btn_col3:
+            if st.button("🔄 Reset to Defaults", use_container_width=True):
+                # Reset to default widget selection
+                st.session_state.widgets = {
+                    "quick_location_logger": True,
+                    "key_metrics": True,
+                    "tax_progress": True,
+                    "quick_insights": True,
+                    "status_overview": True,
+                    "state_breakdown": True,
+                    "financial_summary": True,
+                    "ai_tips": False,
+                    "expense_sparkline": False,
+                    "reminders": False
+                }
+                st.rerun()
+        
+        # Show current selection summary
+        enabled_count = sum(1 for enabled in st.session_state.widgets.values() if enabled)
+        total_count = len(st.session_state.widgets)
+        st.info(f"📊 Currently showing {enabled_count} of {total_count} available widgets on your dashboard.")
+
         # Reset to defaults
         st.subheader("Reset Settings")
         if st.button("🔄 Reset to Defaults", type="secondary"):

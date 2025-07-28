@@ -74,9 +74,27 @@ def initialize_session_state():
     # Email notification preferences
     if "email_notifications" not in st.session_state:
         st.session_state.email_notifications = False
-    
+
     if "daily_email_time" not in st.session_state:
         st.session_state.daily_email_time = "09:00"
+
+    # Dashboard widget configuration - controls which widgets are displayed
+    if "widgets" not in st.session_state:
+        st.session_state.widgets = {
+            # Core widgets enabled by default
+            "quick_location_logger": True,   # Fast location logging interface
+            "key_metrics": True,            # Arizona/Minnesota days overview  
+            "tax_progress": True,           # Visual progress toward 183-day threshold
+            "quick_insights": True,         # Tax optimization and recommendations
+            "status_overview": True,        # Detailed status and risk levels
+            "state_breakdown": True,        # Individual state progress bars
+            "financial_summary": True,     # Budget and expense summaries
+
+            # Optional widgets disabled by default
+            "ai_tips": False,              # AI-powered financial advice
+            "expense_sparkline": False,    # Mini expense trend charts
+            "reminders": False             # Upcoming dates and warnings
+        }
 
 def reset_session_state():
     """Reset session state to defaults"""

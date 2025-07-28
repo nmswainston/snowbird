@@ -3,7 +3,23 @@ import datetime
 from utils.data_models import SnowbirdData
 
 def render_dashboard():
-    """Render the enhanced premium dashboard"""
+    """Render the enhanced premium dashboard with configurable widgets"""
+    
+    # Initialize default widget configuration if not present
+    if 'widgets' not in st.session_state:
+        st.session_state.widgets = {
+            "quick_location_logger": True,
+            "key_metrics": True,
+            "tax_progress": True,
+            "quick_insights": True,
+            "status_overview": True,
+            "state_breakdown": True,
+            "financial_summary": True,
+            "ai_tips": False,
+            "expense_sparkline": False,
+            "reminders": False
+        }
+    
     st.markdown('<div class="winter-card fade-in">', unsafe_allow_html=True)
 
     # Premium header section
@@ -17,64 +33,66 @@ def render_dashboard():
     </div>
     """, unsafe_allow_html=True)
 
-    # Combined Quick Location Logging Card
-    with st.container():
-        # Add light-blue border styling to the container
+    # Widget: Quick Location Logger - render only if enabled
+    if st.session_state.widgets.get("quick_location_logger", True):
+        with st.container():
+            # Add light-blue border styling to the container
+            st.markdown("""
+            <div style="border: 2px solid #e3f2fd; border-radius: 12px; padding: 2rem; margin-bottom: 2.5rem; background: linear-gradient(135deg, #f8fdff 0%, #e3f2fd 100%);">
+            """, unsafe_allow_html=True)
+
+            # Mini-label above the controls
+            st.markdown("**Log your location quickly:**")
+            st.markdown("<br>", unsafe_allow_html=True)
+
+            # Create horizontal layout for location picker and button
+            # On mobile, these will stack vertically due to Streamlit's responsive design
+            location_col, button_col = st.columns([2, 1])
+
+            with location_col:
+                # Location dropdown picker
+                current_location = st.selectbox(
+                    "Select your current location:", 
+                    list(st.session_state.states.keys()),
+                    key="quick_location_picker",
+                    label_visibility="collapsed"  # Hide label since we have the mini-label above
+                )
+
+            with button_col:
+                # Log Today button - matches the current quick action functionality
+                if st.button("📍 Log Today", type="primary", use_container_width=True, key="quick_log_button"):
+                    # Import the data model for logging functionality
+                    from utils.data_models import SnowbirdData
+                    snowbird_data = SnowbirdData()
+                    # Log the selected location for today's date
+                    import datetime
+                    success, message = snowbird_data.add_day_log(current_location, datetime.date.today().isoformat())
+                    if success:
+                        st.success(message)
+                        st.rerun()
+                    else:
+                        st.warning(message)
+
+            # Close the styled container div
+            st.markdown("</div>", unsafe_allow_html=True)
+
+    # Widget: Key Metrics Overview - render only if enabled
+    if st.session_state.widgets.get("key_metrics", True):
         st.markdown("""
-        <div style="border: 2px solid #e3f2fd; border-radius: 12px; padding: 2rem; margin-bottom: 2.5rem; background: linear-gradient(135deg, #f8fdff 0%, #e3f2fd 100%);">
+        <div style="margin: 3rem 0 2.5rem 0;">
+            <h3 style="
+                color: var(--primary, #0891B2);
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin-bottom: 2rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            ">
+                📊 Key Metrics Overview
+            </h3>
+        </div>
         """, unsafe_allow_html=True)
-
-        # Mini-label above the controls
-        st.markdown("**Log your location quickly:**")
-        st.markdown("<br>", unsafe_allow_html=True)
-
-        # Create horizontal layout for location picker and button
-        # On mobile, these will stack vertically due to Streamlit's responsive design
-        location_col, button_col = st.columns([2, 1])
-
-        with location_col:
-            # Location dropdown picker
-            current_location = st.selectbox(
-                "Select your current location:", 
-                list(st.session_state.states.keys()),
-                key="quick_location_picker",
-                label_visibility="collapsed"  # Hide label since we have the mini-label above
-            )
-
-        with button_col:
-            # Log Today button - matches the current quick action functionality
-            if st.button("📍 Log Today", type="primary", use_container_width=True, key="quick_log_button"):
-                # Import the data model for logging functionality
-                from utils.data_models import SnowbirdData
-                snowbird_data = SnowbirdData()
-                # Log the selected location for today's date
-                import datetime
-                success, message = snowbird_data.add_day_log(current_location, datetime.date.today().isoformat())
-                if success:
-                    st.success(message)
-                    st.rerun()
-                else:
-                    st.warning(message)
-
-        # Close the styled container div
-        st.markdown("</div>", unsafe_allow_html=True)
-
-    # Enhanced key metrics section with premium styling
-    st.markdown("""
-    <div style="margin: 3rem 0 2.5rem 0;">
-        <h3 style="
-            color: var(--primary, #0891B2);
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        ">
-            📊 Key Metrics Overview
-        </h3>
-    </div>
-    """, unsafe_allow_html=True)
 
     # Create responsive grid layout with enhanced spacing
     col1, col2, col3 = st.columns([1, 1, 1], gap="large")
@@ -204,13 +222,15 @@ def render_dashboard():
         st.markdown("</div>", unsafe_allow_html=True)
 
     # Add spacing between sections
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("---")
-    st.markdown("<br><br>", unsafe_allow_html=True)
+    if st.session_state.widgets.get("key_metrics", True):
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.markdown("---")
+        st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # Tax residency progress section
-    st.markdown("### 📈 Tax Residency Progress")
-    st.markdown("<br>", unsafe_allow_html=True)
+    # Widget: Tax Residency Progress - render only if enabled
+    if st.session_state.widgets.get("tax_progress", True):
+        st.markdown("### 📈 Tax Residency Progress")
+        st.markdown("<br>", unsafe_allow_html=True)
 
     # Calculate progress percentage for primary state
     progress_percentage = min(primary_days / threshold, 1.0) if threshold > 0 else 0
@@ -243,26 +263,27 @@ def render_dashboard():
     # Progress bar
     st.progress(progress_percentage, text=f"{primary_days}/{threshold} days in {primary_state}")
 
-    # Add spacing
-    st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown("---")
+    # Add spacing after tax progress widget
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.markdown("---")
 
-    # Enhanced insights section with premium styling
-    st.markdown("""
-    <div style="margin: 3.5rem 0 2.5rem 0;">
-        <h3 style="
-            color: var(--primary, #0891B2);
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        ">
-            ✨ Quick Insights
-        </h3>
-    </div>
-    """, unsafe_allow_html=True)
+    # Widget: Quick Insights - render only if enabled
+    if st.session_state.widgets.get("quick_insights", True):
+        st.markdown("""
+        <div style="margin: 3.5rem 0 2.5rem 0;">
+            <h3 style="
+                color: var(--primary, #0891B2);
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin-bottom: 2rem;
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            ">
+                ✨ Quick Insights
+            </h3>
+        </div>
+        """, unsafe_allow_html=True)
 
     insight_col1, insight_col2, insight_col3 = st.columns([1, 1, 1], gap="large")
 
@@ -381,6 +402,46 @@ def render_dashboard():
         </div>
         """, unsafe_allow_html=True)
 
+    # Widget: AI Tips - render only if enabled (new optional widget)
+    if st.session_state.widgets.get("ai_tips", False):
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.markdown("---")
+        st.markdown('<h3><i data-lucide="bot" class="icon"></i>🤖 AI Tips</h3>', unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # AI Tips placeholder content
+        tip_col1, tip_col2 = st.columns(2)
+        
+        with tip_col1:
+            st.info("💡 **Planning Tip**: Consider your travel schedule when approaching the 183-day threshold.")
+        
+        with tip_col2:
+            st.info("💰 **Budget Tip**: Track seasonal expenses to optimize your dual-state budgeting.")
+
+    # Widget: Expense Sparkline - render only if enabled (new optional widget)
+    if st.session_state.widgets.get("expense_sparkline", False):
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.markdown("---")
+        st.markdown('<h3><i data-lucide="trending-up" class="icon"></i>📈 Expense Trends</h3>', unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Expense sparkline placeholder
+        import numpy as np
+        sample_data = np.random.randint(1000, 5000, 12)
+        st.line_chart(sample_data)
+        st.caption("Monthly expense trends across all properties")
+
+    # Widget: Reminders - render only if enabled (new optional widget)
+    if st.session_state.widgets.get("reminders", False):
+        st.markdown("<br><br>", unsafe_allow_html=True)
+        st.markdown("---")
+        st.markdown('<h3><i data-lucide="bell" class="icon"></i>🔔 Reminders</h3>', unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # Reminders placeholder content
+        st.warning("⚠️ **Upcoming**: Tax threshold check recommended in 30 days")
+        st.info("📅 **Reminder**: Review quarterly budget allocations")
+
     st.markdown('</div>', unsafe_allow_html=True)
 
     snowbird_data = SnowbirdData()
@@ -390,9 +451,10 @@ def render_dashboard():
     st.markdown("---")
     st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # Enhanced status overview section
-    st.markdown('<h3><i data-lucide="bar-chart-3" class="icon"></i>📋 Detailed Status Overview</h3>', unsafe_allow_html=True)
-    st.markdown("<br>", unsafe_allow_html=True)
+    # Widget: Detailed Status Overview - render only if enabled
+    if st.session_state.widgets.get("status_overview", True):
+        st.markdown('<h3><i data-lucide="bar-chart-3" class="icon"></i>📋 Detailed Status Overview</h3>', unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
 
     # Create metrics in a responsive grid
     status_col1, status_col2, status_col3 = st.columns(3)
@@ -428,13 +490,14 @@ def render_dashboard():
 
     st.markdown("<br>", unsafe_allow_html=True)  # Add spacing after metrics
 
-    # Add spacing
-    st.markdown("---")
-    st.markdown("<br><br>", unsafe_allow_html=True)
+        # Add spacing
+        st.markdown("---")
+        st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # Enhanced state residency status section
-    st.markdown('<h3><i data-lucide="map-pin" class="icon"></i>🗺️ State-by-State Breakdown</h3>', unsafe_allow_html=True)
-    st.markdown("<br>", unsafe_allow_html=True)
+    # Widget: State-by-State Breakdown - render only if enabled
+    if st.session_state.widgets.get("state_breakdown", True):
+        st.markdown('<h3><i data-lucide="map-pin" class="icon"></i>🗺️ State-by-State Breakdown</h3>', unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
 
     for state, days in st.session_state.states.items():
         status_text, status_class = snowbird_data.get_tax_status(days, st.session_state.tax_threshold)
@@ -482,13 +545,14 @@ def render_dashboard():
 
         st.markdown("<br>", unsafe_allow_html=True)  # Add spacing between states
 
-    # Add spacing
-    st.markdown("---")
-    st.markdown("<br><br>", unsafe_allow_html=True)
+        # Add spacing after state breakdown
+        st.markdown("---")
+        st.markdown("<br><br>", unsafe_allow_html=True)
 
-    # Enhanced financial overview section
-    st.markdown('<h3><i data-lucide="dollar-sign" class="icon"></i>💰 Financial Summary</h3>', unsafe_allow_html=True)
-    st.markdown("<br>", unsafe_allow_html=True)
+    # Widget: Financial Summary - render only if enabled
+    if st.session_state.widgets.get("financial_summary", True):
+        st.markdown('<h3><i data-lucide="dollar-sign" class="icon"></i>💰 Financial Summary</h3>', unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
 
     # Financial metrics in responsive grid
     fin_col1, fin_col2 = st.columns(2)
@@ -551,8 +615,8 @@ def render_dashboard():
         st.metric("**📊 Total Seasonal**", f"${total_seasonal:,}", delta="per month")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # Add final spacing
-    st.markdown("<br><br>", unsafe_allow_html=True)
+        # Add final spacing for financial summary
+        st.markdown("<br><br>", unsafe_allow_html=True)
 def render_metric_card(title, value, delta, icon):
     """Helper function to render a metric card with sleek styling"""
     st.markdown(f"""
