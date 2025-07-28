@@ -8,29 +8,36 @@ def load_custom_css():
     ThemeManager.apply_theme_css()
 
 def render_main_header():
-    """Render the main application header"""
+    """Render the enhanced sleek application header"""
     st.markdown("""
-    <div class="main-header fade-in">
+    <div class="main-header fade-in floating">
         <h1 class="main-title">
             <i data-lucide="home" class="icon-large"></i>
             Snowbird: Your Seasonal Financial Assistant
         </h1>
-        <p class="subtitle">Manage your multi-state lifestyle with confidence</p>
+        <p class="subtitle">Manage your multi-state lifestyle with confidence and style</p>
+        <div style="margin-top: 1rem; opacity: 0.7; font-size: 0.9rem;">
+            <i data-lucide="sparkles" class="icon"></i>
+            Premium Financial Management Experience
+        </div>
     </div>
     """, unsafe_allow_html=True)
 
 def render_metric_card(title: str, value: str, delta: str = None, icon: str = "activity"):
-    """Render a styled metric card"""
-    delta_html = f'<div style="color: var(--success); font-size: 0.8rem; margin-top: 0.25rem;">{delta}</div>' if delta else ""
+    """Render a premium styled metric card with enhanced effects"""
+    delta_html = f'<div style="color: var(--success); font-size: 0.9rem; margin-top: 0.5rem; font-weight: 600;">{delta}</div>' if delta else ""
 
     st.markdown(f"""
-    <div class="metric-card slide-up">
-        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 0.5rem;">
-            <i data-lucide="{icon}" class="icon" style="margin-right: 0.5rem;"></i>
-            <span style="color: var(--text-secondary); font-size: 0.9rem; font-weight: 500;">{title}</span>
+    <div class="metric-card slide-up pulse-glow">
+        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
+            <i data-lucide="{icon}" class="icon-large" style="margin-right: 0.75rem; filter: drop-shadow(0 0 8px var(--primary));"></i>
+            <span style="color: var(--text-secondary); font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">{title}</span>
         </div>
-        <div style="color: var(--primary); font-size: 1.8rem; font-weight: 700;">{value}</div>
+        <div style="color: var(--primary); font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem; text-shadow: var(--glow-primary);">{value}</div>
         {delta_html}
+        <div style="position: absolute; top: 1rem; right: 1rem; opacity: 0.3;">
+            <i data-lucide="trending-up" style="width: 20px; height: 20px; color: var(--accent);"></i>
+        </div>
     </div>
     """, unsafe_allow_html=True)
 

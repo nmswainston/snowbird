@@ -1,7 +1,7 @@
 
 """
-Theme Manager for Snowbird Financial Assistant
-Provides comprehensive theming and styling capabilities with multiple theme options.
+Enhanced Theme Manager for Snowbird Financial Assistant
+Provides comprehensive theming with premium sleek styling and visual effects.
 """
 
 import streamlit as st
@@ -11,7 +11,7 @@ import json
 
 @dataclass
 class ThemeColors:
-    """Theme color definition"""
+    """Enhanced theme color definition with additional sleek properties"""
     primary: str
     secondary: str
     accent: str
@@ -24,137 +24,199 @@ class ThemeColors:
     error: str
     info: str
     
-    # Gradients
+    # Enhanced gradients for sleek design
     primary_gradient: str
+    secondary_gradient: str
     background_gradient: str
+    surface_gradient: str
+    accent_gradient: str
     
-    # Shadows and borders
+    # Sophisticated shadows and effects
     shadow_primary: str
+    shadow_secondary: str
     shadow_light: str
+    shadow_heavy: str
+    glow_primary: str
+    glow_accent: str
+    
+    # Enhanced borders and overlays
     border_light: str
     border_medium: str
+    border_heavy: str
+    overlay_light: str
+    overlay_medium: str
 
-# Predefined themes
+# Premium sleek themes
 THEMES = {
-    "winter_classic": ThemeColors(
-        primary="#12BDF2",
-        secondary="#0EA5E9", 
+    "winter_luxury": ThemeColors(
+        primary="#0EA5E9",
+        secondary="#0284C7", 
         accent="#38BDF8",
-        background="#FFFFFF",
-        surface="#F8FAFC",
-        text_primary="#1E293B",
-        text_secondary="#64748B",
+        background="#FAFBFC",
+        surface="#FFFFFF",
+        text_primary="#0F172A",
+        text_secondary="#475569",
         success="#10B981",
         warning="#F59E0B",
         error="#EF4444",
         info="#3B82F6",
-        primary_gradient="linear-gradient(135deg, #12BDF2 0%, #0EA5E9 100%)",
-        background_gradient="linear-gradient(135deg, #FFFFFF 0%, #E3F4FD 100%)",
-        shadow_primary="rgba(18, 189, 242, 0.15)",
-        shadow_light="rgba(18, 189, 242, 0.08)",
+        primary_gradient="linear-gradient(135deg, #0EA5E9 0%, #0284C7 50%, #0369A1 100%)",
+        secondary_gradient="linear-gradient(135deg, #0284C7 0%, #0369A1 100%)",
+        background_gradient="linear-gradient(135deg, #FAFBFC 0%, #F1F5F9 50%, #E2E8F0 100%)",
+        surface_gradient="linear-gradient(135deg, #FFFFFF 0%, #F8FAFC 100%)",
+        accent_gradient="linear-gradient(135deg, #38BDF8 0%, #0EA5E9 100%)",
+        shadow_primary="0 10px 25px -5px rgba(14, 165, 233, 0.25)",
+        shadow_secondary="0 4px 15px -2px rgba(14, 165, 233, 0.15)",
+        shadow_light="0 2px 8px -1px rgba(0, 0, 0, 0.08)",
+        shadow_heavy="0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+        glow_primary="0 0 30px rgba(14, 165, 233, 0.3)",
+        glow_accent="0 0 20px rgba(56, 189, 248, 0.4)",
         border_light="#E2E8F0",
-        border_medium="#CBD5E1"
+        border_medium="#CBD5E1",
+        border_heavy="#94A3B8",
+        overlay_light="rgba(255, 255, 255, 0.8)",
+        overlay_medium="rgba(255, 255, 255, 0.95)"
     ),
     
-    "arctic_blue": ThemeColors(
-        primary="#0369A1",
-        secondary="#0284C7",
-        accent="#0EA5E9",
-        background="#F0F9FF",
-        surface="#E0F2FE",
-        text_primary="#0C4A6E",
-        text_secondary="#0369A1",
-        success="#059669",
-        warning="#D97706",
-        error="#DC2626",
-        info="#2563EB",
-        primary_gradient="linear-gradient(135deg, #0369A1 0%, #0284C7 100%)",
-        background_gradient="linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%)",
-        shadow_primary="rgba(3, 105, 161, 0.15)",
-        shadow_light="rgba(3, 105, 161, 0.08)",
-        border_light="#BAE6FD",
-        border_medium="#7DD3FC"
-    ),
-    
-    "warm_sunset": ThemeColors(
-        primary="#EA580C",
-        secondary="#DC2626",
-        accent="#F97316",
-        background="#FEF7ED",
-        surface="#FED7AA",
-        text_primary="#9A3412",
-        text_secondary="#C2410C",
-        success="#16A34A",
-        warning="#CA8A04",
-        error="#DC2626",
-        info="#2563EB",
-        primary_gradient="linear-gradient(135deg, #EA580C 0%, #DC2626 100%)",
-        background_gradient="linear-gradient(135deg, #FEF7ED 0%, #FED7AA 100%)",
-        shadow_primary="rgba(234, 88, 12, 0.15)",
-        shadow_light="rgba(234, 88, 12, 0.08)",
-        border_light="#FDBA74",
-        border_medium="#FB923C"
-    ),
-    
-    "forest_green": ThemeColors(
-        primary="#059669",
-        secondary="#047857",
-        accent="#10B981",
-        background="#F0FDF4",
-        surface="#DCFCE7",
-        text_primary="#14532D",
-        text_secondary="#166534",
-        success="#16A34A",
-        warning="#D97706",
-        error="#DC2626",
-        info="#2563EB",
-        primary_gradient="linear-gradient(135deg, #059669 0%, #047857 100%)",
-        background_gradient="linear-gradient(135deg, #F0FDF4 0%, #DCFCE7 100%)",
-        shadow_primary="rgba(5, 150, 105, 0.15)",
-        shadow_light="rgba(5, 150, 105, 0.08)",
-        border_light="#BBF7D0",
-        border_medium="#86EFAC"
-    ),
-    
-    "midnight_dark": ThemeColors(
-        primary="#3B82F6",
-        secondary="#1D4ED8",
-        accent="#60A5FA",
-        background="#0F172A",
-        surface="#1E293B",
+    "midnight_premium": ThemeColors(
+        primary="#6366F1",
+        secondary="#4F46E5",
+        accent="#8B5CF6",
+        background="#0F0F23",
+        surface="#1E1E3A",
         text_primary="#F1F5F9",
         text_secondary="#CBD5E1",
         success="#10B981",
         warning="#F59E0B",
         error="#EF4444",
         info="#3B82F6",
-        primary_gradient="linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%)",
-        background_gradient="linear-gradient(135deg, #0F172A 0%, #1E293B 100%)",
-        shadow_primary="rgba(59, 130, 246, 0.25)",
-        shadow_light="rgba(59, 130, 246, 0.15)",
-        border_light="#334155",
-        border_medium="#475569"
+        primary_gradient="linear-gradient(135deg, #6366F1 0%, #4F46E5 50%, #3730A3 100%)",
+        secondary_gradient="linear-gradient(135deg, #4F46E5 0%, #3730A3 100%)",
+        background_gradient="linear-gradient(135deg, #0F0F23 0%, #1E1B4B 50%, #312E81 100%)",
+        surface_gradient="linear-gradient(135deg, #1E1E3A 0%, #2D2D5A 100%)",
+        accent_gradient="linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%)",
+        shadow_primary="0 10px 25px -5px rgba(99, 102, 241, 0.4)",
+        shadow_secondary="0 4px 15px -2px rgba(99, 102, 241, 0.25)",
+        shadow_light="0 2px 8px -1px rgba(0, 0, 0, 0.3)",
+        shadow_heavy="0 25px 50px -12px rgba(0, 0, 0, 0.6)",
+        glow_primary="0 0 30px rgba(99, 102, 241, 0.5)",
+        glow_accent="0 0 20px rgba(139, 92, 246, 0.6)",
+        border_light="#374151",
+        border_medium="#4B5563",
+        border_heavy="#6B7280",
+        overlay_light="rgba(15, 15, 35, 0.8)",
+        overlay_medium="rgba(15, 15, 35, 0.95)"
+    ),
+    
+    "forest_modern": ThemeColors(
+        primary="#059669",
+        secondary="#047857",
+        accent="#10B981",
+        background="#F0FDF7",
+        surface="#FFFFFF",
+        text_primary="#064E3B",
+        text_secondary="#047857",
+        success="#10B981",
+        warning="#F59E0B",
+        error="#EF4444",
+        info="#3B82F6",
+        primary_gradient="linear-gradient(135deg, #059669 0%, #047857 50%, #065F46 100%)",
+        secondary_gradient="linear-gradient(135deg, #047857 0%, #065F46 100%)",
+        background_gradient="linear-gradient(135deg, #F0FDF7 0%, #ECFDF5 50%, #D1FAE5 100%)",
+        surface_gradient="linear-gradient(135deg, #FFFFFF 0%, #F9FDF9 100%)",
+        accent_gradient="linear-gradient(135deg, #10B981 0%, #059669 100%)",
+        shadow_primary="0 10px 25px -5px rgba(5, 150, 105, 0.25)",
+        shadow_secondary="0 4px 15px -2px rgba(5, 150, 105, 0.15)",
+        shadow_light="0 2px 8px -1px rgba(0, 0, 0, 0.08)",
+        shadow_heavy="0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+        glow_primary="0 0 30px rgba(5, 150, 105, 0.3)",
+        glow_accent="0 0 20px rgba(16, 185, 129, 0.4)",
+        border_light="#D1FAE5",
+        border_medium="#A7F3D0",
+        border_heavy="#6EE7B7",
+        overlay_light="rgba(240, 253, 247, 0.8)",
+        overlay_medium="rgba(240, 253, 247, 0.95)"
+    ),
+    
+    "sunset_elite": ThemeColors(
+        primary="#EA580C",
+        secondary="#DC2626",
+        accent="#F97316",
+        background="#FEF9F3",
+        surface="#FFFFFF",
+        text_primary="#9A3412",
+        text_secondary="#C2410C",
+        success="#10B981",
+        warning="#F59E0B",
+        error="#DC2626",
+        info="#3B82F6",
+        primary_gradient="linear-gradient(135deg, #EA580C 0%, #DC2626 50%, #B91C1C 100%)",
+        secondary_gradient="linear-gradient(135deg, #DC2626 0%, #B91C1C 100%)",
+        background_gradient="linear-gradient(135deg, #FEF9F3 0%, #FED7AA 50%, #FDBA74 100%)",
+        surface_gradient="linear-gradient(135deg, #FFFFFF 0%, #FEF9F3 100%)",
+        accent_gradient="linear-gradient(135deg, #F97316 0%, #EA580C 100%)",
+        shadow_primary="0 10px 25px -5px rgba(234, 88, 12, 0.25)",
+        shadow_secondary="0 4px 15px -2px rgba(234, 88, 12, 0.15)",
+        shadow_light="0 2px 8px -1px rgba(0, 0, 0, 0.08)",
+        shadow_heavy="0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+        glow_primary="0 0 30px rgba(234, 88, 12, 0.3)",
+        glow_accent="0 0 20px rgba(249, 115, 22, 0.4)",
+        border_light="#FED7AA",
+        border_medium="#FDBA74",
+        border_heavy="#FB923C",
+        overlay_light="rgba(254, 249, 243, 0.8)",
+        overlay_medium="rgba(254, 249, 243, 0.95)"
+    ),
+    
+    "arctic_glass": ThemeColors(
+        primary="#0891B2",
+        secondary="#0E7490",
+        accent="#06B6D4",
+        background="#F0FDFF",
+        surface="#FFFFFF",
+        text_primary="#083344",
+        text_secondary="#0E7490",
+        success="#10B981",
+        warning="#F59E0B",
+        error="#EF4444",
+        info="#3B82F6",
+        primary_gradient="linear-gradient(135deg, #0891B2 0%, #0E7490 50%, #155E75 100%)",
+        secondary_gradient="linear-gradient(135deg, #0E7490 0%, #155E75 100%)",
+        background_gradient="linear-gradient(135deg, #F0FDFF 0%, #E6FFFA 50%, #CCFBF1 100%)",
+        surface_gradient="linear-gradient(135deg, #FFFFFF 0%, #F0FDFF 100%)",
+        accent_gradient="linear-gradient(135deg, #06B6D4 0%, #0891B2 100%)",
+        shadow_primary="0 10px 25px -5px rgba(8, 145, 178, 0.25)",
+        shadow_secondary="0 4px 15px -2px rgba(8, 145, 178, 0.15)",
+        shadow_light="0 2px 8px -1px rgba(0, 0, 0, 0.08)",
+        shadow_heavy="0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+        glow_primary="0 0 30px rgba(8, 145, 178, 0.3)",
+        glow_accent="0 0 20px rgba(6, 182, 212, 0.4)",
+        border_light="#CCFBF1",
+        border_medium="#99F6E4",
+        border_heavy="#5EEAD4",
+        overlay_light="rgba(240, 253, 255, 0.8)",
+        overlay_medium="rgba(240, 253, 255, 0.95)"
     )
 }
 
 class ThemeManager:
-    """Centralized theme management"""
+    """Enhanced theme management with sleek design features"""
     
     @staticmethod
     def get_available_themes() -> Dict[str, str]:
-        """Get list of available themes with display names"""
+        """Get list of available sleek themes"""
         return {
-            "winter_classic": "❄️ Winter Classic",
-            "arctic_blue": "🏔️ Arctic Blue", 
-            "warm_sunset": "🌅 Warm Sunset",
-            "forest_green": "🌲 Forest Green",
-            "midnight_dark": "🌙 Midnight Dark"
+            "winter_luxury": "❄️ Winter Luxury",
+            "midnight_premium": "🌙 Midnight Premium", 
+            "forest_modern": "🌲 Forest Modern",
+            "sunset_elite": "🌅 Sunset Elite",
+            "arctic_glass": "🏔️ Arctic Glass"
         }
     
     @staticmethod
     def get_current_theme() -> str:
         """Get currently selected theme"""
-        return st.session_state.get('selected_theme', 'winter_classic')
+        return st.session_state.get('selected_theme', 'winter_luxury')
     
     @staticmethod
     def set_theme(theme_name: str):
@@ -168,19 +230,19 @@ class ThemeManager:
         """Get colors for specified theme or current theme"""
         if theme_name is None:
             theme_name = ThemeManager.get_current_theme()
-        return THEMES.get(theme_name, THEMES['winter_classic'])
+        return THEMES.get(theme_name, THEMES['winter_luxury'])
     
     @staticmethod
     def apply_theme_css():
-        """Apply the current theme's CSS"""
+        """Apply enhanced sleek theme CSS"""
         theme = ThemeManager.get_theme_colors()
         
         css = f"""
         <style>
-            /* Import fonts and icons */
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
+            /* Premium font imports */
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&display=swap');
             
-            /* CSS Variables for current theme */
+            /* Enhanced CSS Variables */
             :root {{
                 --primary: {theme.primary};
                 --secondary: {theme.secondary};
@@ -193,300 +255,476 @@ class ThemeManager:
                 --warning: {theme.warning};
                 --error: {theme.error};
                 --info: {theme.info};
+                
+                /* Enhanced gradients */
                 --primary-gradient: {theme.primary_gradient};
+                --secondary-gradient: {theme.secondary_gradient};
                 --background-gradient: {theme.background_gradient};
+                --surface-gradient: {theme.surface_gradient};
+                --accent-gradient: {theme.accent_gradient};
+                
+                /* Sophisticated shadows */
                 --shadow-primary: {theme.shadow_primary};
+                --shadow-secondary: {theme.shadow_secondary};
                 --shadow-light: {theme.shadow_light};
+                --shadow-heavy: {theme.shadow_heavy};
+                --glow-primary: {theme.glow_primary};
+                --glow-accent: {theme.glow_accent};
+                
+                /* Enhanced borders */
                 --border-light: {theme.border_light};
                 --border-medium: {theme.border_medium};
+                --border-heavy: {theme.border_heavy};
+                --overlay-light: {theme.overlay_light};
+                --overlay-medium: {theme.overlay_medium};
             }}
             
-            /* Global app styling */
+            /* Global sleek styling */
             .stApp {{
                 background: var(--background-gradient);
-                font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                font-family: 'Manrope', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
                 color: var(--text-primary);
                 min-height: 100vh;
+                font-weight: 400;
+                line-height: 1.6;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
             }}
             
-            /* Main container */
+            /* Sleek container styling */
             .main .block-container {{
-                padding-top: 1rem;
-                padding-bottom: 1rem;
+                padding: 2rem 1rem;
+                max-width: 1200px;
+                margin: 0 auto;
             }}
             
-            /* Header styling */
+            /* Premium header with glass effect */
             .main-header {{
                 text-align: center;
-                padding: 2rem 1rem;
-                background: var(--background);
-                border-radius: 16px;
-                margin-bottom: 1.5rem;
-                box-shadow: 0 4px 20px var(--shadow-light);
+                padding: 3rem 2rem;
+                background: var(--overlay-light);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                border-radius: 24px;
+                margin-bottom: 2rem;
+                box-shadow: var(--shadow-primary);
                 border: 1px solid var(--border-light);
-                backdrop-filter: blur(10px);
+                position: relative;
+                overflow: hidden;
+            }}
+            
+            .main-header::before {{
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: var(--primary-gradient);
+                opacity: 0.6;
             }}
             
             .main-title {{
                 color: var(--primary);
-                font-size: clamp(1.5rem, 4vw, 2.5rem);
-                font-weight: 700;
-                margin-bottom: 0.5rem;
-                letter-spacing: -0.02em;
+                font-size: clamp(2rem, 5vw, 3.5rem);
+                font-weight: 800;
+                margin-bottom: 1rem;
+                letter-spacing: -0.03em;
                 background: var(--primary-gradient);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
+                text-shadow: var(--glow-primary);
+                line-height: 1.2;
             }}
             
             .subtitle {{
                 color: var(--text-secondary);
-                font-size: 1rem;
-                font-weight: 400;
+                font-size: 1.25rem;
+                font-weight: 500;
                 letter-spacing: -0.01em;
+                opacity: 0.9;
             }}
             
-            /* Card styling */
-            .theme-card {{
-                background: var(--background);
-                padding: 1.5rem;
-                border-radius: 12px;
-                box-shadow: 0 4px 15px var(--shadow-light);
+            /* Enhanced glass-effect cards */
+            .theme-card, .winter-card {{
+                background: var(--overlay-light);
+                backdrop-filter: blur(20px);
+                -webkit-backdrop-filter: blur(20px);
+                padding: 2rem;
+                border-radius: 20px;
+                box-shadow: var(--shadow-secondary);
                 border: 1px solid var(--border-light);
-                margin: 1rem 0;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                backdrop-filter: blur(10px);
+                margin: 1.5rem 0;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                position: relative;
+                overflow: hidden;
             }}
             
-            .theme-card:hover {{
-                transform: translateY(-2px);
-                box-shadow: 0 8px 25px var(--shadow-primary);
+            .theme-card::before, .winter-card::before {{
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 2px;
+                background: var(--accent-gradient);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            }}
+            
+            .theme-card:hover, .winter-card:hover {{
+                transform: translateY(-8px);
+                box-shadow: var(--shadow-heavy);
                 border-color: var(--border-medium);
             }}
             
-            .winter-card {{
-                background: var(--background);
-                padding: 1.5rem;
-                border-radius: 12px;
-                box-shadow: 0 4px 15px var(--shadow-light);
-                border: 1px solid var(--border-light);
-                margin: 1rem 0;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            .theme-card:hover::before, .winter-card:hover::before {{
+                opacity: 1;
             }}
             
-            .winter-card:hover {{
-                transform: translateY(-2px);
-                box-shadow: 0 8px 25px var(--shadow-primary);
-            }}
-            
-            /* Button styling */
+            /* Premium button styling */
             .stButton > button {{
                 background: var(--primary-gradient) !important;
                 color: white !important;
                 border: none !important;
-                border-radius: 10px !important;
-                padding: 0.75rem 1.5rem !important;
-                font-weight: 600 !important;
-                font-size: 0.95rem !important;
+                border-radius: 14px !important;
+                padding: 1rem 2rem !important;
+                font-weight: 700 !important;
+                font-size: 1rem !important;
                 letter-spacing: -0.01em !important;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-                box-shadow: 0 4px 12px var(--shadow-light) !important;
+                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+                box-shadow: var(--shadow-secondary) !important;
+                position: relative !important;
+                overflow: hidden !important;
+                text-transform: uppercase !important;
+                min-height: 54px !important;
+            }}
+            
+            .stButton > button::before {{
+                content: '' !important;
+                position: absolute !important;
+                top: 0 !important;
+                left: -100% !important;
+                width: 100% !important;
+                height: 100% !important;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent) !important;
+                transition: left 0.5s !important;
             }}
             
             .stButton > button:hover {{
-                transform: translateY(-2px) !important;
-                box-shadow: 0 8px 20px var(--shadow-primary) !important;
-                filter: brightness(1.05) !important;
+                transform: translateY(-4px) scale(1.02) !important;
+                box-shadow: var(--glow-primary) !important;
+                filter: brightness(1.1) !important;
+            }}
+            
+            .stButton > button:hover::before {{
+                left: 100% !important;
             }}
             
             .stButton > button:active {{
-                transform: translateY(0) !important;
+                transform: translateY(-2px) scale(0.98) !important;
             }}
             
-            /* Status indicators */
+            /* Enhanced status indicators with glow */
             .status-safe {{ 
-                color: var(--success); 
-                font-weight: 600; 
-                padding: 0.25rem 0.75rem;
-                background: color-mix(in srgb, var(--success) 10%, transparent);
-                border-radius: 6px;
-                border: 1px solid color-mix(in srgb, var(--success) 20%, transparent);
+                color: var(--success);
+                font-weight: 700;
+                padding: 0.5rem 1rem;
+                background: color-mix(in srgb, var(--success) 15%, transparent);
+                border-radius: 12px;
+                border: 2px solid color-mix(in srgb, var(--success) 30%, transparent);
+                box-shadow: 0 0 20px color-mix(in srgb, var(--success) 20%, transparent);
+                backdrop-filter: blur(10px);
             }}
             
             .status-warning {{ 
-                color: var(--warning); 
-                font-weight: 600;
-                padding: 0.25rem 0.75rem;
-                background: color-mix(in srgb, var(--warning) 10%, transparent);
-                border-radius: 6px;
-                border: 1px solid color-mix(in srgb, var(--warning) 20%, transparent);
+                color: var(--warning);
+                font-weight: 700;
+                padding: 0.5rem 1rem;
+                background: color-mix(in srgb, var(--warning) 15%, transparent);
+                border-radius: 12px;
+                border: 2px solid color-mix(in srgb, var(--warning) 30%, transparent);
+                box-shadow: 0 0 20px color-mix(in srgb, var(--warning) 20%, transparent);
+                backdrop-filter: blur(10px);
             }}
             
             .status-danger {{ 
-                color: var(--error); 
-                font-weight: 600;
-                padding: 0.25rem 0.75rem;
-                background: color-mix(in srgb, var(--error) 10%, transparent);
-                border-radius: 6px;
-                border: 1px solid color-mix(in srgb, var(--error) 20%, transparent);
+                color: var(--error);
+                font-weight: 700;
+                padding: 0.5rem 1rem;
+                background: color-mix(in srgb, var(--error) 15%, transparent);
+                border-radius: 12px;
+                border: 2px solid color-mix(in srgb, var(--error) 30%, transparent);
+                box-shadow: 0 0 20px color-mix(in srgb, var(--error) 20%, transparent);
+                backdrop-filter: blur(10px);
             }}
             
-            /* Tabs styling */
+            /* Sleek tabs with floating effect */
             .stTabs [data-baseweb="tab-list"] {{
-                gap: 8px;
-                background: var(--surface);
-                padding: 0.5rem;
-                border-radius: 12px;
+                gap: 12px;
+                background: var(--overlay-light);
+                backdrop-filter: blur(20px);
+                padding: 0.75rem;
+                border-radius: 16px;
                 border: 1px solid var(--border-light);
+                box-shadow: var(--shadow-light);
             }}
             
             .stTabs [data-baseweb="tab"] {{
-                height: 50px;
-                padding: 0 1.5rem;
+                height: 56px;
+                padding: 0 2rem;
                 background: transparent;
-                border-radius: 8px;
+                border-radius: 12px;
                 color: var(--text-secondary);
                 border: none;
-                font-weight: 500;
-                transition: all 0.3s ease;
+                font-weight: 600;
+                font-size: 0.95rem;
+                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                position: relative;
             }}
             
             .stTabs [aria-selected="true"] {{
                 background: var(--primary-gradient) !important;
                 color: white !important;
-                box-shadow: 0 4px 12px var(--shadow-light);
+                box-shadow: var(--shadow-secondary);
+                transform: scale(1.05);
             }}
             
-            /* Metric styling */
+            /* Premium metric cards */
             .metric-card {{
-                background: var(--background);
-                padding: 1.5rem;
-                border-radius: 12px;
-                box-shadow: 0 4px 15px var(--shadow-light);
+                background: var(--overlay-light);
+                backdrop-filter: blur(20px);
+                padding: 2rem;
+                border-radius: 20px;
+                box-shadow: var(--shadow-light);
                 border: 1px solid var(--border-light);
                 text-align: center;
-                transition: all 0.3s ease;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                position: relative;
+                overflow: hidden;
+            }}
+            
+            .metric-card::after {{
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: var(--accent-gradient);
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
             }}
             
             .metric-card:hover {{
-                transform: translateY(-2px);
-                box-shadow: 0 8px 20px var(--shadow-primary);
+                transform: translateY(-6px) scale(1.02);
+                box-shadow: var(--shadow-primary);
+                border-color: var(--border-medium);
             }}
             
-            /* Sidebar styling */
+            .metric-card:hover::after {{
+                opacity: 0.1;
+            }}
+            
+            /* Enhanced sidebar with glass effect */
             .css-1d391kg {{
-                background: var(--surface) !important;
+                background: var(--overlay-medium) !important;
+                backdrop-filter: blur(20px) !important;
+                border-right: 1px solid var(--border-light) !important;
             }}
             
-            /* Input styling */
+            /* Sleek input styling */
             .stTextInput > div > div > input {{
-                background: var(--background) !important;
-                border: 1px solid var(--border-light) !important;
-                border-radius: 8px !important;
+                background: var(--overlay-light) !important;
+                border: 2px solid var(--border-light) !important;
+                border-radius: 12px !important;
                 color: var(--text-primary) !important;
+                font-weight: 500 !important;
+                padding: 0.75rem 1rem !important;
+                transition: all 0.3s ease !important;
+                backdrop-filter: blur(10px) !important;
+            }}
+            
+            .stTextInput > div > div > input:focus {{
+                border-color: var(--primary) !important;
+                box-shadow: var(--glow-primary) !important;
+                transform: scale(1.02) !important;
             }}
             
             .stSelectbox > div > div {{
-                background: var(--background) !important;
-                border: 1px solid var(--border-light) !important;
-                border-radius: 8px !important;
+                background: var(--overlay-light) !important;
+                border: 2px solid var(--border-light) !important;
+                border-radius: 12px !important;
+                backdrop-filter: blur(10px) !important;
+                transition: all 0.3s ease !important;
             }}
             
-            /* Progress bar styling */
+            .stSelectbox > div > div:hover {{
+                border-color: var(--primary) !important;
+                box-shadow: var(--shadow-light) !important;
+            }}
+            
+            /* Enhanced progress bars */
             .stProgress > div > div > div > div {{
                 background: var(--primary-gradient) !important;
-            }}
-            
-            /* Radio button styling */
-            .stRadio > div {{
-                background: var(--surface);
-                padding: 1rem;
-                border-radius: 8px;
-                border: 1px solid var(--border-light);
-            }}
-            
-            /* Expander styling */
-            .streamlit-expanderHeader {{
-                background: var(--surface) !important;
                 border-radius: 8px !important;
-                border: 1px solid var(--border-light) !important;
+                box-shadow: var(--glow-primary) !important;
             }}
             
-            /* Icon styling */
+            /* Sleek expanders */
+            .streamlit-expanderHeader {{
+                background: var(--overlay-light) !important;
+                border-radius: 14px !important;
+                border: 1px solid var(--border-light) !important;
+                backdrop-filter: blur(10px) !important;
+                transition: all 0.3s ease !important;
+            }}
+            
+            .streamlit-expanderHeader:hover {{
+                box-shadow: var(--shadow-light) !important;
+                transform: translateY(-2px) !important;
+            }}
+            
+            /* Icon styling with glow effects */
             .icon {{
-                width: 16px;
-                height: 16px;
+                width: 18px;
+                height: 18px;
                 display: inline-block;
                 margin-right: 8px;
                 vertical-align: middle;
                 color: var(--primary);
+                filter: drop-shadow(0 0 4px var(--primary));
             }}
             
             .icon-large {{
-                width: 24px;
-                height: 24px;
+                width: 28px;
+                height: 28px;
                 margin-right: 12px;
                 color: var(--primary);
+                filter: drop-shadow(0 0 8px var(--primary));
             }}
             
-            /* Responsive design */
+            /* Mobile responsiveness with enhanced spacing */
             @media (max-width: 768px) {{
                 .main-header {{
-                    padding: 1.5rem 1rem;
+                    padding: 2rem 1.5rem;
+                    border-radius: 20px;
                 }}
                 
                 .main-title {{
-                    font-size: 1.75rem !important;
+                    font-size: 2rem !important;
                 }}
                 
                 .theme-card, .winter-card {{
-                    padding: 1rem;
-                    margin: 0.5rem 0;
+                    padding: 1.5rem;
+                    margin: 1rem 0;
+                    border-radius: 16px;
                 }}
                 
                 .stButton > button {{
-                    min-height: 44px !important;
-                    padding: 0.8rem 1.5rem !important;
-                    font-size: 1rem !important;
+                    min-height: 48px !important;
+                    padding: 0.875rem 1.5rem !important;
+                    font-size: 0.95rem !important;
                 }}
             }}
             
-            /* Animation utilities */
+            /* Advanced animations */
             .fade-in {{
-                animation: fadeIn 0.5s ease-in;
+                animation: fadeInUp 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             }}
             
-            @keyframes fadeIn {{
-                from {{ opacity: 0; transform: translateY(10px); }}
-                to {{ opacity: 1; transform: translateY(0); }}
+            @keyframes fadeInUp {{
+                0% {{ 
+                    opacity: 0; 
+                    transform: translateY(30px) scale(0.95);
+                }}
+                100% {{ 
+                    opacity: 1; 
+                    transform: translateY(0) scale(1);
+                }}
             }}
             
             .slide-up {{
-                animation: slideUp 0.3s ease-out;
+                animation: slideUpScale 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             }}
             
-            @keyframes slideUp {{
-                from {{ transform: translateY(20px); opacity: 0; }}
-                to {{ transform: translateY(0); opacity: 1; }}
+            @keyframes slideUpScale {{
+                0% {{ 
+                    transform: translateY(40px) scale(0.9);
+                    opacity: 0;
+                }}
+                100% {{ 
+                    transform: translateY(0) scale(1);
+                    opacity: 1;
+                }}
+            }}
+            
+            /* Floating animation for interactive elements */
+            .floating {{
+                animation: floating 3s ease-in-out infinite;
+            }}
+            
+            @keyframes floating {{
+                0%, 100% {{ transform: translateY(0px); }}
+                50% {{ transform: translateY(-10px); }}
+            }}
+            
+            /* Pulse animation for important elements */
+            .pulse-glow {{
+                animation: pulseGlow 2s ease-in-out infinite;
+            }}
+            
+            @keyframes pulseGlow {{
+                0%, 100% {{ 
+                    box-shadow: var(--shadow-light);
+                }}
+                50% {{ 
+                    box-shadow: var(--glow-primary);
+                }}
             }}
         </style>
         
-        <!-- Lucide Icons Script -->
+        <!-- Enhanced Lucide Icons Script -->
         <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
         <script>
-            document.addEventListener('DOMContentLoaded', function() {{
+            // Enhanced icon initialization with smooth transitions
+            function initializeIcons() {{
                 if (typeof lucide !== 'undefined') {{
                     lucide.createIcons();
+                    
+                    // Add smooth transitions to icons
+                    document.querySelectorAll('[data-lucide]').forEach(icon => {{
+                        icon.style.transition = 'all 0.3s ease';
+                    }});
+                }}
+            }}
+            
+            document.addEventListener('DOMContentLoaded', initializeIcons);
+            
+            // Enhanced mutation observer for dynamic content
+            const observer = new MutationObserver(function(mutations) {{
+                let shouldUpdate = false;
+                mutations.forEach(mutation => {{
+                    if (mutation.addedNodes.length > 0) {{
+                        shouldUpdate = true;
+                    }}
+                }});
+                
+                if (shouldUpdate) {{
+                    setTimeout(initializeIcons, 100);
                 }}
             }});
             
-            // Re-run icon creation after Streamlit updates
-            const observer = new MutationObserver(function() {{
-                if (typeof lucide !== 'undefined') {{
-                    lucide.createIcons();
-                }}
+            observer.observe(document.body, {{ 
+                childList: true, 
+                subtree: true,
+                attributes: false 
             }});
-            observer.observe(document.body, {{ childList: true, subtree: true }});
+            
+            // Add smooth scrolling
+            document.documentElement.style.scrollBehavior = 'smooth';
         </script>
         """
         
@@ -494,9 +732,9 @@ class ThemeManager:
     
     @staticmethod
     def render_theme_selector():
-        """Render theme selection interface"""
-        st.markdown('<div class="theme-card">', unsafe_allow_html=True)
-        st.markdown('**🎨 Theme Selection**')
+        """Render enhanced theme selection interface"""
+        st.markdown('<div class="theme-card fade-in">', unsafe_allow_html=True)
+        st.markdown('**🎨 Premium Theme Selection**')
         
         current_theme = ThemeManager.get_current_theme()
         available_themes = ThemeManager.get_available_themes()
@@ -505,7 +743,7 @@ class ThemeManager:
         
         with col1:
             selected_theme = st.selectbox(
-                "Choose your theme:",
+                "Choose your premium theme:",
                 options=list(available_themes.keys()),
                 format_func=lambda x: available_themes[x],
                 index=list(available_themes.keys()).index(current_theme),
@@ -515,47 +753,18 @@ class ThemeManager:
         with col2:
             if st.button("Apply Theme", key="apply_theme_btn"):
                 ThemeManager.set_theme(selected_theme)
-                st.success("Theme applied!")
+                st.success("✨ Premium theme applied!")
         
-        # Theme preview
+        # Enhanced theme preview
         if selected_theme != current_theme:
-            st.info(f"Preview: {available_themes[selected_theme]} theme selected. Click 'Apply Theme' to activate.")
+            st.info(f"🎭 Preview: **{available_themes[selected_theme]}** theme selected. Click 'Apply Theme' to activate this premium experience.")
         
         st.markdown('</div>', unsafe_allow_html=True)
-    
-    @staticmethod
-    def render_theme_preview(theme_name: str):
-        """Render a preview of the specified theme"""
-        theme = ThemeManager.get_theme_colors(theme_name)
-        
-        st.markdown(f"""
-        <div style="
-            background: {theme.background};
-            border: 2px solid {theme.border_light};
-            border-radius: 12px;
-            padding: 1rem;
-            margin: 0.5rem 0;
-        ">
-            <div style="color: {theme.primary}; font-weight: 600; margin-bottom: 0.5rem;">
-                {THEMES[theme_name] if theme_name in THEMES else theme_name}
-            </div>
-            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-                <div style="width: 20px; height: 20px; background: {theme.primary}; border-radius: 4px;"></div>
-                <div style="width: 20px; height: 20px; background: {theme.secondary}; border-radius: 4px;"></div>
-                <div style="width: 20px; height: 20px; background: {theme.accent}; border-radius: 4px;"></div>
-                <div style="width: 20px; height: 20px; background: {theme.success}; border-radius: 4px;"></div>
-                <div style="width: 20px; height: 20px; background: {theme.warning}; border-radius: 4px;"></div>
-            </div>
-            <div style="color: {theme.text_secondary}; font-size: 0.8rem;">
-                Click to preview this theme
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
 
 def initialize_theme_system():
-    """Initialize the theme system"""
+    """Initialize the enhanced theme system"""
     if 'selected_theme' not in st.session_state:
-        st.session_state.selected_theme = 'winter_classic'
+        st.session_state.selected_theme = 'winter_luxury'
     
-    # Apply the current theme
+    # Apply the current theme with enhanced effects
     ThemeManager.apply_theme_css()
