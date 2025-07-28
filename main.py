@@ -9,6 +9,8 @@ from components.feedback_system import render_feedback_form, render_help_section
 from utils.i18n import render_language_selector, t
 from utils.version_manager import render_version_info
 from utils.error_handling import initialize_error_monitoring, render_error_banner
+from components.session_state import initialize_session_state
+from utils.email_notifications import initialize_email_scheduler
 
 # Configure Streamlit page first
 st.set_page_config(
@@ -23,6 +25,16 @@ def safe_main():
     try:
         # Try to import and run main app
         from main_app import main
+
+        # Initialize session state
+        initialize_session_state()
+
+        # Load custom CSS
+        load_custom_css()
+
+        # Initialize email notification scheduler
+        initialize_email_scheduler()
+
         main()
     except ImportError as e:
         st.error("❌ **Import Error**")

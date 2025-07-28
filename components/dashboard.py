@@ -23,15 +23,15 @@ def render_dashboard():
         st.markdown("""
         <div style="border: 2px solid #e3f2fd; border-radius: 12px; padding: 2rem; margin-bottom: 2.5rem; background: linear-gradient(135deg, #f8fdff 0%, #e3f2fd 100%);">
         """, unsafe_allow_html=True)
-        
+
         # Mini-label above the controls
         st.markdown("**Log your location quickly:**")
         st.markdown("<br>", unsafe_allow_html=True)
-        
+
         # Create horizontal layout for location picker and button
         # On mobile, these will stack vertically due to Streamlit's responsive design
         location_col, button_col = st.columns([2, 1])
-        
+
         with location_col:
             # Location dropdown picker
             current_location = st.selectbox(
@@ -40,7 +40,7 @@ def render_dashboard():
                 key="quick_location_picker",
                 label_visibility="collapsed"  # Hide label since we have the mini-label above
             )
-        
+
         with button_col:
             # Log Today button - matches the current quick action functionality
             if st.button("📍 Log Today", type="primary", use_container_width=True, key="quick_log_button"):
@@ -55,7 +55,7 @@ def render_dashboard():
                     st.rerun()
                 else:
                     st.warning(message)
-        
+
         # Close the styled container div
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -181,26 +181,26 @@ def render_dashboard():
                 pointer-events: none;
             "></div>
         """, unsafe_allow_html=True)
-        
+
         # Calculate percentage of 183-day allowance used
         pct = min(primary_days / 183, 1.0)
         percentage_used = pct * 100
-        
+
         # Display the progress section with enhanced label
         st.markdown("**⚠️ Tax Threshold Progress**")
-        
+
         # Enhanced progress container
         with st.container():
             # Progress bar showing percentage toward 183-day threshold
             st.progress(pct, text=f"Days logged: {primary_days}/183")
-            
+
             # Enhanced caption with better typography
             st.caption(f"You've used {percentage_used:.1f}% of your 183-day allowance")
-            
+
             # Enhanced tooltip button
             if st.button("ℹ️", key="threshold_tooltip", help=f"Days remaining: {days_remaining} | Primary state: {primary_state}"):
                 st.info(f"Exact details: {days_remaining} days remaining until threshold in {primary_state}")
-        
+
         st.markdown("</div>", unsafe_allow_html=True)
 
     # Add spacing between sections
@@ -510,20 +510,20 @@ def render_dashboard():
             st.metric(f"{state_icon} {state}", f"${total_budget:,}", delta="per month")
 
         st.write("---")
-        
+
         # Enhanced header with pie chart icon and larger font
         st.markdown("<h3>📊 Combined Monthly Spend</h3>", unsafe_allow_html=True)
-        
+
         # Clear metric display with bold formatting and no delta
         st.metric(
             label="Combined Monthly Spend", 
             value=f"${total_all_budgets:,}", 
             delta=None
         )
-        
+
         # Additional context label for clarity
         st.caption("All properties combined")
-        
+
         st.markdown("</div>", unsafe_allow_html=True)
 
     with fin_col2:
@@ -564,3 +564,35 @@ def render_metric_card(title, value, delta, icon):
         <div style="color: var(--text-secondary); font-size: 0.875rem;">{delta}</div>
     </div>
     """, unsafe_allow_html=True)
+
+# Sidebar navigation update
+with st.sidebar:
+    st.markdown("### 🏠 Snowbird Assistant")
+
+    # Navigation
+    selected_page = st.selectbox(
+        "Navigate to:",
+        ["Dashboard", "Day Tracker", "Budget Manager", "Reports", "Settings", "Email Notifications"]
+    )
+
+# Page rendering logic with email notification integration
+if selected_page == "Dashboard":
+    render_dashboard()
+elif selected_page == "Day Tracker":
+    st.title("🗓️ Day Tracker")
+    st.info("Day Tracker page - Coming soon!")
+elif selected_page == "Budget Manager":
+    st.title("💰 Budget Manager")
+    st.info("Budget Manager page - Coming soon!")
+elif selected_page == "Reports":
+    st.title("📊 Reports")
+    st.info("Reports page - Coming soon!")
+elif selected_page == "Settings":
+    st.title("⚙️ Settings")
+    st.info("Settings page - Coming soon!")
+
+elif selected_page == "Email Notifications":
+    st.title("📧 Email Notifications")
+    # from components.email_settings import render_email_settings #Importing here to avoid circular dependency
+    # render_email_settings()
+    st.info("Email Notifications - Coming soon!")

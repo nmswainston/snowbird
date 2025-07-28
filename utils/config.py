@@ -20,6 +20,8 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     ENVIRONMENT: str = "development"
     SENTRY_DSN: str = ""
+    DAILY_REMINDER_TIME: str = "09:00"
+    NOTIFICATION_EMAIL: str = ""
 
     class Config:
         env_file = ".env"

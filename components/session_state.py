@@ -71,6 +71,13 @@ def initialize_session_state():
     if "auto_bills" not in st.session_state:
         st.session_state.auto_bills = False
 
+    # Email notification preferences
+    if "email_notifications" not in st.session_state:
+        st.session_state.email_notifications = False
+    
+    if "daily_email_time" not in st.session_state:
+        st.session_state.daily_email_time = "09:00"
+
 def reset_session_state():
     """Reset session state to defaults"""
     for key in list(st.session_state.keys()):
