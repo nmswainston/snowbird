@@ -519,8 +519,8 @@ def render_dashboard():
     st.markdown("<br>", unsafe_allow_html=True)  # Add spacing after metrics
 
         # Add spacing
-        st.markdown("---")
-        st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown("---")
+    st.markdown("<br><br>", unsafe_allow_html=True)
 
     # Widget: State-by-State Breakdown - render only if enabled
     if st.session_state.widgets.get("state_breakdown", True):
