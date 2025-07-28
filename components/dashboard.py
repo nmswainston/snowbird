@@ -645,6 +645,7 @@ def render_dashboard():
 
         # Add final spacing for financial summary
         st.markdown("<br><br>", unsafe_allow_html=True)
+
 def render_metric_card(title, value, delta, icon):
     """Helper function to render a metric card with sleek styling"""
     st.markdown(f"""
@@ -656,35 +657,3 @@ def render_metric_card(title, value, delta, icon):
         <div style="color: var(--text-secondary); font-size: 0.875rem;">{delta}</div>
     </div>
     """, unsafe_allow_html=True)
-
-# Sidebar navigation update
-with st.sidebar:
-    st.markdown("### 🏠 Snowbird Assistant")
-
-    # Navigation
-    selected_page = st.selectbox(
-        "Navigate to:",
-        ["Dashboard", "Day Tracker", "Budget Manager", "Reports", "Settings", "Email Notifications"]
-    )
-
-# Page rendering logic with email notification integration
-if selected_page == "Dashboard":
-    render_dashboard()
-elif selected_page == "Day Tracker":
-    st.title("🗓️ Day Tracker")
-    st.info("Day Tracker page - Coming soon!")
-elif selected_page == "Budget Manager":
-    st.title("💰 Budget Manager")
-    st.info("Budget Manager page - Coming soon!")
-elif selected_page == "Reports":
-    st.title("📊 Reports")
-    st.info("Reports page - Coming soon!")
-elif selected_page == "Settings":
-    st.title("⚙️ Settings")
-    st.info("Settings page - Coming soon!")
-
-elif selected_page == "Email Notifications":
-    st.title("📧 Email Notifications")
-    # from components.email_settings import render_email_settings #Importing here to avoid circular dependency
-    # render_email_settings()
-    st.info("Email Notifications - Coming soon!")
