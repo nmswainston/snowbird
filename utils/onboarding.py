@@ -234,6 +234,27 @@ def render_onboarding_carousel():
         margin-top: 2rem;
         padding-top: 1rem;
         border-top: 1px solid #e2e8f0;
+        gap: 1rem;
+    }
+    
+    .onboarding-nav .stButton > button {
+        min-width: 120px !important;
+        padding: 0.75rem 1.5rem !important;
+        font-size: 0.95rem !important;
+        font-weight: 600 !important;
+        border-radius: 10px !important;
+        white-space: nowrap !important;
+        text-overflow: ellipsis !important;
+        overflow: hidden !important;
+        line-height: 1.4 !important;
+        letter-spacing: 0.01em !important;
+        height: auto !important;
+        min-height: 44px !important;
+    }
+    
+    .onboarding-nav .stButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
     }
     
     .step-indicator {
@@ -261,6 +282,41 @@ def render_onboarding_carousel():
         font-size: 1.5rem;
         color: #64748b;
         cursor: pointer;
+    }
+    
+    /* Responsive button styling for mobile */
+    @media (max-width: 768px) {
+        .onboarding-nav {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        
+        .onboarding-nav .stButton > button {
+            width: 100% !important;
+            min-width: unset !important;
+            font-size: 0.9rem !important;
+            padding: 0.8rem 1rem !important;
+        }
+        
+        .onboarding-modal {
+            padding: 1.5rem;
+            margin: 1rem;
+        }
+        
+        .step-indicator {
+            text-align: center;
+            margin: 0.5rem 0;
+        }
+    }
+    
+    /* Ensure text doesn't break in buttons */
+    .onboarding-nav [data-testid="stButton"] {
+        flex: 0 0 auto;
+    }
+    
+    .onboarding-nav [data-testid="stButton"]:nth-child(2) {
+        flex: 1 0 auto;
+        max-width: 200px;
     }
     </style>
     """, unsafe_allow_html=True)
