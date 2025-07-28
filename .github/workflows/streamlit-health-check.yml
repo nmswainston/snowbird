@@ -1,0 +1,110 @@
+
+name: Streamlit Health Check
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'  # Every 6 hours
+  workflow_dispatch:
+
+jobs:
+  health_check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install requests
+
+      - name: Test Streamlit app startup
+        run: |
+          # Start Streamlit in background
+          streamlit run main.py --server.port 8501 --server.headless true &
+          STREAMLIT_PID=$!
+          
+          # Wait for app to start
+          sleep 10
+          
+          # Check if process is running
+          if ps -p $STREAMLIT_PID > /dev/null; then
+            echo "✅ Streamlit app started successfully"
+          else
+            echo "❌ Streamlit app failed to start"
+            exit 1
+          fi
+          
+          # Clean up
+          kill $STREAMLIT_PID || true
+
+      - name: Validate configuration files
+        run: |
+          python -c "
+          import sys
+          import os
+          sys.path.append('.')
+          
+          try:
+              from config import config
+              print('✅ Config file is valid')
+          except Exception as e:
+              print(f'❌ Config validation failed: {e}')
+              sys.exit(1)
+          
+          # Check required files
+          required_files = [
+              'main.py',
+              'requirements.txt',
+              'components/styles.py',
+              'utils/data_models.py'
+          ]
+          
+          for file in required_files:
+              if os.path.exists(file):
+                  print(f'✅ {file} exists')
+              else:
+                  print(f'❌ {file} missing')
+                  sys.exit(1)
+          "
+
+      - name: Check for security issues
+        run: |
+          python -c "
+          import os
+          import sys
+          
+          # Check for sensitive data in code
+          sensitive_patterns = ['password', 'secret', 'api_key', 'token']
+          issues = []
+          
+          for root, dirs, files in os.walk('.'):
+              # Skip hidden directories and common ignore patterns
+              dirs[:] = [d for d in dirs if not d.startswith('.') and d not in ['__pycache__', 'node_modules']]
+              
+              for file in files:
+                  if file.endswith(('.py', '.yml', '.yaml', '.json')):
+                      filepath = os.path.join(root, file)
+                      try:
+                          with open(filepath, 'r', encoding='utf-8') as f:
+                              content = f.read().lower()
+                              for pattern in sensitive_patterns:
+                                  if pattern in content and 'example' not in filepath:
+                                      issues.append(f'{filepath}: contains {pattern}')
+                      except:
+                          pass
+          
+          if issues:
+              print('⚠️ Potential security issues found:')
+              for issue in issues[:5]:  # Limit output
+                  print(f'  - {issue}')
+          else:
+              print('✅ No obvious security issues detected')
+          "
