@@ -269,10 +269,4 @@ def apply_basic_styles():
     }
     </style>
     """, unsafe_allow_html=True)
-
-def render_main_header():
-    """Render main application header"""
-    st.title("❄️ Snowbird Financial Assistant 🏖️")
-    st.markdown("Helping you fly between seasons with your finances in check.")
-    st.markdown("---")
 ```
