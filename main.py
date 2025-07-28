@@ -19,43 +19,17 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Add error boundary and fix React issues
+# Streamlit app configuration
 st.markdown("""
-<script>
-// Prevent React onClick handler conflicts
-(function() {
-    const originalError = window.onerror;
-    window.onerror = function(msg, url, line, col, error) {
-        if (msg && msg.includes('Minified React error')) {
-            console.warn('React error intercepted and handled');
-            return true; // Prevent default error handling
-        }
-        if (originalError) {
-            return originalError.apply(this, arguments);
-        }
-        return false;
-    };
-    
-    // Handle unhandled promise rejections
-    window.addEventListener('unhandledrejection', function(event) {
-        if (event.reason && event.reason.message && event.reason.message.includes('React')) {
-            console.warn('React promise rejection handled');
-            event.preventDefault();
-        }
-    });
-})();
-
-// Fix WebSocket reconnection issues with better cleanup
-window.addEventListener('beforeunload', function() {
-    try {
-        if (window.streamlitConnection && window.streamlitConnection.readyState === 1) {
-            window.streamlitConnection.close(1000, 'Page unload');
-        }
-    } catch (e) {
-        console.log('WebSocket cleanup handled');
-    }
-});
-</script>
+<style>
+/* Prevent text selection on buttons to avoid React conflicts */
+button {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+</style>
 """, unsafe_allow_html=True)
 
 # Initialize Firebase authentication with error handling
@@ -174,51 +148,11 @@ def main():
     # Render styled header
     render_main_header()
 
-    # Add PWA meta tags and status
+    # Add minimal PWA support
     st.markdown("""
-    <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-        <meta name="theme-color" content="#A0D8F1">
-        <meta name="apple-mobile-web-app-capable" content="yes">
-        <meta name="apple-mobile-web-app-status-bar-style" content="default">
-        <meta name="apple-mobile-web-app-title" content="Snowbird">
-        <meta name="mobile-web-app-capable" content="yes">
-        <meta name="application-name" content="Snowbird">
-        <meta name="msapplication-TileColor" content="#A0D8F1">
-        <meta name="msapplication-config" content="/static/browserconfig.xml">
-
-        <!-- PWA Manifest -->
-        <link rel="manifest" href="/static/manifest.json">
-
-        <!-- Icons -->
-        <link rel="icon" type="image/png" sizes="192x192" href="/static/icon-192.png">
-        <link rel="icon" type="image/png" sizes="512x512" href="/static/icon-512.png">
-        <link rel="apple-touch-icon" href="/static/icon-192.png">
-
-        <!-- Splash screens for iOS -->
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-        <!-- Load PWA utilities -->
-        <script src="/static/pwa-utils.js" defer></script>
-        
-        <!-- PWA Status Indicator -->
-        <script>
-        window.addEventListener('load', function() {
-            // Check if running as PWA
-            const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
-                         window.navigator.standalone === true;
-            
-            if (isPWA) {
-                console.log('[PWA] Running in standalone mode');
-                document.body.classList.add('pwa-standalone');
-            }
-            
-            // Show connection status
-            window.addEventListener('online', () => console.log('[PWA] Back online'));
-            window.addEventListener('offline', () => console.log('[PWA] Gone offline'));
-        });
-        </script>
-    </head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#A0D8F1">
+    <link rel="manifest" href="/static/manifest.json">
     """, unsafe_allow_html=True)
 
     # Add user profile and logout in sidebar
@@ -570,7 +504,7 @@ def main():
                 with col2:
                     st.metric("Active Features", f"{sum(feature_flags.get_all_flags().values())}")
                 with col3:
-                    st.metric("Environment", config.environment.title())
+                    st.metric("Environment", settings.ENVIRONMENT.title())
                     
             except Exception as e:
                 st.warning(f"System admin dashboard temporarily unavailable: {e}")
