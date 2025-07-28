@@ -8,6 +8,9 @@ import os
 # Add the current directory to the Python path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
+# Initialize feature flags system first (required before other imports)
+from utils.feature_flags import feature_flags, is_feature_enabled, feature_gate
+
 # Configure Streamlit for deployment
 st.set_page_config(
     page_title="Snowbird: Your Seasonal Financial Assistant", 
@@ -107,9 +110,6 @@ else:
             def sync_location_data(self, uid, data):
                 return True
         return StubSync()
-
-# Initialize feature flags system first
-from utils.feature_flags import feature_flags, is_feature_enabled, feature_gate
 
 # Initialize configuration from utils/config.py
 from utils.config import settings
