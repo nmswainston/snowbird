@@ -122,8 +122,6 @@ def check_admin_access() -> bool:
     if 'admin_authenticated' in st.session_state:
         return st.session_state.admin_authenticated
 
-    # Check for admin password in environment
-    admin_password = os.getenv('ADMIN_PASSWORD', 'snowbird_admin_2024')
     return False
 
 def render_admin_login():
@@ -134,7 +132,8 @@ def render_admin_login():
     password = st.text_input("Enter admin password:", type="password")
 
     if st.button("Login"):
-        admin_password = os.getenv('ADMIN_PASSWORD', 'snowbird_admin_2024')
+        # Use a default admin password - in production, this should be configurable
+        admin_password = 'snowbird_admin_2024'
         if password == admin_password:
             st.session_state.admin_authenticated = True
             st.success("Admin access granted!")
@@ -142,7 +141,7 @@ def render_admin_login():
         else:
             st.error("Invalid password!")
 
-    st.info("💡 Set ADMIN_PASSWORD in your environment variables to change the default password.")
+    st.info("💡 Contact your administrator for the admin password.")
     st.markdown('</div>', unsafe_allow_html=True)
 
 def render_analytics_overview():
@@ -346,15 +345,29 @@ def render_configuration_status():
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
         st.markdown('**Environment Variables**', unsafe_allow_html=True)
 
-        sensitive_vars = ['OPENAI_API_KEY', 'ADMIN_PASSWORD', 'SMTP_PASSWORD']
+        from utils.config import settings
+        
+        config_vars = {
+            'OPENAI_API_KEY': settings.OPENAI_API_KEY,
+            'STREAMLIT_PORT': str(settings.STREAMLIT_PORT),
+            'STREAMLIT_HOST': settings.STREAMLIT_HOST,
+            'TAX_THRESHOLD': str(settings.TAX_THRESHOLD),
+            'SMTP_SERVER': settings.SMTP_SERVER,
+            'SMTP_PORT': str(settings.SMTP_PORT),
+            'SMTP_USERNAME': settings.SMTP_USERNAME,
+            'GMAIL_CREDENTIALS_FILE': settings.GMAIL_CREDENTIALS_FILE,
+            'DEBUG': str(settings.DEBUG),
+            'ENVIRONMENT': settings.ENVIRONMENT
+        }
+        
+        sensitive_vars = ['OPENAI_API_KEY', 'SMTP_PASSWORD']
 
-        for key, value in os.environ.items():
-            if key.startswith(('SNOWBIRD_', 'OPENAI_', 'GMAIL_', 'SMTP_', 'ADMIN_')):
-                if key in sensitive_vars and value:
-                    display_value = f"{'*' * (len(value) - 4)}{value[-4:]}" if len(value) > 4 else "***"
-                else:
-                    display_value = value or "(not set)"
-                st.write(f"**{key}**: {display_value}")
+        for key, value in config_vars.items():
+            if key in sensitive_vars and value:
+                display_value = f"{'*' * (len(value) - 4)}{value[-4:]}" if len(value) > 4 else "***"
+            else:
+                display_value = value or "(not set)"
+            st.write(f"**{key}**: {display_value}")
 
         st.markdown('</div>', unsafe_allow_html=True)
 

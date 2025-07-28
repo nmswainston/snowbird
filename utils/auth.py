@@ -33,10 +33,11 @@ def check_openai_availability():
     """Check if OpenAI is available and configured"""
     try:
         from openai import OpenAI
-        api_key = os.getenv("OPENAI_API_KEY", "")
-        if api_key and api_key.strip():
+        from utils.config import settings
+        
+        if settings.OPENAI_API_KEY and settings.OPENAI_API_KEY.strip():
             try:
-                client = OpenAI(api_key=api_key)
+                client = OpenAI(api_key=settings.OPENAI_API_KEY)
                 return True, client
             except Exception:
                 return False, None

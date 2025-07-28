@@ -358,8 +358,8 @@ def check_external_services():
     """Check the status of external services"""
     try:
         # Check if OpenAI key is available
-        import os
-        if os.getenv('OPENAI_API_KEY'):
+        from utils.config import settings
+        if settings.OPENAI_API_KEY:
             return "🟢 Available"
         else:
             return "🟡 No API Key"
