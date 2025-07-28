@@ -6,8 +6,8 @@ Provides system health, analytics, and user activity monitoring.
 import streamlit as st
 import datetime
 import json
-import psutil
 import os
+import psutil
 from pathlib import Path
 from typing import Dict, Any, List
 
@@ -17,8 +17,8 @@ from utils.logging_config import logger
 # Import config more safely to avoid circular imports
 try:
     from config import config
-except ImportError:
-    import os
+except ImportError as e:
+    logger.warning(f"Could not import config: {e}, using fallback")
     # Fallback config if import fails
     class FallbackConfig:
         environment = os.getenv('ENVIRONMENT', 'development')
