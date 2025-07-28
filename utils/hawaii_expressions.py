@@ -1,4 +1,3 @@
-
 """
 Standard expressions for the Snowbird app
 Providing professional and friendly messaging throughout the application
@@ -12,12 +11,12 @@ class StandardExpressions:
 
     # Friendly greetings and positive vibes
     GREETINGS = [
-        "Hello there! 👋",
+        "Hello there!",
         "Hi, how's it going! 😊", 
         "What's happening? 🙂",
         "Hey, how are you? 👍",
         "Great to see you! 🌟",
-        "Welcome back! 👋"
+        "Welcome back!"
     ]
 
     # Success messages with positive flavor
@@ -46,7 +45,7 @@ class StandardExpressions:
         "Just a moment... 🔄",
         "Almost done, small wait... ⏰",
         "Getting things ready... 📦",
-        "Making the magic happen... ✨",
+        "Making things happen... ✨",
         "Hang tight, almost done... 😊"
     ]
 
@@ -93,7 +92,7 @@ class StandardExpressions:
         "California": [
             "Great surfing weather! 🏄",
             "Golden state living! ✨",
-            "West coast lifestyle! 🌊",
+            "West coast lifestyle!",
             "California dreaming! 😎"
         ]
     }
@@ -104,7 +103,7 @@ class StandardExpressions:
             "Good morning, sunshine! 🌅",
             "Rise and shine! ☀️",
             "Beautiful morning ahead! 🌴",
-            "Morning energy is great! 🌊"
+            "Morning energy is great!"
         ],
         "afternoon": [
             "Afternoon productivity! 🌞",

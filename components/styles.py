@@ -436,14 +436,13 @@ def apply_basic_styles():
     }
 
     /* Improved loading animations */
-    .loading-wave {
-        animation: wave 2s ease-in-out infinite;
+    .loading-pulse {
+        animation: pulse 2s ease-in-out infinite;
     }
 
-    @keyframes wave {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-10px); }
-        100% { transform: translateY(0); }
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
     }
 
     /* Better touch targets */
