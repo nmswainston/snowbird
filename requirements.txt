@@ -9,6 +9,8 @@ pydantic[email]
 pydantic-settings
 python-dotenv
 pytest
+pytest-cov
+tenacity
 loguru
 sentry-sdk[streamlit]
 structlog
