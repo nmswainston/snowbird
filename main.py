@@ -16,15 +16,37 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Initialize Firebase authentication
-from components.auth_components import check_authentication, render_logout_button
-from utils.profile_sync import initialize_user_session, save_user_session, get_profile_sync
-
-# Check authentication first
-user = check_authentication()
-
-# Initialize user session with profile data
-initialize_user_session()
+# Initialize Firebase authentication with error handling
+try:
+    from components.auth_components import check_authentication, render_logout_button
+    from utils.profile_sync import initialize_user_session, save_user_session, get_profile_sync
+    
+    # Check authentication first
+    user = check_authentication()
+    
+    # Initialize user session with profile data
+    initialize_user_session()
+    FIREBASE_AVAILABLE = True
+except ImportError as e:
+    st.warning("⚠️ Firebase authentication not available. Running in local mode.")
+    user = {"uid": "local_user", "email": "local@demo.com"}
+    FIREBASE_AVAILABLE = False
+    
+    # Define stub functions
+    def render_logout_button():
+        st.sidebar.markdown("**👤 Demo User (Local Mode)**")
+    
+    def initialize_user_session():
+        pass
+        
+    def save_user_session():
+        return True
+        
+    def get_profile_sync():
+        class StubSync:
+            def sync_location_data(self, uid, data):
+                return True
+        return StubSync()
 
 # Initialize security
 from utils.security import SessionSecurity, get_privacy_notice
@@ -80,8 +102,12 @@ def main():
         render_logout_button()
         
         with st.expander("👤 User Profile"):
-            from components.auth_components import render_user_profile
-            render_user_profile()
+            if FIREBASE_AVAILABLE:
+                from components.auth_components import render_user_profile
+                render_user_profile()
+            else:
+                st.markdown("**Demo User (Local Mode)**")
+                st.text_input("Email", value="local@demo.com", disabled=True)
         
         with st.expander("🔒 Privacy & Security"):
             st.markdown(get_privacy_notice())
@@ -92,10 +118,13 @@ def main():
                 st.rerun()
                 
             if st.button("Save Profile Data"):
-                if save_user_session():
-                    st.success("✅ Profile data saved!")
+                if FIREBASE_AVAILABLE:
+                    if save_user_session():
+                        st.success("✅ Profile data saved!")
+                    else:
+                        st.error("❌ Failed to save profile data")
                 else:
-                    st.error("❌ Failed to save profile data")
+                    st.success("✅ Profile data saved locally!")
 
     # Import analytics
     from components.analytics import track_page_view, track_user_action, track_feature_usage
@@ -162,13 +191,17 @@ def main():
         if st.button(f"Log a day in {location}"):
             st.session_state.states[location] += 1
             
-            # Sync with user profile
-            sync = get_profile_sync()
-            if sync.sync_location_data(user['uid'], st.session_state.states):
-                track_user_action("log_day", {"location": location, "total_days": st.session_state.states[location]})
-                st.success(f"Logged a day in {location}!")
+            # Sync with user profile if Firebase is available
+            if FIREBASE_AVAILABLE:
+                sync = get_profile_sync()
+                if sync.sync_location_data(user['uid'], st.session_state.states):
+                    track_user_action("log_day", {"location": location, "total_days": st.session_state.states[location]})
+                    st.success(f"Logged a day in {location}!")
+                else:
+                    st.warning("Day logged locally, but failed to sync with cloud. Data will sync automatically later.")
             else:
-                st.warning("Day logged locally, but failed to sync with cloud. Data will sync automatically later.")
+                track_user_action("log_day", {"location": location, "total_days": st.session_state.states[location]})
+                st.success(f"Logged a day in {location}! (Local mode)")
         st.markdown('</div>', unsafe_allow_html=True)
 
         # Show current totals
