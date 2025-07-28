@@ -20,25 +20,25 @@ def render_dashboard():
     # Enhanced key metrics section with st.metric components
     st.markdown("### 📊 Key Metrics Overview")
     st.write("")  # Add spacing
-    
+
     # Create responsive grid layout (3 columns on desktop, adapts to mobile)
     col1, col2, col3 = st.columns(3)
-    
+
     # Get current data for metrics
     az_days = st.session_state.states.get("Arizona", 0)
     mn_days = st.session_state.states.get("Minnesota", 0)
     threshold = st.session_state.tax_threshold
-    
+
     # Calculate remaining days for primary state (highest count)
     primary_state = "Arizona" if az_days >= mn_days else "Minnesota"
     primary_days = max(az_days, mn_days)
     days_remaining = max(0, threshold - primary_days)
-    
+
     with col1:
         # Arizona days metric with desert emoji
         st.markdown("""
         <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); 
-                    padding: 1rem; border-radius: 12px; margin-bottom: 1rem;">
+                    padding: 1rem; border-radius: 12px; margin-bottom: 1rem; border: 1px solid #e2e8f0;">
         """, unsafe_allow_html=True)
         st.metric(
             label="🏜️ Days in Arizona",
@@ -51,7 +51,7 @@ def render_dashboard():
         # Minnesota days metric with snow emoji
         st.markdown("""
         <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); 
-                    padding: 1rem; border-radius: 12px; margin-bottom: 1rem;">
+                    padding: 1rem; border-radius: 12px; margin-bottom: 1rem; border: 1px solid #e2e8f0;">
         """, unsafe_allow_html=True)
         st.metric(
             label="❄️ Days in Minnesota",
@@ -64,7 +64,7 @@ def render_dashboard():
         # Days remaining metric with warning emoji
         st.markdown("""
         <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); 
-                    padding: 1rem; border-radius: 12px; margin-bottom: 1rem;">
+                    padding: 1rem; border-radius: 12px; margin-bottom: 1rem; border: 1px solid #e2e8f0;">
         """, unsafe_allow_html=True)
         delta_color = "normal" if days_remaining > 30 else "inverse"
         st.metric(
@@ -79,14 +79,14 @@ def render_dashboard():
     st.write("")
     st.markdown("---")
     st.write("")
-    
+
     # Tax residency progress section
     st.markdown("### 📈 Tax Residency Progress")
     st.write("")
-    
+
     # Calculate progress percentage for primary state
     progress_percentage = min(primary_days / threshold, 1.0) if threshold > 0 else 0
-    
+
     # Color coding for progress bar
     if progress_percentage < 0.7:
         progress_color = "🟢 Safe Zone"
@@ -97,7 +97,7 @@ def render_dashboard():
     else:
         progress_color = "🔴 High Risk"
         bar_color = "#F44336"
-    
+
     # Create progress bar with custom styling
     st.markdown(f"""
     <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
@@ -111,20 +111,20 @@ def render_dashboard():
         </p>
     </div>
     """, unsafe_allow_html=True)
-    
+
     # Progress bar
     st.progress(progress_percentage, text=f"{primary_days}/{threshold} days in {primary_state}")
-    
+
     # Add spacing
     st.write("")
     st.markdown("---")
-    
+
     # Additional insights section with improved layout
     st.markdown("### ✨ Quick Insights")
     st.write("")
-    
+
     insight_col1, insight_col2, insight_col3 = st.columns(3)
-    
+
     with insight_col1:
         # Tax optimization score
         tax_score = max(0, min(100, 100 - (progress_percentage * 100)))
@@ -136,7 +136,7 @@ def render_dashboard():
         st.markdown(f"<h2 style='color: #2e7d32; margin: 0.5rem 0;'>{tax_score:.0f}%</h2>", unsafe_allow_html=True)
         st.markdown("Compliance Score")
         st.markdown("</div>", unsafe_allow_html=True)
-    
+
     with insight_col2:
         # Days available
         total_logged = sum(st.session_state.states.values())
@@ -149,7 +149,7 @@ def render_dashboard():
         st.markdown(f"<h2 style='color: #1976d2; margin: 0.5rem 0;'>{days_available}</h2>", unsafe_allow_html=True)
         st.markdown("Remaining in Year")
         st.markdown("</div>", unsafe_allow_html=True)
-    
+
     with insight_col3:
         # Next recommendation
         if days_remaining < 30:
@@ -161,7 +161,7 @@ def render_dashboard():
         else:
             recommendation = "Continue current plan"
             rec_color = "#388e3c"
-            
+
         st.markdown(f"""
         <div style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); 
                     padding: 1rem; border-radius: 12px; text-align: center;">
@@ -179,7 +179,7 @@ def render_dashboard():
     st.write("")
     st.markdown("---")
     st.write("")
-    
+
     # Enhanced status overview section
     st.markdown('<h3><i data-lucide="bar-chart-3" class="icon"></i>📋 Detailed Status Overview</h3>', unsafe_allow_html=True)
     st.write("")
@@ -191,7 +191,7 @@ def render_dashboard():
         total_days = sum(st.session_state.states.values())
         st.markdown("""
         <div style="background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); 
-                    padding: 1rem; border-radius: 12px;">
+                    padding: 1rem; border-radius: 12px; border: 1px solid #e2e8f0;">
         """, unsafe_allow_html=True)
         st.metric("📊 Total Days Logged", total_days, delta=f"Out of 365 days")
         st.markdown("</div>", unsafe_allow_html=True)
@@ -200,7 +200,7 @@ def render_dashboard():
         days_left = (365 - total_days) if total_days < 365 else 0
         st.markdown("""
         <div style="background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); 
-                    padding: 1rem; border-radius: 12px;">
+                    padding: 1rem; border-radius: 12px; border: 1px solid #e2e8f0;">
         """, unsafe_allow_html=True)
         st.metric("📅 Days Remaining in Year", days_left, delta=f"{(days_left/365)*100:.1f}% of year left")
         st.markdown("</div>", unsafe_allow_html=True)
@@ -211,17 +211,17 @@ def render_dashboard():
         risk_level = "🔴 High" if closest_to_threshold >= threshold * 0.9 else "🟡 Medium" if closest_to_threshold >= threshold * 0.75 else "🟢 Low"
         st.markdown("""
         <div style="background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%); 
-                    padding: 1rem; border-radius: 12px;">
+                    padding: 1rem; border-radius: 12px; border: 1px solid #e2e8f0;">
         """, unsafe_allow_html=True)
         st.metric("⚠️ Tax Risk Level", risk_level, delta=f"{closest_to_threshold} days in primary state")
         st.markdown("</div>", unsafe_allow_html=True)
-    
+
     st.write("")  # Add spacing after metrics
 
     # Add spacing
     st.markdown("---")
     st.write("")
-    
+
     # Enhanced state residency status section
     st.markdown('<h3><i data-lucide="map-pin" class="icon"></i>🗺️ State-by-State Breakdown</h3>', unsafe_allow_html=True)
     st.write("")
@@ -233,7 +233,7 @@ def render_dashboard():
 
         # Enhanced state card with better styling
         state_icon = "🌵" if "Arizona" in state else "❄️" if "Minnesota" in state else "🏠"
-        
+
         st.markdown(f"""
         <div style="background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%); 
                     padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; 
@@ -243,14 +243,14 @@ def render_dashboard():
             </h4>
         </div>
         """, unsafe_allow_html=True)
-        
+
         # Two-column layout for state details
         state_col1, state_col2 = st.columns([2, 1])
-        
+
         with state_col1:
             # Progress bar with enhanced styling
             st.progress(progress, text=f"{days} of {st.session_state.tax_threshold} days ({progress*100:.1f}%)")
-            
+
             # Status message with appropriate styling
             if status_text == "SAFE":
                 st.success(f"✅ **{status_text}** - {days_remaining} days remaining until threshold")
@@ -269,13 +269,13 @@ def render_dashboard():
                 delta=delta_text,
                 delta_color=delta_color
             )
-        
+
         st.write("")  # Add spacing between states
 
     # Add spacing
     st.markdown("---")
     st.write("")
-    
+
     # Enhanced financial overview section
     st.markdown('<h3><i data-lucide="dollar-sign" class="icon"></i>💰 Financial Summary</h3>', unsafe_allow_html=True)
     st.write("")
@@ -290,14 +290,14 @@ def render_dashboard():
         """, unsafe_allow_html=True)
         st.markdown('**🏠 Monthly Home Budgets**')
         st.write("")
-        
+
         total_all_budgets = 0
         for state, budget in st.session_state.home_budgets.items():
             total_budget = sum(budget.values())
             total_all_budgets += total_budget
             state_icon = "🌵" if "Arizona" in state else "❄️"
             st.metric(f"{state_icon} {state}", f"${total_budget:,}", delta="per month")
-        
+
         st.write("---")
         st.metric("**📊 Total Monthly Budget**", f"${total_all_budgets:,}", delta="All properties")
         st.markdown("</div>", unsafe_allow_html=True)
@@ -309,7 +309,7 @@ def render_dashboard():
         """, unsafe_allow_html=True)
         st.markdown('**📅 Seasonal Expenses**')
         st.write("")
-        
+
         total_seasonal = sum(st.session_state.seasonal_cash_flow.values())
         for category, amount in st.session_state.seasonal_cash_flow.items():
             # Add emojis for different expense categories
@@ -322,11 +322,11 @@ def render_dashboard():
             else:
                 emoji = "💸"
             st.metric(f"{emoji} {category}", f"${amount:,}", delta="per month")
-        
+
         st.write("---")
         st.metric("**📊 Total Seasonal**", f"${total_seasonal:,}", delta="per month")
         st.markdown("</div>", unsafe_allow_html=True)
-    
+
     # Add final spacing
     st.write("")
 def render_metric_card(title, value, delta, icon):
