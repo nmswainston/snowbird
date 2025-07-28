@@ -59,12 +59,25 @@ def render_dashboard():
         # Close the styled container div
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # Enhanced key metrics section with st.metric components
-    st.markdown("### 📊 Key Metrics Overview")
-    st.write("")  # Add spacing
+    # Enhanced key metrics section with premium styling
+    st.markdown("""
+    <div style="margin: 2.5rem 0 2rem 0;">
+        <h3 style="
+            color: var(--primary, #0891B2);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        ">
+            📊 Key Metrics Overview
+        </h3>
+    </div>
+    """, unsafe_allow_html=True)
 
-    # Create responsive grid layout (3 columns on desktop, adapts to mobile)
-    col1, col2, col3 = st.columns(3)
+    # Create responsive grid layout with enhanced spacing
+    col1, col2, col3 = st.columns([1, 1, 1], gap="large")
 
     # Get current data for metrics
     az_days = st.session_state.states.get("Arizona", 0)
@@ -77,10 +90,30 @@ def render_dashboard():
     days_remaining = max(0, threshold - primary_days)
 
     with col1:
-        # Arizona days metric with desert emoji
+        # Arizona days metric with enhanced desert theme
         st.markdown("""
-        <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); 
-                    padding: 1rem; border-radius: 12px; margin-bottom: 1rem; border: 1px solid #e2e8f0;">
+        <div style="
+            background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 20%, #fb923c 100%); 
+            padding: 1.75rem; 
+            border-radius: 20px; 
+            margin-bottom: 1.5rem; 
+            border: 1px solid rgba(251, 146, 60, 0.2);
+            box-shadow: 0 8px 32px rgba(251, 146, 60, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        " onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 48px rgba(251, 146, 60, 0.25), 0 4px 16px rgba(0, 0, 0, 0.15)';" 
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 32px rgba(251, 146, 60, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1)';">
+            <div style="
+                position: absolute;
+                top: -50%;
+                right: -50%;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+                pointer-events: none;
+            "></div>
         """, unsafe_allow_html=True)
         st.metric(
             label="🏜️ Days in Arizona",
@@ -90,10 +123,30 @@ def render_dashboard():
         st.markdown("</div>", unsafe_allow_html=True)
 
     with col2:
-        # Minnesota days metric with snow emoji
+        # Minnesota days metric with enhanced winter theme
         st.markdown("""
-        <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); 
-                    padding: 1rem; border-radius: 12px; margin-bottom: 1rem; border: 1px solid #e2e8f0;">
+        <div style="
+            background: linear-gradient(135deg, #f0f9ff 0%, #bae6fd 20%, #0ea5e9 100%); 
+            padding: 1.75rem; 
+            border-radius: 20px; 
+            margin-bottom: 1.5rem; 
+            border: 1px solid rgba(14, 165, 233, 0.2);
+            box-shadow: 0 8px 32px rgba(14, 165, 233, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        " onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 48px rgba(14, 165, 233, 0.25), 0 4px 16px rgba(0, 0, 0, 0.15)';" 
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 32px rgba(14, 165, 233, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1)';">
+            <div style="
+                position: absolute;
+                top: -50%;
+                right: -50%;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+                pointer-events: none;
+            "></div>
         """, unsafe_allow_html=True)
         st.metric(
             label="❄️ Days in Minnesota",
@@ -103,28 +156,48 @@ def render_dashboard():
         st.markdown("</div>", unsafe_allow_html=True)
 
     with col3:
-        # Tax threshold progress visualization with progress bar
+        # Tax threshold progress with enhanced styling
         st.markdown("""
-        <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); 
-                    padding: 1rem; border-radius: 12px; margin-bottom: 1rem; border: 1px solid #e2e8f0;">
+        <div style="
+            background: linear-gradient(135deg, #fefce8 0%, #fde047 20%, #eab308 100%); 
+            padding: 1.75rem; 
+            border-radius: 20px; 
+            margin-bottom: 1.5rem; 
+            border: 1px solid rgba(234, 179, 8, 0.2);
+            box-shadow: 0 8px 32px rgba(234, 179, 8, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        " onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 48px rgba(234, 179, 8, 0.25), 0 4px 16px rgba(0, 0, 0, 0.15)';" 
+           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 32px rgba(234, 179, 8, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1)';">
+            <div style="
+                position: absolute;
+                top: -50%;
+                right: -50%;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+                pointer-events: none;
+            "></div>
         """, unsafe_allow_html=True)
         
         # Calculate percentage of 183-day allowance used
         pct = min(primary_days / 183, 1.0)
         percentage_used = pct * 100
         
-        # Display the progress section with label
+        # Display the progress section with enhanced label
         st.markdown("**⚠️ Tax Threshold Progress**")
         
-        # Add tooltip with the raw number for reference
+        # Enhanced progress container
         with st.container():
             # Progress bar showing percentage toward 183-day threshold
             st.progress(pct, text=f"Days logged: {primary_days}/183")
             
-            # Small label showing percentage used
+            # Enhanced caption with better typography
             st.caption(f"You've used {percentage_used:.1f}% of your 183-day allowance")
             
-            # Tooltip showing the exact days remaining (hidden behind hover)
+            # Enhanced tooltip button
             if st.button("ℹ️", key="threshold_tooltip", help=f"Days remaining: {days_remaining} | Primary state: {primary_state}"):
                 st.info(f"Exact details: {days_remaining} days remaining until threshold in {primary_state}")
         
@@ -174,57 +247,139 @@ def render_dashboard():
     st.write("")
     st.markdown("---")
 
-    # Additional insights section with improved layout
-    st.markdown("### ✨ Quick Insights")
-    st.write("")
+    # Enhanced insights section with premium styling
+    st.markdown("""
+    <div style="margin: 3rem 0 2.5rem 0;">
+        <h3 style="
+            color: var(--primary, #0891B2);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        ">
+            ✨ Quick Insights
+        </h3>
+    </div>
+    """, unsafe_allow_html=True)
 
-    insight_col1, insight_col2, insight_col3 = st.columns(3)
+    insight_col1, insight_col2, insight_col3 = st.columns([1, 1, 1], gap="large")
 
     with insight_col1:
-        # Tax optimization score
+        # Tax optimization score with enhanced green theme
         tax_score = max(0, min(100, 100 - (progress_percentage * 100)))
-        st.markdown("""
-        <div style="background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); 
-                    padding: 1rem; border-radius: 12px; text-align: center;">
+        st.markdown(f"""
+        <div style="
+            background: linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 20%, #22c55e 100%); 
+            padding: 2rem; 
+            border-radius: 20px; 
+            text-align: center;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            box-shadow: 0 8px 32px rgba(34, 197, 94, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        " onmouseover="this.style.transform='translateY(-6px) scale(1.02)'; this.style.boxShadow='0 16px 48px rgba(34, 197, 94, 0.25), 0 4px 16px rgba(0, 0, 0, 0.15)';" 
+           onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 8px 32px rgba(34, 197, 94, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1)';">
+            <div style="
+                position: absolute;
+                top: -50%;
+                right: -50%;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+                pointer-events: none;
+            "></div>
+            <div style="font-weight: 700; font-size: 1rem; margin-bottom: 1rem; color: rgba(22, 101, 52, 0.9);">🎯 Tax Optimization</div>
+            <div style="color: #166534; margin: 1rem 0; font-size: 2.5rem; font-weight: 800; line-height: 1;">{tax_score:.0f}%</div>
+            <div style="color: rgba(22, 101, 52, 0.8); font-size: 0.9rem; font-weight: 500;">Compliance Score</div>
+        </div>
         """, unsafe_allow_html=True)
-        st.markdown(f"**🎯 Tax Optimization**")
-        st.markdown(f"<h2 style='color: #2e7d32; margin: 0.5rem 0;'>{tax_score:.0f}%</h2>", unsafe_allow_html=True)
-        st.markdown("Compliance Score")
-        st.markdown("</div>", unsafe_allow_html=True)
 
     with insight_col2:
-        # Days available
+        # Days available with enhanced blue theme
         total_logged = sum(st.session_state.states.values())
         days_available = 365 - total_logged
-        st.markdown("""
-        <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); 
-                    padding: 1rem; border-radius: 12px; text-align: center;">
+        st.markdown(f"""
+        <div style="
+            background: linear-gradient(135deg, #eff6ff 0%, #bfdbfe 20%, #3b82f6 100%); 
+            padding: 2rem; 
+            border-radius: 20px; 
+            text-align: center;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 8px 32px rgba(59, 130, 246, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        " onmouseover="this.style.transform='translateY(-6px) scale(1.02)'; this.style.boxShadow='0 16px 48px rgba(59, 130, 246, 0.25), 0 4px 16px rgba(0, 0, 0, 0.15)';" 
+           onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 8px 32px rgba(59, 130, 246, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1)';">
+            <div style="
+                position: absolute;
+                top: -50%;
+                right: -50%;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+                pointer-events: none;
+            "></div>
+            <div style="font-weight: 700; font-size: 1rem; margin-bottom: 1rem; color: rgba(29, 78, 216, 0.9);">📅 Days Available</div>
+            <div style="color: #1d4ed8; margin: 1rem 0; font-size: 2.5rem; font-weight: 800; line-height: 1;">{days_available}</div>
+            <div style="color: rgba(29, 78, 216, 0.8); font-size: 0.9rem; font-weight: 500;">Remaining in Year</div>
+        </div>
         """, unsafe_allow_html=True)
-        st.markdown(f"**📅 Days Available**")
-        st.markdown(f"<h2 style='color: #1976d2; margin: 0.5rem 0;'>{days_available}</h2>", unsafe_allow_html=True)
-        st.markdown("Remaining in Year")
-        st.markdown("</div>", unsafe_allow_html=True)
 
     with insight_col3:
-        # Next recommendation
+        # Enhanced recommendation with dynamic theming
         if days_remaining < 30:
             recommendation = "Plan location change"
-            rec_color = "#f57c00"
+            rec_color = "#dc2626"
+            bg_gradient = "linear-gradient(135deg, #fef2f2 0%, #fecaca 20%, #ef4444 100%)"
+            border_color = "rgba(239, 68, 68, 0.2)"
+            shadow_color = "rgba(239, 68, 68, 0.15)"
         elif days_remaining < 60:
             recommendation = "Monitor closely"
-            rec_color = "#fbc02d"
+            rec_color = "#d97706"
+            bg_gradient = "linear-gradient(135deg, #fffbeb 0%, #fed7aa 20%, #f59e0b 100%)"
+            border_color = "rgba(245, 158, 11, 0.2)"
+            shadow_color = "rgba(245, 158, 11, 0.15)"
         else:
             recommendation = "Continue current plan"
-            rec_color = "#388e3c"
+            rec_color = "#059669"
+            bg_gradient = "linear-gradient(135deg, #ecfdf5 0%, #a7f3d0 20%, #10b981 100%)"
+            border_color = "rgba(16, 185, 129, 0.2)"
+            shadow_color = "rgba(16, 185, 129, 0.15)"
 
         st.markdown(f"""
-        <div style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); 
-                    padding: 1rem; border-radius: 12px; text-align: center;">
+        <div style="
+            background: {bg_gradient}; 
+            padding: 2rem; 
+            border-radius: 20px; 
+            text-align: center;
+            border: 1px solid {border_color};
+            box-shadow: 0 8px 32px {shadow_color}, 0 2px 8px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        " onmouseover="this.style.transform='translateY(-6px) scale(1.02)'; this.style.boxShadow='0 16px 48px {shadow_color.replace('0.15', '0.25')}, 0 4px 16px rgba(0, 0, 0, 0.15)';" 
+           onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 8px 32px {shadow_color}, 0 2px 8px rgba(0, 0, 0, 0.1)';">
+            <div style="
+                position: absolute;
+                top: -50%;
+                right: -50%;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+                pointer-events: none;
+            "></div>
+            <div style="font-weight: 700; font-size: 1rem; margin-bottom: 1rem; color: rgba(0, 0, 0, 0.8);">🔮 Recommendation</div>
+            <div style="color: {rec_color}; margin: 1rem 0; font-size: 1.1rem; font-weight: 700; line-height: 1.2;">{recommendation}</div>
+            <div style="color: rgba(0, 0, 0, 0.7); font-size: 0.9rem; font-weight: 500;">{days_remaining} days buffer</div>
+        </div>
         """, unsafe_allow_html=True)
-        st.markdown(f"**🔮 Recommendation**")
-        st.markdown(f"<h3 style='color: {rec_color}; margin: 0.5rem 0; font-size: 1rem;'>{recommendation}</h3>", unsafe_allow_html=True)
-        st.markdown(f"{days_remaining} days buffer")
-        st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown('</div>', unsafe_allow_html=True)
 
