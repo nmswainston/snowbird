@@ -1,4 +1,3 @@
-
 """
 Snowbird Financial Assistant - Main Application
 """
@@ -65,34 +64,35 @@ def main():
 
     # Render styled header
     render_main_header()
-    
+
     # Add privacy notice in sidebar
     with st.sidebar:
         with st.expander("🔒 Privacy & Security"):
             st.markdown(get_privacy_notice())
-            
+
             if st.button("Clear Session Data"):
                 SessionSecurity.clear_sensitive_data()
                 st.success("Session data cleared!")
                 st.rerun()
 
     # Create main navigation tabs
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
         "📊 Dashboard", 
         "📅 Day Tracker", 
         "🗺️ Auto-Track",
         "💰 Budgets", 
         "🤖 AI Assistant", 
-        "📋 Reports"
+        "📋 Reports",
+        "🎨 Themes"
     ])
 
     with tab1:
         # Dashboard - Overview of all key metrics
         st.markdown('**<i data-lucide="bar-chart-3" class="icon"></i>Dashboard Overview**', unsafe_allow_html=True)
-        
+
         # Quick stats
         col1, col2, col3 = st.columns(3)
-        
+
         with col1:
             st.metric("Arizona Days", st.session_state.states["Arizona"])
         with col2:
@@ -104,9 +104,9 @@ def main():
         # Tax residency status
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
         st.markdown('**<i data-lucide="alert-triangle" class="icon"></i>Tax Residency Status**', unsafe_allow_html=True)
-        
+
         col1, col2 = st.columns(2)
-        
+
         for idx, (state, days) in enumerate(st.session_state.states.items()):
             col = col1 if idx == 0 else col2
             with col:
@@ -120,15 +120,15 @@ def main():
                 else:
                     status_class = "status-safe"
                     status_text = f"✅ {remaining_days} days left"
-                
+
                 st.markdown(f'<p class="{status_class}">{status_text}</p>', unsafe_allow_html=True)
-        
+
         st.markdown('</div>', unsafe_allow_html=True)
 
     with tab2:
         # Day Tracker - Log location
         st.markdown('**<i data-lucide="map-pin" class="icon"></i>Log Your Location**', unsafe_allow_html=True)
-        
+
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
         location = st.radio("Where are you today?", ("Arizona", "Minnesota"))
         if st.button(f"Log a day in {location}"):
@@ -139,7 +139,7 @@ def main():
         # Show current totals
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
         st.markdown('**<i data-lucide="calendar" class="icon"></i>Current Totals**', unsafe_allow_html=True)
-        
+
         for state, days in st.session_state.states.items():
             remaining_days = TAX_THRESHOLD_DAYS - days
             progress = min(days / TAX_THRESHOLD_DAYS, 1.0)
@@ -161,14 +161,14 @@ def main():
         <p>📊 <strong>Audit Trail:</strong> Comprehensive logging for tax compliance</p>
         </div>
         """, unsafe_allow_html=True)
-        
+
         from components.auto_tracker import render_auto_tracker
         render_auto_tracker()
 
     with tab4:
         # Budgets
         st.markdown('**<i data-lucide="dollar-sign" class="icon"></i>Budget Management**', unsafe_allow_html=True)
-        
+
         # Home budgets
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
         st.markdown('**<i data-lucide="home" class="icon"></i>Home Maintenance Budget**', unsafe_allow_html=True)
@@ -189,7 +189,7 @@ def main():
     with tab5:
         # AI Assistant
         st.markdown('**<i data-lucide="brain" class="icon"></i>Ask Snowbird AI**', unsafe_allow_html=True)
-        
+
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
         if not openai.api_key or openai.api_key.strip() == "":
             st.info("💡 To enable AI features, add your OPENAI_API_KEY to Replit Secrets in the Tools panel.")
@@ -215,26 +215,26 @@ def main():
         if st.session_state.chat_response:
             st.markdown("**AI Response:**")
             st.write(st.session_state.chat_response)
-        
+
         st.markdown('</div>', unsafe_allow_html=True)
 
     with tab6:
         # Reports
         st.markdown('**<i data-lucide="file-text" class="icon"></i>Tax Residency Reports**', unsafe_allow_html=True)
-        
+
         st.markdown('<div class="winter-card">', unsafe_allow_html=True)
         st.markdown('**Annual Summary**', unsafe_allow_html=True)
-        
+
         total_days = sum(st.session_state.states.values())
         current_year = datetime.datetime.now().year
-        
+
         st.write(f"**Tax Year {current_year} Summary:**")
         for state, days in st.session_state.states.items():
             percentage = (days / total_days * 100) if total_days > 0 else 0
             st.write(f"• {state}: {days} days ({percentage:.1f}%)")
-        
+
         st.write(f"• **Total Days Logged**: {total_days}")
-        
+
         # Tax status summary
         st.markdown("**Tax Residency Status:**")
         for state, days in st.session_state.states.items():
@@ -243,8 +243,20 @@ def main():
             else:
                 remaining = TAX_THRESHOLD_DAYS - days
                 st.success(f"✅ Safe in {state} ({remaining} days remaining)")
-        
+
         st.markdown('</div>', unsafe_allow_html=True)
+
+    with tab7:
+        # Themes
+        st.markdown('**<i data-lucide="palette" class="icon"></i>Theme Customization**', unsafe_allow_html=True)
+
+        from components.theme_selector import render_advanced_theme_selector, render_theme_customizer
+
+        st.markdown('<div class="winter-card">', unsafe_allow_html=True)
+        render_advanced_theme_selector()
+        st.markdown('</div>', unsafe_allow_html=True)
+
+        render_theme_customizer()
 
 if __name__ == "__main__":
     main()

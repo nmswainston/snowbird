@@ -15,4 +15,7 @@ structlog
 tenacity
 email-validator
 cryptography
-cryptography
+Pillow
+streamlit-elements
+plotly
+altair
