@@ -28,6 +28,24 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+def start_api_server():
+    """Start API server in background thread"""
+    try:
+        from api import run_api_server
+        import threading
+        
+        # Start API server in background thread
+        api_thread = threading.Thread(
+            target=run_api_server,
+            args=("0.0.0.0", 8000),
+            daemon=True
+        )
+        api_thread.start()
+        
+    except Exception as e:
+        # Don't crash the main app if API server fails
+        print(f"API server start failed: {e}")
+
 def main():
     """Main application function"""
     try:
