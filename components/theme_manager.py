@@ -703,9 +703,26 @@ class ThemeManager:
             // Enhanced mutation observer for dynamic content
             const observer = new MutationObserver(function(mutations) {
                 let shouldUpdate = false;
-                mutations.forEach(mutation => {
-                    if (mutation.addedNodes.length > 0) {
+                mutations.forEach(mutation => {{
+                    if (mutation.addedNodes.length > 0) {{
                         shouldUpdate = true;
+                    }}
+                }});
+
+                if (shouldUpdate) {{
+                    setTimeout(initializeIcons, 100);
+                }}
+            }});
+
+            observer.observe(document.body, {{ 
+                childList: true, 
+                subtree: true,
+                attributes: false 
+            }});
+
+            // Add smooth scrolling
+            document.documentElement.style.scrollBehavior = 'smooth';
+        </script>
                     }
                 });
 
