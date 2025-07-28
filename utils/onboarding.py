@@ -234,23 +234,25 @@ def render_onboarding_carousel():
         margin-top: 2rem;
         padding-top: 1rem;
         border-top: 1px solid #e2e8f0;
-        gap: 1rem;
+        gap: 1.5rem;
+        flex-wrap: nowrap;
     }
     
     .onboarding-nav .stButton > button {
-        min-width: 150px !important;
+        min-width: 180px !important;
         width: auto !important;
-        padding: 0.9rem 2rem !important;
-        font-size: 0.95rem !important;
+        max-width: none !important;
+        padding: 1rem 2.5rem !important;
+        font-size: 0.9rem !important;
         font-weight: 600 !important;
         border-radius: 12px !important;
         white-space: nowrap !important;
         text-overflow: clip !important;
         overflow: visible !important;
-        line-height: 1.1 !important;
-        letter-spacing: 0.01em !important;
+        line-height: 1.2 !important;
+        letter-spacing: 0.02em !important;
         height: auto !important;
-        min-height: 50px !important;
+        min-height: 52px !important;
         border: 2px solid transparent !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         position: relative !important;
@@ -260,6 +262,8 @@ def render_onboarding_carousel():
         justify-content: center !important;
         box-sizing: border-box !important;
         word-break: keep-all !important;
+        flex-shrink: 0 !important;
+        flex-grow: 0 !important;
     }
     
     /* Previous button - secondary styling */
@@ -369,12 +373,13 @@ def render_onboarding_carousel():
         
         .onboarding-nav .stButton > button {
             width: 100% !important;
-            min-width: 140px !important;
-            font-size: 0.9rem !important;
-            padding: 1rem 1.5rem !important;
-            min-height: 52px !important;
+            min-width: 160px !important;
+            font-size: 0.85rem !important;
+            padding: 1rem 2rem !important;
+            min-height: 54px !important;
             word-break: keep-all !important;
             overflow: visible !important;
+            flex-shrink: 0 !important;
         }
         
         .onboarding-modal {
