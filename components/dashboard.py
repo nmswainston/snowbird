@@ -346,6 +346,7 @@ def render_dashboard():
         st.markdown('**🏠 Monthly Home Budgets**')
         st.write("")
 
+        # Calculate total budget across all properties
         total_all_budgets = 0
         for state, budget in st.session_state.home_budgets.items():
             total_budget = sum(budget.values())
@@ -354,7 +355,20 @@ def render_dashboard():
             st.metric(f"{state_icon} {state}", f"${total_budget:,}", delta="per month")
 
         st.write("---")
-        st.metric("**📊 Total Monthly Budget**", f"${total_all_budgets:,}", delta="All properties")
+        
+        # Enhanced header with pie chart icon and larger font
+        st.markdown("<h3>📊 Combined Monthly Spend</h3>", unsafe_allow_html=True)
+        
+        # Clear metric display with bold formatting and no delta
+        st.metric(
+            label="Combined Monthly Spend", 
+            value=f"${total_all_budgets:,}", 
+            delta=None
+        )
+        
+        # Additional context label for clarity
+        st.caption("All properties combined")
+        
         st.markdown("</div>", unsafe_allow_html=True)
 
     with fin_col2:
