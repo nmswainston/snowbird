@@ -3,7 +3,7 @@ import os
 from typing import Dict, Any, Optional
 import streamlit as st
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     OPENAI_API_KEY: str = ""
