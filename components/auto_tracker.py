@@ -5,6 +5,8 @@ import requests
 from typing import Dict, Optional, Tuple
 from utils.data_models import SnowbirdData
 from utils.logging_config import data_logger
+from utils.gmail_parser import GmailTravelParser
+from utils.error_handling import APIError, ErrorDisplay
 
 class AutoLocationTracker:
     """Automatic location tracking for audit trails"""
@@ -144,9 +146,75 @@ class AutoLocationTracker:
 def render_auto_tracker():
     """Render automatic location tracking interface"""
     tracker = AutoLocationTracker()
+    gmail_parser = GmailTravelParser()
     
-    st.markdown('<div class="winter-card">', unsafe_allow_html=True)
     st.markdown('**<i data-lucide="map" class="icon"></i>Automatic Location Tracking**', unsafe_allow_html=True)
+    
+    # Gmail Integration Section
+    st.markdown('<div class="winter-card">', unsafe_allow_html=True)
+    st.markdown('**<i data-lucide="mail" class="icon"></i>Gmail Travel Analysis**', unsafe_allow_html=True)
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        gmail_enabled = st.toggle("Enable Gmail Integration", value=False)
+        if gmail_enabled:
+            days_back = st.slider("Analyze emails from last N days:", 7, 90, 30)
+    
+    with col2:
+        if gmail_enabled and st.button("🔍 Analyze Travel Emails"):
+            with st.spinner("Analyzing your emails for travel information..."):
+                try:
+                    travel_emails = gmail_parser.search_travel_emails(days_back=days_back)
+                    
+                    if travel_emails:
+                        suggestions = gmail_parser.suggest_location_logs(travel_emails)
+                        st.session_state.gmail_suggestions = suggestions
+                        st.session_state.gmail_emails = travel_emails
+                        st.success(f"📧 Found {len(travel_emails)} travel-related emails with {len(suggestions)} location suggestions")
+                    else:
+                        st.info("📭 No travel-related emails found in the specified period")
+                        
+                except APIError as e:
+                    ErrorDisplay.api_error(e, "Gmail")
+                except Exception as e:
+                    st.error(f"❌ Error analyzing emails: {str(e)}")
+    
+    # Show Gmail suggestions if available
+    if gmail_enabled and 'gmail_suggestions' in st.session_state:
+        st.markdown("**📋 Travel Suggestions from Emails:**")
+        
+        suggestions = st.session_state.gmail_suggestions
+        if suggestions:
+            for i, suggestion in enumerate(suggestions[:10]):  # Show top 10
+                with st.expander(f"📅 {suggestion['date']} - {suggestion['location']} ({suggestion['confidence']} confidence)"):
+                    col1, col2 = st.columns([2, 1])
+                    
+                    with col1:
+                        st.write(f"**Source:** {suggestion['source_email']}")
+                        st.write(f"**Travel Type:** {suggestion['travel_type']}")
+                        st.write(f"**Confidence:** {suggestion['confidence']}")
+                    
+                    with col2:
+                        if st.button(f"Log this day", key=f"gmail_log_{i}"):
+                            success, message = tracker.snowbird_data.add_day_log(
+                                suggestion['location'],
+                                suggestion['date'],
+                                auto_logged=True
+                            )
+                            if success:
+                                st.success(f"✅ {message}")
+                                st.rerun()
+                            else:
+                                st.warning(message)
+        else:
+            st.info("No location suggestions found in analyzed emails")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # GPS Location Tracking Section
+    st.markdown('<div class="winter-card">', unsafe_allow_html=True)
+    st.markdown('**<i data-lucide="map-pin" class="icon"></i>GPS Location Tracking**', unsafe_allow_html=True)
     
     # Auto-tracking settings
     col1, col2 = st.columns(2)

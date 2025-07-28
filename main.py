@@ -131,7 +131,16 @@ def main():
         st.markdown('</div>', unsafe_allow_html=True)
 
     with tab3:
-        # Auto-Tracking
+        # Auto-Tracking with Gmail Integration
+        st.markdown('**<i data-lucide="search" class="icon"></i>Intelligent Location Detection**', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="winter-card">
+        <p>✈️ <strong>Gmail Travel Analysis:</strong> Automatically detect travel from your email confirmations</p>
+        <p>📍 <strong>GPS Location:</strong> Get your current location for manual verification</p>
+        <p>📊 <strong>Audit Trail:</strong> Comprehensive logging for tax compliance</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
         from components.auto_tracker import render_auto_tracker
         render_auto_tracker()
 
