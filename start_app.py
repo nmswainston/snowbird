@@ -9,23 +9,17 @@ import subprocess
 import time
 import os
 import signal
-import psutil
 from pathlib import Path
 
 def kill_existing_streamlit():
     """Kill any existing Streamlit processes"""
     try:
-        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
-            try:
-                cmdline = ' '.join(proc.info['cmdline'] or [])
-                if 'streamlit' in cmdline and 'main.py' in cmdline:
-                    print(f"Killing existing Streamlit process: {proc.info['pid']}")
-                    proc.kill()
-                    proc.wait(timeout=5)
-            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.TimeoutExpired):
-                pass
+        # Use pkill to kill streamlit processes
+        subprocess.run(['pkill', '-f', 'streamlit'], check=False)
+        time.sleep(2)  # Give processes time to die
+        print("✓ Cleaned up existing Streamlit processes")
     except Exception as e:
-        print(f"Warning: Could not check for existing processes: {e}")
+        print(f"Warning: Could not clean up processes: {e}")
 
 def check_dependencies():
     """Check if all required dependencies are available"""
@@ -39,55 +33,83 @@ def check_dependencies():
             missing.append(module)
     
     if missing:
-        print(f"Error: Missing required modules: {', '.join(missing)}")
-        print("Please install them with: pip install " + " ".join(missing))
-        return False
+        print(f"❌ Missing required modules: {', '.join(missing)}")
+        print(f"Installing missing modules...")
+        try:
+            subprocess.run([sys.executable, '-m', 'pip', 'install'] + missing, check=True)
+            print("✓ Dependencies installed")
+        except subprocess.CalledProcessError:
+            print("❌ Failed to install dependencies")
+            return False
     
     return True
 
-def check_main_files():
-    """Check if main application files exist"""
-    required_files = ['main.py', 'main_app.py', 'config.py']
-    missing = []
-    
-    for file_path in required_files:
-        if not Path(file_path).exists():
-            missing.append(file_path)
-    
-    if missing:
-        print(f"Error: Missing required files: {', '.join(missing)}")
-        return False
-    
-    return True
+def ensure_directories():
+    """Ensure required directories exist"""
+    directories = ['logs', 'static', '.streamlit']
+    for directory in directories:
+        Path(directory).mkdir(exist_ok=True)
+    print("✓ Required directories created")
 
-def create_logs_dir():
-    """Ensure logs directory exists"""
-    Path('logs').mkdir(exist_ok=True)
+def create_streamlit_config():
+    """Create optimized Streamlit configuration"""
+    config_dir = Path('.streamlit')
+    config_dir.mkdir(exist_ok=True)
+    
+    config_content = """
+[server]
+port = 8501
+address = "0.0.0.0"
+headless = true
+enableCORS = false
+enableXsrfProtection = false
+enableWebsocketCompression = false
+maxMessageSize = 200
+maxUploadSize = 200
+fileWatcherType = "none"
+runOnSave = false
+
+[browser]
+gatherUsageStats = false
+
+[theme]
+base = "light"
+primaryColor = "#12BDF2"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F0F4F8"
+textColor = "#1E293B"
+
+[logger]
+level = "warning"
+"""
+    
+    config_file = config_dir / 'config.toml'
+    with open(config_file, 'w') as f:
+        f.write(config_content.strip())
+    
+    print("✓ Streamlit configuration created")
 
 def start_streamlit():
     """Start Streamlit with optimized settings"""
     cmd = [
         sys.executable, '-m', 'streamlit', 'run', 'main.py',
-        '--server.port', '5000',  # Use Replit's recommended port
+        '--server.port', '8501',
         '--server.address', '0.0.0.0',
         '--server.headless', 'true',
-        '--server.enableCORS', 'true',  # Enable CORS for better compatibility
+        '--server.enableCORS', 'false',
+        '--server.enableXsrfProtection', 'false',
         '--server.enableWebsocketCompression', 'false',
         '--server.fileWatcherType', 'none',
-        '--browser.gatherUsageStats', 'false',
-        '--logger.level', 'info',  # More verbose logging for debugging
         '--server.maxMessageSize', '200',
-        '--server.enableStaticServing', 'true',
-        '--server.runOnSave', 'false',
-        '--server.enableXsrfProtection', 'false',  # Disable for development
-        '--server.baseUrlPath', '',
-        '--global.developmentMode', 'false'
+        '--browser.gatherUsageStats', 'false',
+        '--logger.level', 'warning'
     ]
     
-    print("Starting Streamlit server...")
+    print("🚀 Starting Streamlit server...")
     print(f"Command: {' '.join(cmd)}")
     
     try:
+        # Start the process
         process = subprocess.Popen(
             cmd,
             stdout=subprocess.PIPE,
@@ -96,64 +118,69 @@ def start_streamlit():
             bufsize=1
         )
         
-        # Monitor the process for a few seconds
-        for i in range(10):
+        # Monitor startup for first few seconds
+        startup_success = False
+        for i in range(15):  # Wait up to 15 seconds
             if process.poll() is not None:
-                print(f"Process exited with code: {process.returncode}")
-                output = process.communicate()[0]
+                # Process has terminated
+                output, _ = process.communicate()
+                print(f"❌ Process exited early with code: {process.returncode}")
                 print("Output:", output)
                 return False
+            
             time.sleep(1)
-            print(f"Server starting... ({i+1}/10)")
+            if i == 5:
+                print("✓ Server starting...")
+            elif i == 10:
+                print("✓ Server should be ready soon...")
         
-        print("✅ Streamlit server appears to be running successfully!")
+        print("✅ Streamlit server started successfully!")
         print("🌐 Access your app at: http://localhost:8501")
+        print("📱 Or from external: http://0.0.0.0:8501")
         
-        # Keep the process running
+        # Keep the process running and monitor it
         try:
             process.wait()
         except KeyboardInterrupt:
-            print("\n⏹️ Shutting down server...")
+            print("\n🛑 Shutting down server...")
             process.terminate()
-            process.wait()
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
         
         return True
         
     except Exception as e:
-        print(f"Error starting Streamlit: {e}")
+        print(f"❌ Failed to start Streamlit: {e}")
         return False
 
 def main():
     """Main startup function"""
-    print("🏠 Snowbird App Startup Script")
-    print("=" * 40)
+    print("🔄 Starting Snowbird Financial Assistant...")
+    print("=" * 50)
     
-    # Kill existing processes
-    print("🔄 Checking for existing Streamlit processes...")
+    # Step 1: Clean up any existing processes
     kill_existing_streamlit()
-    time.sleep(2)
     
-    # Check dependencies
-    print("📦 Checking dependencies...")
+    # Step 2: Check dependencies
     if not check_dependencies():
-        sys.exit(1)
+        print("❌ Dependency check failed")
+        return 1
     
-    # Check files
-    print("📁 Checking required files...")
-    if not check_main_files():
-        sys.exit(1)
+    # Step 3: Ensure directories exist
+    ensure_directories()
     
-    # Create logs directory
-    print("📝 Setting up logging...")
-    create_logs_dir()
+    # Step 4: Create optimized config
+    create_streamlit_config()
     
-    # Start the server
-    print("🚀 Starting Snowbird application...")
-    success = start_streamlit()
-    
-    if not success:
-        print("❌ Failed to start the application")
-        sys.exit(1)
+    # Step 5: Start the application
+    if start_streamlit():
+        print("✅ Application started successfully!")
+        return 0
+    else:
+        print("❌ Failed to start application")
+        return 1
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
