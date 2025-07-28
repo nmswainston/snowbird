@@ -16,7 +16,7 @@ run = ["sh", "-c", "streamlit run main.py --server.port $PORT --server.address 0
 deploymentTarget = "cloudrun"
 
 [workflows]
-runButton = "Snowbird App (Port 5000)"
+runButton = "Snowbird App (Stable)"
 
 [[workflows.workflow]]
 name = "Run Streamlit App"
@@ -111,7 +111,7 @@ args = "sleep 3"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "streamlit run main.py --server.port 8501 --server.address 0.0.0.0 --server.headless true --server.enableCORS false --server.enableWebsocketCompression false --server.fileWatcherType none --browser.gatherUsageStats false --logger.level error --server.maxMessageSize 200 --server.enableStaticServing false"
+args = "python -m streamlit run main.py --server.port 5000 --server.address 0.0.0.0 --server.headless true --server.enableCORS false --server.enableWebsocketCompression false --server.fileWatcherType none --browser.gatherUsageStats false --logger.level warning --server.maxMessageSize 200 --server.runOnSave false --server.enableStaticServing true"
 
 [[workflows.workflow]]
 name = "Snowbird App (PWA Optimized)"
