@@ -1,3 +1,7 @@
+"""
+Simplified styling for Snowbird app using the enhanced theme system
+"""
+
 import streamlit as st
 from components.theme_manager import ThemeManager, initialize_theme_system
 
@@ -6,35 +10,47 @@ def load_custom_css():
     # Initialize and apply theme system
     initialize_theme_system()
     ThemeManager.apply_theme_css()
-    
-    # Apply light/dark theme toggle
+
+    # Apply light/dark theme toggle if needed
     apply_theme_toggle()
-    
-    # Add accessibility improvements
-    from utils.accessibility import add_accessibility_css
-    add_accessibility_css()
 
 def apply_theme_toggle():
     """Apply light/dark theme based on user selection"""
-    # Get theme from session state, default to Light
     theme = st.session_state.get("theme", "Light")
-    
+
     if theme == "Dark":
-        # Inject dark mode CSS
         st.markdown("""
         <style>
-        /* Dark theme override styles */
+        /* Dark theme overrides */
         .stApp {
             background-color: #121212 !important;
             color: #eeeeee !important;
         }
-        
-        body {
-            background-color: #121212 !important;
+
+        .winter-card {
+            background: #1e1e1e !important;
+            border: 1px solid #333333 !important;
             color: #eeeeee !important;
         }
-        
-        .stButton>button {
+
+        .stTextInput > div > div > input,
+        .stSelectbox > div > div,
+        .stDateInput > div > div > input,
+        .stNumberInput > div > div > input {
+            background-color: #2d2d2d !important;
+            border-color: #444444 !important;
+            color: #eeeeee !important;
+        }
+
+        .css-1d391kg {
+            background-color: #1a1a1a !important;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            color: #eeeeee !important;
+        }
+
+                .stButton>button {
             background-color: #444444 !important;
             border-color: #444444 !important;
             color: #eeeeee !important;
@@ -44,42 +60,6 @@ def apply_theme_toggle():
             background-color: #555555 !important;
             border-color: #555555 !important;
         }
-        
-        .winter-card {
-            background: #1e1e1e !important;
-            border: 1px solid #333333 !important;
-            color: #eeeeee !important;
-        }
-        
-        .stTextInput > div > div > input {
-            background-color: #2d2d2d !important;
-            border-color: #444444 !important;
-            color: #eeeeee !important;
-        }
-        
-        .stSelectbox > div > div {
-            background-color: #2d2d2d !important;
-            border-color: #444444 !important;
-            color: #eeeeee !important;
-        }
-        
-        .stDateInput > div > div > input {
-            background-color: #2d2d2d !important;
-            border-color: #444444 !important;
-            color: #eeeeee !important;
-        }
-        
-        .stNumberInput > div > div > input {
-            background-color: #2d2d2d !important;
-            border-color: #444444 !important;
-            color: #eeeeee !important;
-        }
-        
-        /* Sidebar dark theme */
-        .css-1d391kg {
-            background-color: #1a1a1a !important;
-        }
-        
         /* Tabs dark theme */
         .stTabs [data-baseweb="tab-list"] {
             background-color: #2d2d2d !important;
@@ -95,7 +75,6 @@ def apply_theme_toggle():
             background-color: #444444 !important;
             color: #eeeeee !important;
         }
-        
         /* Progress bars */
         .stProgress > div > div {
             background-color: #333333 !important;
@@ -106,16 +85,6 @@ def apply_theme_toggle():
             background-color: #1e1e1e !important;
             border: 1px solid #333333 !important;
         }
-        
-        /* Headers and text */
-        h1, h2, h3, h4, h5, h6 {
-            color: #eeeeee !important;
-        }
-        
-        .stMarkdown {
-            color: #eeeeee !important;
-        }
-        
         /* Success/warning/error messages */
         .stSuccess {
             background-color: #1a4a1a !important;
@@ -149,16 +118,15 @@ def render_theme_toggle():
             index=0 if st.session_state.get("theme", "Light") == "Light" else 1,
             key="theme_toggle"
         )
-        
-        # Update session state when selection changes
+
         if theme_option != st.session_state.get("theme", "Light"):
             st.session_state["theme"] = theme_option
             st.rerun()
 
 def render_main_header():
-    """Render the enhanced sleek application header"""
+    """Render the enhanced application header"""
     st.markdown("""
-    <div class="main-header fade-in floating">
+    <div class="main-header fade-in">
         <h1 class="main-title">
             <i data-lucide="home" class="icon-large"></i>
             Snowbird: Your Seasonal Financial Assistant
@@ -172,16 +140,16 @@ def render_main_header():
     """, unsafe_allow_html=True)
 
 def render_metric_card(title: str, value: str, delta: str = None, icon: str = "activity"):
-    """Render a premium styled metric card with enhanced effects"""
+    """Render a styled metric card"""
     delta_html = f'<div style="color: var(--success); font-size: 0.9rem; margin-top: 0.5rem; font-weight: 600;">{delta}</div>' if delta else ""
 
     st.markdown(f"""
-    <div class="metric-card slide-up pulse-glow">
+    <div class="metric-card slide-up">
         <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
-            <i data-lucide="{icon}" class="icon-large" style="margin-right: 0.75rem; filter: drop-shadow(0 0 8px var(--primary));"></i>
+            <i data-lucide="{icon}" class="icon-large" style="margin-right: 0.75rem;"></i>
             <span style="color: var(--text-secondary); font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">{title}</span>
         </div>
-        <div style="color: var(--primary); font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem; text-shadow: var(--glow-primary);">{value}</div>
+        <div style="color: var(--primary); font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem;">{value}</div>
         {delta_html}
         <div style="position: absolute; top: 1rem; right: 1rem; opacity: 0.3;">
             <i data-lucide="trending-up" style="width: 20px; height: 20px; color: var(--accent);"></i>
@@ -199,10 +167,7 @@ def render_icon(name: str, size: str = "16", color: str = None):
     # Use span instead of i to avoid React conflicts
     st.markdown(f'<span class="lucide-icon" data-icon="{name}" style="width: {size}px; height: {size}px; {color_style}; display: inline-block;"></span>', unsafe_allow_html=True)
 """Basic styling for Snowbird app"""
-import streamlit as st
 
-def load_custom_css():
-    """Load custom CSS styles"""
     st.markdown("""
     <style>
     /* Light-blue accent for CTAs - consistent branding */
@@ -309,3 +274,4 @@ def render_main_header():
     st.title("❄️ Snowbird Financial Assistant 🏖️")
     st.markdown("Helping you fly between seasons with your finances in check.")
     st.markdown("---")
+```
