@@ -7,6 +7,7 @@ from utils.data_models import SnowbirdData
 from utils.logging_config import data_logger
 from utils.gmail_parser import GmailTravelParser
 from utils.error_handling import APIError, ErrorDisplay
+from utils.security import AuditLogger, DataPrivacy
 
 class AutoLocationTracker:
     """Automatic location tracking for audit trails"""

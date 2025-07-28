@@ -14,3 +14,5 @@ sentry-sdk[streamlit]
 structlog
 tenacity
 email-validator
+cryptography
+cryptography

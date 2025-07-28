@@ -17,6 +17,17 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Initialize security
+from utils.security import SessionSecurity, get_privacy_notice
+SessionSecurity.initialize_secure_session()
+
+# Check session validity
+if not SessionSecurity.check_session_validity():
+    st.warning("⏰ Your session has expired for security reasons. Please refresh the page.")
+    st.stop()
+else:
+    SessionSecurity.refresh_session()
+
 # Load custom styling
 from components.styles import load_custom_css, render_main_header
 load_custom_css()
@@ -54,6 +65,16 @@ def main():
 
     # Render styled header
     render_main_header()
+    
+    # Add privacy notice in sidebar
+    with st.sidebar:
+        with st.expander("🔒 Privacy & Security"):
+            st.markdown(get_privacy_notice())
+            
+            if st.button("Clear Session Data"):
+                SessionSecurity.clear_sensitive_data()
+                st.success("Session data cleared!")
+                st.rerun()
 
     # Create main navigation tabs
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([

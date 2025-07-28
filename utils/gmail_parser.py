@@ -13,6 +13,7 @@ from google.auth.transport.requests import Request
 from utils.auth import authenticate_gmail
 from utils.logging_config import data_logger
 from utils.error_handling import APIError
+from utils.security import DataEncryption, DataPrivacy, AuditLogger
 import streamlit as st
 
 class GmailTravelParser:
@@ -87,6 +88,9 @@ class GmailTravelParser:
                 if email_data:
                     travel_emails.append(email_data)
             
+            # Log Gmail access for audit purposes
+            AuditLogger.log_gmail_access(len(travel_emails))
+            
             return travel_emails
             
         except Exception as e:
@@ -106,6 +110,10 @@ class GmailTravelParser:
             
             # Extract body
             body = self.extract_email_body(message['payload'])
+            
+            # Sanitize email content for privacy
+            body = DataPrivacy.sanitize_email_content(body)
+            subject = DataPrivacy.sanitize_email_content(subject)
             
             # Parse for travel information
             travel_info = self.parse_travel_information(subject, body, sender)
