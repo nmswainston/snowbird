@@ -16,6 +16,16 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Initialize Firebase authentication
+from components.auth_components import check_authentication, render_logout_button
+from utils.profile_sync import initialize_user_session, save_user_session, get_profile_sync
+
+# Check authentication first
+user = check_authentication()
+
+# Initialize user session with profile data
+initialize_user_session()
+
 # Initialize security
 from utils.security import SessionSecurity, get_privacy_notice
 SessionSecurity.initialize_secure_session()
@@ -65,8 +75,14 @@ def main():
     # Render styled header
     render_main_header()
 
-    # Add privacy notice in sidebar
+    # Add user profile and logout in sidebar
     with st.sidebar:
+        render_logout_button()
+        
+        with st.expander("👤 User Profile"):
+            from components.auth_components import render_user_profile
+            render_user_profile()
+        
         with st.expander("🔒 Privacy & Security"):
             st.markdown(get_privacy_notice())
 
@@ -74,6 +90,12 @@ def main():
                 SessionSecurity.clear_sensitive_data()
                 st.success("Session data cleared!")
                 st.rerun()
+                
+            if st.button("Save Profile Data"):
+                if save_user_session():
+                    st.success("✅ Profile data saved!")
+                else:
+                    st.error("❌ Failed to save profile data")
 
     # Import analytics
     from components.analytics import track_page_view, track_user_action, track_feature_usage
@@ -139,8 +161,14 @@ def main():
         location = st.radio("Where are you today?", ("Arizona", "Minnesota"))
         if st.button(f"Log a day in {location}"):
             st.session_state.states[location] += 1
-            track_user_action("log_day", {"location": location, "total_days": st.session_state.states[location]})
-            st.success(f"Logged a day in {location}!")
+            
+            # Sync with user profile
+            sync = get_profile_sync()
+            if sync.sync_location_data(user['uid'], st.session_state.states):
+                track_user_action("log_day", {"location": location, "total_days": st.session_state.states[location]})
+                st.success(f"Logged a day in {location}!")
+            else:
+                st.warning("Day logged locally, but failed to sync with cloud. Data will sync automatically later.")
         st.markdown('</div>', unsafe_allow_html=True)
 
         # Show current totals

@@ -23,5 +23,7 @@ streamlit-analytics
 psutil
 mixpanel
 streamlit-authenticator
-psutil
-psutil
+firebase-admin
+google-cloud-firestore
+pyrebase4
+streamlit-firebase-auth
