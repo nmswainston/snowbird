@@ -72,19 +72,35 @@ class SnowbirdData:
         Initializes the SnowbirdData class with default values.
         """
         self.tax_threshold = 183
+        
+        # State-specific tax residency thresholds
+        self.state_tax_thresholds = {
+            "Arizona": 183,
+            "Minnesota": 183,
+            "Florida": 183,  # No income tax, but for other purposes
+            "California": 183,  # But has additional substantial presence test
+            "Texas": 183,  # No income tax
+            "Nevada": 183,  # No income tax
+            "New York": 183,
+            "Default": 183  # Fallback for unlisted states
+        }
 
-    def get_tax_status(self, days: int, threshold: int = None):
+    def get_tax_status(self, days: int, threshold: int = None, state: str = None):
         """Get tax residency status for a state
 
         Args:
             days (int): Number of days spent in the state.
             threshold (int, optional): Tax residency threshold. Defaults to None.
+            state (str, optional): State name for state-specific threshold. Defaults to None.
 
         Returns:
             tuple: A tuple containing tax status and its severity.
         """
         if threshold is None:
-            threshold = self.tax_threshold
+            if state and state in self.state_tax_thresholds:
+                threshold = self.state_tax_thresholds[state]
+            else:
+                threshold = self.state_tax_thresholds.get("Default", self.tax_threshold)
 
         percentage = (days / threshold) * 100
         if days >= threshold:
