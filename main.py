@@ -7,7 +7,169 @@ import csv
 from io import StringIO
 
 # Configure Streamlit for deployment
-st.set_page_config(page_title="Snowbird AI Financial Assistant", layout="wide")
+st.set_page_config(
+    page_title="Snowbird AI Financial Assistant", 
+    layout="wide",
+    page_icon="❄️",
+    initial_sidebar_state="expanded"
+)
+
+# Custom CSS for better appearance
+st.markdown("""
+<style>
+    /* Main app styling */
+    .main > div {
+        padding: 2rem 1rem;
+    }
+    
+    /* Header styling */
+    .stApp > header {
+        background-color: transparent;
+    }
+    
+    /* Custom title styling */
+    .main-title {
+        text-align: center;
+        padding: 2rem 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 3rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .subtitle {
+        text-align: center;
+        color: #666;
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+    }
+    
+    /* Card-like containers */
+    .metric-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-left: 4px solid #667eea;
+        margin: 1rem 0;
+    }
+    
+    .warning-card {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    
+    .success-card {
+        background: #d4edda;
+        border: 1px solid #c3e6cb;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    
+    .info-card {
+        background: #d1ecf1;
+        border: 1px solid #bee5eb;
+        border-radius: 8px;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    
+    /* Button styling */
+    .stButton > button {
+        border-radius: 20px;
+        border: none;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .stButton > button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    /* Sidebar styling */
+    .css-1d391kg {
+        background-color: #f8f9fa;
+    }
+    
+    /* Metric styling */
+    .metric-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+        margin: 0.5rem 0;
+    }
+    
+    /* Progress bar styling */
+    .stProgress > div > div > div > div {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* Status indicators */
+    .status-safe {
+        color: #28a745;
+        font-weight: bold;
+    }
+    
+    .status-warning {
+        color: #ffc107;
+        font-weight: bold;
+    }
+    
+    .status-danger {
+        color: #dc3545;
+        font-weight: bold;
+    }
+    
+    /* Section headers */
+    .section-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin: 2rem 0 1rem 0;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #eee;
+    }
+    
+    /* Table styling */
+    .dataframe {
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Location detection styling */
+    .location-container {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        padding: 1.5rem;
+        border-radius: 15px;
+        color: white;
+        text-align: center;
+        margin: 1rem 0;
+    }
+    
+    /* Quick actions styling */
+    .quick-actions {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 10px;
+        border: 1px solid #dee2e6;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # Try to load OpenAI, handle if not available or no API key
 try:
@@ -117,9 +279,9 @@ if "current_location" not in st.session_state:
 if "last_nudge_date" not in st.session_state:
     st.session_state.last_nudge_date = None
 
-# Streamlit UI
-st.title("❄️ Snowbird AI Financial Assistant 🏖️")
-st.write("Helping you fly between seasons with your finances in check.")
+# Streamlit UI with enhanced styling
+st.markdown('<h1 class="main-title">❄️ Snowbird AI Financial Assistant 🏖️</h1>', unsafe_allow_html=True)
+st.markdown('<p class="subtitle">Helping you fly between seasons with your finances in check</p>', unsafe_allow_html=True)
 
 # Settings section
 with st.sidebar:
@@ -188,19 +350,20 @@ with st.sidebar:
             st.rerun()
 
 # Location tracking and logging
-st.header("📍 Location Tracking & Day Counter")
+st.markdown('<h2 class="section-header">📍 Location Tracking & Day Counter</h2>', unsafe_allow_html=True)
 
 # Location detection section
 col1, col2 = st.columns([2, 1])
 with col1:
-    st.subheader("🌐 Smart Location Detection")
+    st.markdown('<div class="location-container">', unsafe_allow_html=True)
+    st.markdown("### 🌐 Smart Location Detection")
     location_html = """
-    <div id="location-info">
-        <p>Click the button below to detect your current location:</p>
-        <button onclick="getLocation()" style="padding: 10px 20px; background-color: #0066cc; color: white; border: none; border-radius: 5px; cursor: pointer;">
+    <div id="location-info" style="text-align: center;">
+        <p style="margin-bottom: 1rem;">Click the button below to detect your current location:</p>
+        <button onclick="getLocation()" style="padding: 12px 24px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 25px; cursor: pointer; font-weight: bold; transition: transform 0.3s ease;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
             📍 Detect My Location
         </button>
-        <div id="location-result" style="margin-top: 10px;"></div>
+        <div id="location-result" style="margin-top: 15px; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 8px; min-height: 40px;"></div>
     </div>
     
     <script>
@@ -250,8 +413,10 @@ with col1:
     </script>
     """
     st.components.v1.html(location_html, height=200)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 with col2:
+    st.markdown('<div class="quick-actions">', unsafe_allow_html=True)
     st.subheader("📱 Quick Actions")
     today = datetime.date.today()
     st.write(f"📅 Today: {today.strftime('%B %d, %Y')}")
@@ -267,7 +432,8 @@ with col2:
                     consecutive_days += 1
                 else:
                     break
-            st.metric("🔥 Current Streak", f"{consecutive_days} days in {last_state}")
+            st.markdown(f'<div class="metric-container"><h4>🔥 Current Streak</h4><h2>{consecutive_days} days in {last_state}</h2></div>', unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # Manual day logging
 st.subheader("📝 Manual Day Logging")
@@ -358,39 +524,74 @@ def check_and_show_nudges():
 check_and_show_nudges()
 
 # Show budgets
-st.header("📊 Home Maintenance Budget")
+st.markdown('<h2 class="section-header">📊 Home Maintenance Budget</h2>', unsafe_allow_html=True)
 budget_home = st.selectbox("Select a home to view budget:", list(st.session_state.states.keys()))
 budget = st.session_state.home_budgets[budget_home]
-st.subheader(f"{budget_home} Budget")
+
+st.markdown(f'<div class="metric-card"><h3>🏠 {budget_home} Budget</h3>', unsafe_allow_html=True)
 
 # Display budget with total
 total_budget = 0
-for category, amount in budget.items():
-    st.write(f"- {category}: ${amount}/month")
+budget_cols = st.columns(len(budget))
+for i, (category, amount) in enumerate(budget.items()):
+    with budget_cols[i]:
+        st.metric(category, f"${amount}", delta="per month")
     total_budget += amount
-st.write(f"**Total Monthly Budget: ${total_budget}**")
+
+st.markdown(f'<h3 style="text-align: center; color: #667eea; margin-top: 1rem;">💰 Total Monthly Budget: ${total_budget}</h3></div>', unsafe_allow_html=True)
 
 # Seasonal cash flow
-st.header("💸 Seasonal Cash Flow Plan")
+st.markdown('<h2 class="section-header">💸 Seasonal Cash Flow Plan</h2>', unsafe_allow_html=True)
+st.markdown('<div class="metric-card">', unsafe_allow_html=True)
+
 total_seasonal = 0
-for category, amount in st.session_state.seasonal_cash_flow.items():
-    st.write(f"- {category}: ${amount}/month")
-    total_seasonal += amount
-st.write(f"**Total Monthly Seasonal Expenses: ${total_seasonal}**")
+if st.session_state.seasonal_cash_flow:
+    seasonal_cols = st.columns(min(3, len(st.session_state.seasonal_cash_flow)))
+    for i, (category, amount) in enumerate(st.session_state.seasonal_cash_flow.items()):
+        with seasonal_cols[i % 3]:
+            st.metric(category, f"${amount}", delta="per month")
+        total_seasonal += amount
+
+st.markdown(f'<h3 style="text-align: center; color: #667eea; margin-top: 1rem;">💰 Total Monthly Seasonal Expenses: ${total_seasonal}</h3></div>', unsafe_allow_html=True)
 
 # Residency tracker
-st.header("📅 Tax Residency Tracker")
-st.write(f"*Tax residency threshold: {st.session_state.tax_threshold} days*")
-for state, days in st.session_state.states.items():
-    st.write(f"{state}: {days} days")
-    if days >= st.session_state.tax_threshold:
-        st.warning(f"You may now be considered a tax resident of {state}!")
+st.markdown('<h2 class="section-header">📅 Tax Residency Tracker</h2>', unsafe_allow_html=True)
+st.markdown(f'<p style="text-align: center; font-style: italic; color: #666;">Tax residency threshold: {st.session_state.tax_threshold} days</p>', unsafe_allow_html=True)
 
-# Progress bars for visual representation
-st.subheader("Days Progress")
+# Create visual cards for each state
 for state, days in st.session_state.states.items():
     progress = min(days / st.session_state.tax_threshold, 1.0)
-    st.progress(progress, text=f"{state}: {days}/{st.session_state.tax_threshold} days")
+    
+    # Determine status and color
+    if days >= st.session_state.tax_threshold:
+        status = "🔴 TAX RESIDENT"
+        status_class = "status-danger"
+        card_class = "warning-card"
+    elif days >= st.session_state.tax_threshold * 0.85:
+        status = "⚠️ CRITICAL"
+        status_class = "status-warning" 
+        card_class = "warning-card"
+    elif days >= st.session_state.tax_threshold * 0.7:
+        status = "🟡 CAUTION"
+        status_class = "status-warning"
+        card_class = "info-card"
+    else:
+        status = "✅ SAFE"
+        status_class = "status-safe"
+        card_class = "success-card"
+    
+    st.markdown(f'''
+    <div class="{card_class}">
+        <h4>🏠 {state}</h4>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 1.2rem; font-weight: bold;">{days} days</span>
+            <span class="{status_class}">{status}</span>
+        </div>
+    </div>
+    ''', unsafe_allow_html=True)
+    
+    # Progress bar
+    st.progress(progress, text=f"{state}: {days}/{st.session_state.tax_threshold} days ({progress*100:.1f}%)")
 
 # Tax Information
 st.header("💰 State Tax Information")
@@ -576,35 +777,48 @@ with col2:
             st.write(f"• 🚨 Already exceeded threshold for {state}")
 
 # Enhanced AI Chat with Context
-st.header("🤖 Enhanced Snowbird AI Assistant")
+st.markdown('<h2 class="section-header">🤖 Enhanced Snowbird AI Assistant</h2>', unsafe_allow_html=True)
 
 # Add planning features
 col1, col2 = st.columns([2, 1])
 
 with col1:
+    st.markdown('<div class="metric-card">', unsafe_allow_html=True)
     question = st.text_input("💬 Ask about your travel plans, tax implications, or get smart suggestions:")
     
     # Quick suggestion buttons
-    st.write("**Quick Questions:**")
+    st.markdown("**⚡ Quick Questions:**")
     quick_questions = [
         "How many more days can I safely stay in Arizona?",
-        "What's my tax risk assessment?",
+        "What's my tax risk assessment?", 
         "Suggest an optimal travel schedule for next month",
         "Compare costs between my residences",
         "When should I plan my next move?"
     ]
     
-    for i, q in enumerate(quick_questions):
-        if st.button(q, key=f"quick_{i}"):
-            question = q
+    # Display quick questions in a more organized way
+    for i in range(0, len(quick_questions), 2):
+        cols = st.columns(2)
+        for j, col in enumerate(cols):
+            if i + j < len(quick_questions):
+                with col:
+                    if st.button(quick_questions[i + j], key=f"quick_{i+j}", use_container_width=True):
+                        question = quick_questions[i + j]
+    st.markdown('</div>', unsafe_allow_html=True)
 
 with col2:
-    st.write("**🎯 Smart Features:**")
-    st.write("• Real-time nudges")
-    st.write("• Risk assessments") 
-    st.write("• Travel optimization")
-    st.write("• Cost comparisons")
-    st.write("• Tax planning advice")
+    st.markdown('''
+    <div class="info-card">
+        <h4>🎯 Smart Features</h4>
+        <ul style="margin: 0; padding-left: 1.2rem;">
+            <li>🚨 Real-time nudges</li>
+            <li>📊 Risk assessments</li>
+            <li>🗓️ Travel optimization</li>
+            <li>💰 Cost comparisons</li>
+            <li>📋 Tax planning advice</li>
+        </ul>
+    </div>
+    ''', unsafe_allow_html=True)
 
 if st.button("🚀 Get AI Advice"):
     if not openai_available:
@@ -643,8 +857,12 @@ if st.button("🚀 Get AI Advice"):
             st.session_state.chat_response = f"Error: {e}"
 
 if st.session_state.chat_response:
-    st.markdown("**🤖 AI Response:**")
-    st.write(st.session_state.chat_response)
+    st.markdown('''
+    <div class="metric-card" style="border-left: 4px solid #28a745;">
+        <h4>🤖 AI Response:</h4>
+    </div>
+    ''', unsafe_allow_html=True)
+    st.markdown(st.session_state.chat_response)
 
 # Reset option
 st.header("🔄 Reset Data")
