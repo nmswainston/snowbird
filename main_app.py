@@ -895,8 +895,7 @@ def render_settings_tab():
                 "reminders": False
             }
 
-        # Create checkboxes for each widget in```python
- a two-column layout
+        # Create checkboxes for each widget in a two-column layout
         widget_col1, widget_col2 = st.columns(2)
 
         widget_keys = list(available_widgets.keys())
