@@ -8,7 +8,13 @@ def render_day_tracker():
     snowbird_data = SnowbirdData()
     
     st.markdown('<h2><i data-lucide="calendar-days" class="icon"></i>Residency Day Tracker</h2>', unsafe_allow_html=True)
-
+    
+    # Horizontal divider after header for visual separation
+    st.markdown("---")
+    
+    # Add spacing before residency section
+    st.write("")
+    
     # Current location logging
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
     st.markdown('**<i data-lucide="map-pin" class="icon"></i>Log Your Current Location**', unsafe_allow_html=True)
@@ -29,6 +35,9 @@ def render_day_tracker():
                 st.warning(message)
 
     st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Add spacing before activity section
+    st.write("")
 
     # Recent activity
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
@@ -43,6 +52,9 @@ def render_day_tracker():
         st.write("No activity logged yet. Start by logging your current location!")
 
     st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Add spacing before bulk operations section
+    st.write("")
 
     # Bulk operations - wrapped in expander to reduce visual noise
     st.markdown('<div class="winter-card">', unsafe_allow_html=True)
