@@ -29,63 +29,90 @@ ONBOARDING_STEPS = [
             "⚠️ Monitor tax residency risk", 
             "💰 Manage dual-home budgets",
             "🤖 Get AI financial advice"
-        ]
+        ],
+        "action_hint": "Click 'Next' to start your tour!"
     },
     {
-        "title": "Log Your Days 📅",
+        "title": "Step 1: Log Your First Day 📅",
         "body": """
-        **Stay Tax Compliant**
+        **Start Tracking Your Location**
         
-        Track which state you're in each day. Snowbird monitors your progress toward 
-        the 183-day tax residency threshold and alerts you when you're getting close.
+        After this tour, go to the **📅 Day Tracker** tab and log where you are today. 
+        This is crucial for tax residency tracking!
         
-        Your location data helps ensure you don't accidentally become a tax resident 
-        of the wrong state!
+        Snowbird monitors your progress toward the 183-day threshold and alerts you 
+        when you're getting close to becoming a tax resident.
         """,
         "icon": "map-pin",
         "features": [
-            "🏡 Daily location logging",
-            "📊 Visual progress tracking",
-            "⚡ Smart threshold alerts",
-            "📋 Tax-ready reports"
-        ]
+            "🏡 Click 'Day Tracker' tab",
+            "📍 Select your current state",
+            "✅ Click 'Log Day'",
+            "📊 Watch your progress update"
+        ],
+        "action_hint": "💡 Try it: After this tour, click the 'Day Tracker' tab and log your first day!"
     },
     {
-        "title": "Manage Budgets 💰",
+        "title": "Step 2: Check Your Progress 📊",
         "body": """
-        **Track Expenses Across Homes**
+        **Monitor Your Tax Residency Status**
         
-        Set and monitor budgets for utilities, insurance, HOA fees, and seasonal 
-        expenses across both of your residences. Get insights into your dual-home lifestyle costs.
+        The **📊 Dashboard** shows your current residency progress with visual charts 
+        and risk assessments. Check this regularly to stay compliant!
         
-        Plan ahead for travel, healthcare, and emergency expenses!
+        You'll see days remaining before hitting the 183-day threshold for each state.
         """,
-        "icon": "dollar-sign",
+        "icon": "bar-chart-3",
         "features": [
-            "🏠 Dual-home budget tracking",
-            "💸 Seasonal expense planning",
-            "📈 Spending analysis",
-            "💡 Cost optimization tips"
-        ]
+            "📊 View your Dashboard",
+            "🏜️ See Arizona days logged",
+            "❄️ See Minnesota days logged",
+            "⚠️ Check risk status"
+        ],
+        "action_hint": "💡 Try it: The Dashboard tab shows your real-time residency status!"
     },
     {
-        "title": "Ask Snowbird AI 🤖",
+        "title": "Step 3: Ask Snowbird AI 🤖",
         "body": """
-        **Your Personal Financial Assistant**
+        **Get Personalized Financial Advice**
         
-        Get personalized financial advice anytime! Our AI understands the unique 
-        challenges of seasonal residents and can help with tax strategies, 
-        budgeting tips, and financial planning.
+        Visit the **🤖 AI Assistant** tab to ask questions about tax residency, 
+        budgeting, or financial planning. Try asking about your specific situation!
         
-        Just ask any financial question and get expert guidance!
+        Example questions: "How close am I to the tax threshold?" or "Tips for managing dual-home expenses?"
         """,
         "icon": "brain",
         "features": [
-            "🎯 Personalized advice",
-            "📝 Tax strategy guidance", 
-            "💡 Budgeting recommendations",
-            "🔍 Seasonal planning tips"
-        ]
+            "🤖 Click 'AI Assistant' tab",
+            "💬 Type your question",
+            "📝 Get personalized advice",
+            "👍👎 Rate the response"
+        ],
+        "action_hint": "💡 Try it: Ask the AI about tax residency strategies for snowbirds!"
+    },
+    {
+        "title": "You're All Set! 🎉",
+        "body": """
+        **Ready to Manage Your Seasonal Finances**
+        
+        You now know how to:
+        ✅ Log your daily location
+        ✅ Monitor your tax residency progress
+        ✅ Get AI-powered financial advice
+        
+        **Pro Tips:**
+        • Check your dashboard weekly
+        • Set up budget tracking in the Budgets tab
+        • Use Settings to customize notifications
+        """,
+        "icon": "check-circle",
+        "features": [
+            "🚀 Start logging your days",
+            "📱 Bookmark this app",
+            "🔔 Set up notifications",
+            "❓ Use Help if you need guidance"
+        ],
+        "action_hint": "🎯 Click 'Get Started!' to begin using Snowbird!"
     }
 ]
 
@@ -149,11 +176,12 @@ def render_onboarding_carousel():
         background: white;
         border-radius: 16px;
         padding: 2rem;
-        max-width: 600px;
+        max-width: 700px;
         width: 90%;
-        max-height: 80vh;
+        max-height: 85vh;
         overflow-y: auto;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        border: 2px solid #12BDF2;
     }
     
     .onboarding-header {
@@ -212,6 +240,28 @@ def render_onboarding_carousel():
         color: #64748b;
         font-size: 0.9rem;
     }
+    
+    .action-hint {
+        background: linear-gradient(90deg, #12BDF2, #06b6d4);
+        color: white;
+        padding: 1rem;
+        border-radius: 12px;
+        margin: 1.5rem 0;
+        font-weight: 600;
+        text-align: center;
+        border-left: 4px solid #0891b2;
+    }
+    
+    .onboarding-close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: #64748b;
+        cursor: pointer;
+    }
     </style>
     """, unsafe_allow_html=True)
     
@@ -241,6 +291,14 @@ def render_onboarding_carousel():
         </div>
         """, unsafe_allow_html=True)
         
+        # Close button
+        col_close1, col_close2 = st.columns([6, 1])
+        with col_close2:
+            if st.button("✕", key="onboarding_close", help="Close tour"):
+                st.session_state.onboarded = True
+                st.session_state.onboarding_dismissed = True
+                st.rerun()
+        
         # Step content
         st.markdown(step_data['body'])
         
@@ -250,6 +308,10 @@ def render_onboarding_carousel():
             for feature in step_data['features']:
                 st.markdown(f'<div class="feature-item">{feature}</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
+        
+        # Action hint
+        if 'action_hint' in step_data:
+            st.markdown(f'<div class="action-hint">{step_data["action_hint"]}</div>', unsafe_allow_html=True)
         
         # Navigation
         col_nav1, col_nav2, col_nav3 = st.columns([1, 2, 1])

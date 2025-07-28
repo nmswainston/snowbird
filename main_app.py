@@ -5,6 +5,7 @@ from components.dashboard import render_dashboard
 from components.day_tracker import render_day_tracker
 from utils.auth import check_openai_availability
 from utils.data_models import SnowbirdData
+from utils.onboarding import render_onboarding_carousel, should_show_onboarding, render_onboarding_trigger
 
 # Configure Streamlit
 st.set_page_config(
@@ -55,6 +56,11 @@ def main():
 
     # Render main header
     render_main_header()
+
+    # Show onboarding tour for first-time users
+    if should_show_onboarding():
+        render_onboarding_carousel()
+        return  # Don't render the rest of the app during onboarding
 
     # Dashboard now includes integrated quick actions
 
@@ -542,6 +548,10 @@ def render_settings_tab():
         st.session_state.ai_features = ai_features
 
         st.subheader("System Information")
+
+        # Onboarding restart option
+        st.markdown("**Onboarding & Help**")
+        render_onboarding_trigger()
 
         if st.button("📊 Show System Info"):
             try:

@@ -68,6 +68,22 @@ def initialize_session_state():
     if 'theme_animations_enabled' not in st.session_state:
         st.session_state.theme_animations_enabled = True
 
+    # Onboarding tracking
+    if 'onboarded' not in st.session_state:
+        st.session_state.onboarded = False
+
+    if 'onboarding_step' not in st.session_state:
+        st.session_state.onboarding_step = 0
+
+    if 'onboarding_dismissed' not in st.session_state:
+        st.session_state.onboarding_dismissed = False
+
+    if 'first_day_logged' not in st.session_state:
+        st.session_state.first_day_logged = False
+
+    if 'ai_question_asked' not in st.session_state:
+        st.session_state.ai_question_asked = False
+
 def reset_session_state():
     """Reset session state to defaults"""
     for key in list(st.session_state.keys()):
