@@ -22,11 +22,15 @@ def render_day_tracker():
     col1, col2 = st.columns([2, 1])
 
     with col1:
+        # Updated selectbox label for clearer microcopy - asking where user is today
         current_location = st.selectbox("Where are you today?", list(st.session_state.states.keys()))
         custom_date = st.date_input("Select date:", value=datetime.date.today())
+        # Added helpful caption explaining date picker default behavior
+        st.caption("Defaults to today—change if needed")
 
     with col2:
-        if st.button("Log Day", type="primary"):
+        # Changed button label to "Log Today" for clearer microcopy
+        if st.button("Log Today", type="primary"):
             success, message = snowbird_data.add_day_log(current_location, custom_date.isoformat())
             if success:
                 st.success(message)
@@ -65,7 +69,8 @@ def render_day_tracker():
         col1, col2 = st.columns(2)
 
         with col1:
-            bulk_state = st.selectbox("State for bulk operation:", list(st.session_state.states.keys()), key="bulk_state")
+            # Updated selectbox label to match main interface microcopy
+            bulk_state = st.selectbox("Which location for bulk operation?", list(st.session_state.states.keys()), key="bulk_state")
             bulk_days = st.number_input("Set total days:", min_value=0, max_value=365, value=st.session_state.states[bulk_state])
 
             if st.button("Update Total Days"):
