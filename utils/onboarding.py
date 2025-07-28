@@ -238,22 +238,25 @@ def render_onboarding_carousel():
     }
     
     .onboarding-nav .stButton > button {
-        min-width: 120px !important;
-        padding: 0.75rem 1.5rem !important;
-        font-size: 0.95rem !important;
+        min-width: 130px !important;
+        padding: 0.8rem 1.75rem !important;
+        font-size: 1rem !important;
         font-weight: 600 !important;
         border-radius: 12px !important;
         white-space: nowrap !important;
-        text-overflow: ellipsis !important;
-        overflow: hidden !important;
-        line-height: 1.4 !important;
-        letter-spacing: 0.01em !important;
+        text-overflow: clip !important;
+        overflow: visible !important;
+        line-height: 1.2 !important;
+        letter-spacing: 0.02em !important;
         height: auto !important;
-        min-height: 44px !important;
+        min-height: 48px !important;
         border: 2px solid transparent !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
         position: relative !important;
-        overflow: hidden !important;
+        text-transform: uppercase !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
     }
     
     /* Previous button - secondary styling */
@@ -364,8 +367,9 @@ def render_onboarding_carousel():
         .onboarding-nav .stButton > button {
             width: 100% !important;
             min-width: unset !important;
-            font-size: 0.9rem !important;
-            padding: 0.8rem 1rem !important;
+            font-size: 0.95rem !important;
+            padding: 0.9rem 1.25rem !important;
+            min-height: 50px !important;
         }
         
         .onboarding-modal {
@@ -444,7 +448,7 @@ def render_onboarding_carousel():
         
         with col_nav1:
             if current_step > 0:
-                if st.button("← Previous", key="onboarding_prev"):
+                if st.button("Previous", key="onboarding_prev"):
                     st.session_state.onboarding_step -= 1
                     st.rerun()
         
@@ -456,11 +460,11 @@ def render_onboarding_carousel():
         
         with col_nav3:
             if current_step < total_steps - 1:
-                if st.button("Next →", key="onboarding_next", type="primary"):
+                if st.button("Next", key="onboarding_next", type="primary"):
                     st.session_state.onboarding_step += 1
                     st.rerun()
             else:
-                if st.button("Get Started! 🚀", key="onboarding_finish", type="primary"):
+                if st.button("Get Started", key="onboarding_finish", type="primary"):
                     st.session_state.onboarded = True
                     st.balloons()  # Celebration effect
                     st.rerun()
