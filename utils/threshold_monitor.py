@@ -22,13 +22,16 @@ class ThresholdMonitor:
         Returns:
             List of threshold warnings with details
         """
+        from utils.data_models import SnowbirdData
         warnings = []
+        snowbird_data = SnowbirdData()
         
         # Get current state counts
         states = st.session_state.get('states', {})
-        threshold = st.session_state.get('tax_threshold', self.tax_threshold)
         
         for state, days in states.items():
+            # Get state-specific threshold
+            threshold = snowbird_data.state_tax_thresholds.get(state, snowbird_data.tax_threshold)
             remaining_days = threshold - days
             percentage = (days / threshold) * 100
             

@@ -255,9 +255,11 @@ def render_dashboard():
     
     # Loop through each state with enhanced mobile-responsive cards
     for state, days in st.session_state.states.items():
-        status_text, status_class = snowbird_data.get_tax_status(days, st.session_state.tax_threshold)
-        progress = min(days / st.session_state.tax_threshold, 1.0) if st.session_state.tax_threshold > 0 else 0
-        days_remaining = max(0, st.session_state.tax_threshold - days)
+        status_text, status_class = snowbird_data.get_tax_status(days, state=state)
+        # Get state-specific threshold
+        state_threshold = snowbird_data.state_tax_thresholds.get(state, snowbird_data.tax_threshold)
+        progress = min(days / state_threshold, 1.0) if state_threshold > 0 else 0
+        days_remaining = max(0, state_threshold - days)
         
         # State icon mapping
         state_icon = "🌵" if "Arizona" in state else "❄️" if "Minnesota" in state else "🏠"
@@ -277,8 +279,11 @@ def render_dashboard():
         state_col1, state_col2 = st.columns([2, 1])
         
         with state_col1:
+            # Get state-specific threshold for display
+            state_threshold = snowbird_data.state_tax_thresholds.get(state, snowbird_data.tax_threshold)
+            
             # Progress bar with percentage
-            st.progress(progress, text=f"{days}/{st.session_state.tax_threshold} days ({progress*100:.1f}%)")
+            st.progress(progress, text=f"{days}/{state_threshold} days ({progress*100:.1f}%)")ext=f"{days}/{st.session_state.tax_threshold} days ({progress*100:.1f}%)")
             
             # Status message with appropriate styling
             if status_text == "SAFE":

@@ -37,8 +37,19 @@ def get_tax_status_summary():
     if not hasattr(st.session_state, 'states') or not st.session_state.states:
         return {"status": "no_data", "message": "No location data available"}
     
-    max_days = max(st.session_state.states.values())
-    threshold = getattr(st.session_state, 'tax_threshold', 183)
+    from utils.data_models import SnowbirdData
+    snowbird_data = SnowbirdData()
+    
+    # Find the state with most days and its specific threshold
+    max_days = 0
+    max_state = ""
+    for state, days in st.session_state.states.items():
+        if days > max_days:
+            max_days = days
+            max_state = state
+    
+    # Use state-specific threshold
+    threshold = snowbird_data.state_tax_thresholds.get(max_state, snowbird_data.tax_threshold)
     remaining = threshold - max_days
     
     if remaining <= 0:

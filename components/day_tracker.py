@@ -200,8 +200,10 @@ def render_day_tracker():
         st.subheader("🎯 Current Status")
         
         for state, days in st.session_state.states.items():
-            status, severity = data_manager.get_tax_status(days)
-            percentage = (days / st.session_state.tax_threshold) * 100
+            status, severity = data_manager.get_tax_status(days, state=state)
+            # Get state-specific threshold
+            state_threshold = data_manager.state_tax_thresholds.get(state, data_manager.tax_threshold)
+            percentage = (days / state_threshold) * 100
             
             st.write(f"**{state}**: {days} days")
             st.write(f"Status: {status}")
