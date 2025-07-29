@@ -967,4 +967,68 @@ def render_settings_tab():
             }
 
         # Create checkboxes for each widget in a two-column layout
-        widget_col1, widget_
+        widget_col1, widget_col2 = st.columns(2)
+
+        # Display widgets in two columns
+        widget_keys = list(available_widgets.keys())
+        mid_point = len(widget_keys) // 2
+
+        with widget_col1:
+            for widget_key in widget_keys[:mid_point]:
+                widget_info = available_widgets[widget_key]
+                current_value = st.session_state.widgets.get(widget_key, True)
+                
+                new_value = st.checkbox(
+                    widget_info["name"],
+                    value=current_value,
+                    help=widget_info["description"],
+                    key=f"widget_{widget_key}"
+                )
+                st.session_state.widgets[widget_key] = new_value
+
+        with widget_col2:
+            for widget_key in widget_keys[mid_point:]:
+                widget_info = available_widgets[widget_key]
+                current_value = st.session_state.widgets.get(widget_key, True)
+                
+                new_value = st.checkbox(
+                    widget_info["name"],
+                    value=current_value,
+                    help=widget_info["description"],
+                    key=f"widget_{widget_key}"
+                )
+                st.session_state.widgets[widget_key] = new_value
+
+        # Quick actions for widget management
+        st.markdown("---")
+        widget_action_col1, widget_action_col2, widget_action_col3 = st.columns(3)
+
+        with widget_action_col1:
+            if st.button("✅ Enable All Widgets"):
+                for widget_key in available_widgets.keys():
+                    st.session_state.widgets[widget_key] = True
+                st.rerun()
+
+        with widget_action_col2:
+            if st.button("❌ Disable All Widgets"):
+                for widget_key in available_widgets.keys():
+                    st.session_state.widgets[widget_key] = False
+                st.rerun()
+
+        with widget_action_col3:
+            if st.button("🔄 Reset to Defaults"):
+                st.session_state.widgets = {
+                    "quick_location_logger": True,
+                    "key_metrics": True,
+                    "tax_progress": True,
+                    "quick_insights": True,
+                    "status_overview": True,
+                    "state_breakdown": True,
+                    "financial_summary": True,
+                    "ai_tips": False,
+                    "expense_sparkline": False,
+                    "reminders": False
+                }
+                st.rerun()
+
+        st.info("💡 Changes will take effect when you refresh the dashboard tab.")
