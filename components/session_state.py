@@ -75,6 +75,14 @@ def initialize_session_state():
     if 'theme_animations_enabled' not in st.session_state:
         st.session_state.theme_animations_enabled = True
 
+    # User preferences (required for auth_app.py)
+    if 'user_preferences' not in st.session_state:
+        st.session_state.user_preferences = {
+            'theme': 'light',
+            'notifications': True,
+            'auto_tracking': False
+        }
+
     # Pro User Features and Branding
     if 'is_pro_user' not in st.session_state:
         st.session_state.is_pro_user = False  # Default: not a Pro user
@@ -90,6 +98,16 @@ def initialize_session_state():
 
     if 'custom_secondary_color' not in st.session_state:
         st.session_state.custom_secondary_color = '#0284C7'  # Default secondary color
+
+    # Trip planning and financial data (required for auth_app.py)
+    if 'trip_plans' not in st.session_state:
+        st.session_state.trip_plans = []
+
+    if 'financial_notes' not in st.session_state:
+        st.session_state.financial_notes = []
+
+    if 'saved_destinations' not in st.session_state:
+        st.session_state.saved_destinations = []
 
     # Onboarding tracking
     if 'onboarded' not in st.session_state:
