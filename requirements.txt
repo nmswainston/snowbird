@@ -14,7 +14,6 @@ tenacity
 loguru
 sentry-sdk[streamlit]
 structlog
-tenacity
 email-validator
 cryptography
 Pillow
@@ -28,9 +27,7 @@ streamlit-authenticator
 firebase-admin
 google-cloud-firestore
 pyrebase4
-streamlit-authenticator
 schedule
-smtplib2
 requests>=2.31.0
 fastapi>=0.104.0
 uvicorn>=0.24.0
