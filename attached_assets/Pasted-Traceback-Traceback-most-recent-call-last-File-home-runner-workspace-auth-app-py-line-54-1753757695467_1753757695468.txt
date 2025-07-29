@@ -1,0 +1,48 @@
+Traceback:
+Traceback (most recent call last):
+  File "/home/runner/workspace/auth_app.py", line 542, in main
+    user = check_authentication()
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/components/auth_components.py", line 202, in check_authentication
+    render_auth_page()
+  File "/home/runner/workspace/components/auth_components.py", line 108, in render_auth_page
+    render_login_form()
+  File "/home/runner/workspace/components/auth_components.py", line 28, in render_login_form
+    st.rerun()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/metrics_util.py", line 443, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/commands/execution_control.py", line 154, in rerun
+    st.empty()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/metrics_util.py", line 443, in wrapped_func
+    result = non_optional_func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/elements/empty.py", line 100, in empty
+    return self.dg._enqueue("empty", empty_proto)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/delta_generator.py", line 501, in _enqueue
+    _enqueue_message(msg)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/scriptrunner_utils/script_run_context.py", line 297, in enqueue_message
+    ctx.enqueue(msg)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/scriptrunner_utils/script_run_context.py", line 205, in enqueue
+    self._enqueue(msg_to_send)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 410, in _enqueue_forward_msg
+    self._maybe_handle_execution_control_request()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.11/site-packages/streamlit/runtime/scriptrunner/script_runner.py", line 446, in _maybe_handle_execution_control_request
+    raise RerunException(request.rerun_data)
+streamlit.runtime.scriptrunner_utils.exceptions.RerunException: RerunData(page_script_hash='fad58de7366495db4650cfefac2fcd61', cached_message_hashes={'24853b06fbdd19ced7b137a364be1d9b'}, context_info=timezone: "America/Phoenix"
+timezone_offset: 420
+locale: "en-US"
+url: "https://72f378a8-11ab-4ebe-8efc-1f5ad259b190-00-rheuzsywcwto.worf.replit.dev/"
+is_embedded: false
+color_scheme: "light"
+)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/runner/workspace/main.py", line 39, in safe_main
+    main()
+  File "/home/runner/workspace/auth_app.py", line 556, in main
+    except st.stop:
+TypeError: catching classes that do not inherit from BaseException is not allowed
