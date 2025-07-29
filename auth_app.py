@@ -564,7 +564,9 @@ def main():
         if st.session_state.get('debug_mode', False):
             with st.expander("Debug Details"):
                 st.code(f"Error Type: {type(e).__name__}")
-                st.code(f"Error Message: {str(e)}") Fallback logout option
+                st.code(f"Error Message: {str(e)}")
+        
+        # Fallback logout option
         if st.button("🔄 Reset Session"):
             for key in list(st.session_state.keys()):
                 del st.session_state[key]
