@@ -265,6 +265,8 @@ def initialize_error_monitoring():
     try:
         import sentry_sdk
         from sentry_sdk.integrations.logging import LoggingIntegration
+        import logging
+        import os
         
         sentry_dsn = os.getenv('SENTRY_DSN')
         if sentry_dsn:
@@ -280,8 +282,10 @@ def initialize_error_monitoring():
                 environment=os.getenv('ENVIRONMENT', 'development')
             )
             logger.info("Sentry error monitoring initialized")
-    except ImportError:
-        logger.info("Sentry not available, using local error logging")
+    except (ImportError, ModuleNotFoundError, AttributeError) as e:
+        logger.info(f"Sentry not available, using local error logging: {e}")
+    except Exception as e:
+        logger.warning(f"Failed to initialize Sentry: {e}")
 
 def render_error_banner(error_type: str, message: str, show_details: bool = False):
     """Render user-friendly error banner"""

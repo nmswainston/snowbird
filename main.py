@@ -48,7 +48,18 @@ def safe_main():
         if st.button("🔄 Restart Application"):
             st.rerun()
 
-    except Exception as e:
+    except (AttributeError, ModuleNotFoundError, NameError) as e:
+        st.error("❌ **Module Error**")
+        st.write(f"Module configuration issue: {e}")
+        st.info("💡 **Solutions:**")
+        st.write("1. Check that all required files exist")
+        st.write("2. Verify imports are correct")
+        st.write("3. Restart the application")
+
+        if st.button("🔄 Restart Application"):
+            st.rerun()
+
+    except BaseException as e:
         st.error("🚨 **Application Error**")
         st.write("The Snowbird app encountered an unexpected error.")
 
