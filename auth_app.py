@@ -556,11 +556,15 @@ def main():
     except st.stop:
         # User not authenticated, auth page is already rendered
         pass
-    except Exception as e:
+    except BaseException as e:
         st.error(f"❌ Dashboard Error: {e}")
         st.write("Please refresh the page or contact support.")
         
-        # Fallback logout option
+        # Debug information
+        if st.session_state.get('debug_mode', False):
+            with st.expander("Debug Details"):
+                st.code(f"Error Type: {type(e).__name__}")
+                st.code(f"Error Message: {str(e)}") Fallback logout option
         if st.button("🔄 Reset Session"):
             for key in list(st.session_state.keys()):
                 del st.session_state[key]

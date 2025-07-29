@@ -284,7 +284,7 @@ def initialize_error_monitoring():
             logger.info("Sentry error monitoring initialized")
     except (ImportError, ModuleNotFoundError, AttributeError) as e:
         logger.info(f"Sentry not available, using local error logging: {e}")
-    except Exception as e:
+    except BaseException as e:
         logger.warning(f"Failed to initialize Sentry: {e}")
 
 def render_error_banner(error_type: str, message: str, show_details: bool = False):

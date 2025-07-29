@@ -1,8 +1,15 @@
 import streamlit as st
 from utils.data_models import (
     DEFAULT_STATES, DEFAULT_HOME_BUDGETS, DEFAULT_SEASONAL_CASH_FLOW,
-    DEFAULT_BILLS, DEFAULT_MIGRATION_CHECKLIST
+    DEFAULT_BILLS,
 )
+
+try:
+    from utils.data_models import DEFAULT_MIGRATION_CHECKLIST
+except ImportError:
+    # Fallback if data_models isn't available
+    DEFAULT_MIGRATION_CHECKLIST = []
+
 
 def initialize_session_state():
     """Initialize all session state variables with default values"""
@@ -71,16 +78,16 @@ def initialize_session_state():
     # Pro User Features and Branding
     if 'is_pro_user' not in st.session_state:
         st.session_state.is_pro_user = False  # Default: not a Pro user
-    
+
     if 'custom_logo_base64' not in st.session_state:
         st.session_state.custom_logo_base64 = None  # No custom logo by default
-    
+
     if 'custom_primary_color' not in st.session_state:
         st.session_state.custom_primary_color = '#0EA5E9'  # Default primary color
-    
+
     if 'custom_accent_color' not in st.session_state:
         st.session_state.custom_accent_color = '#38BDF8'  # Default accent color
-    
+
     if 'custom_secondary_color' not in st.session_state:
         st.session_state.custom_secondary_color = '#0284C7'  # Default secondary color
 
