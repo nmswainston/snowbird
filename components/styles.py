@@ -143,32 +143,41 @@ def render_main_header():
         # Any error, fall back to standard header
         pass
 
-    # Standard header for non-Pro users or fallback
+    # Standard header for non-Pro users or fallback with enhanced typography
     st.markdown("""
     <div class="main-header fade-in">
-        <h1 class="main-title">
-            <i data-lucide="home" class="icon-large"></i>
-            Snowbird: Your Seasonal Financial Assistant
-        </h1>
+        <div class="brand-logo">
+            <i data-lucide="home" class="icon-brand"></i>
+            <div class="brand-text">
+                <h1 class="main-title">Snowbird</h1>
+                <div class="brand-tagline">Seasonal Financial Assistant</div>
+            </div>
+        </div>
         <p class="subtitle">Manage your multi-state lifestyle with confidence and style</p>
-        <div style="margin-top: 1rem; opacity: 0.7; font-size: 0.9rem;">
-            <i data-lucide="sparkles" class="icon"></i>
-            Premium Financial Management Experience
+        <div class="header-badges">
+            <div class="feature-badge">
+                <i data-lucide="sparkles" class="badge-icon"></i>
+                Premium Financial Management
+            </div>
+            <div class="feature-badge">
+                <i data-lucide="shield-check" class="badge-icon"></i>
+                Secure & Private
+            </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
 
 def render_metric_card(title: str, value: str, delta: str = None, icon: str = "activity"):
-    """Render a styled metric card"""
-    delta_html = f'<div style="color: var(--success); font-size: 0.9rem; margin-top: 0.5rem; font-weight: 600;">{delta}</div>' if delta else ""
+    """Render a styled metric card with enhanced typography"""
+    delta_html = f'<div style="color: var(--success); font-family: \'Inter\', system-ui, sans-serif; font-size: 0.9rem; margin-top: 0.5rem; font-weight: 600; letter-spacing: -0.01em;">{delta}</div>' if delta else ""
 
     st.markdown(f"""
     <div class="metric-card slide-up">
         <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 1rem;">
             <i data-lucide="{icon}" class="icon-large" style="margin-right: 0.75rem;"></i>
-            <span style="color: var(--text-secondary); font-size: 1rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">{title}</span>
+            <span style="color: var(--text-secondary); font-family: 'Satoshi', 'Plus Jakarta Sans', system-ui, sans-serif; font-size: 0.875rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;">{title}</span>
         </div>
-        <div style="color: var(--primary); font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem;">{value}</div>
+        <div style="color: var(--primary); font-family: 'Satoshi', system-ui, sans-serif; font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 900; margin-bottom: 0.5rem; letter-spacing: -0.02em; line-height: 1.1;">{value}</div>
         {delta_html}
         <div style="position: absolute; top: 1rem; right: 1rem; opacity: 0.3;">
             <i data-lucide="trending-up" style="width: 20px; height: 20px; color: var(--accent);"></i>

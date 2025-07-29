@@ -236,8 +236,16 @@ class ThemeManager:
 
         css = f"""
         <style>
-            /* Premium font imports */
-            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@300;400;500;600;700;800&display=swap');
+            /* Premium font imports - Enhanced typography */
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Satoshi:wght@300;400;500;600;700;800;900&display=swap');
+            
+            /* Fallback for Satoshi font */
+            @font-face {
+                font-family: 'Satoshi-Fallback';
+                src: local('Inter'), local('system-ui'), local('-apple-system');
+                font-weight: 100 900;
+                font-style: normal;
+            }
 
             /* Enhanced CSS Variables */
             :root {{
@@ -276,16 +284,79 @@ class ThemeManager:
                 --overlay-medium: {theme.overlay_medium};
             }}
 
-            /* Global sleek styling */
+            /* Global sleek styling with enhanced typography */
             .stApp {{
                 background: var(--background-gradient);
-                font-family: 'Manrope', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                font-family: 'Plus Jakarta Sans', 'Satoshi', 'Satoshi-Fallback', 'Manrope', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
                 color: var(--text-primary);
                 min-height: 100vh;
                 font-weight: 400;
-                line-height: 1.6;
+                line-height: 1.7;
+                letter-spacing: -0.005em;
                 -webkit-font-smoothing: antialiased;
                 -moz-osx-font-smoothing: grayscale;
+                text-rendering: optimizeLegibility;
+                font-feature-settings: "liga" 1, "kern" 1, "calt" 1;
+            }}
+            
+            /* Enhanced typography hierarchy */
+            h1, h2, h3, h4, h5, h6 {{
+                font-family: 'Satoshi', 'Plus Jakarta Sans', 'Manrope', system-ui, sans-serif;
+                font-weight: 700;
+                letter-spacing: -0.02em;
+                line-height: 1.3;
+                margin-bottom: 0.75em;
+                color: var(--text-primary);
+            }}
+            
+            h1 {{ 
+                font-size: clamp(2rem, 5vw, 3.5rem); 
+                font-weight: 800; 
+                letter-spacing: -0.04em; 
+            }}
+            
+            h2 {{ 
+                font-size: clamp(1.5rem, 4vw, 2.5rem); 
+                font-weight: 700; 
+                letter-spacing: -0.03em; 
+            }}
+            
+            h3 {{ 
+                font-size: clamp(1.25rem, 3vw, 2rem); 
+                font-weight: 600; 
+                letter-spacing: -0.02em; 
+            }}
+            
+            h4 {{ 
+                font-size: clamp(1.125rem, 2.5vw, 1.5rem); 
+                font-weight: 600; 
+            }}
+            
+            h5 {{ 
+                font-size: clamp(1rem, 2vw, 1.25rem); 
+                font-weight: 600; 
+            }}
+            
+            h6 {{ 
+                font-size: clamp(0.875rem, 1.5vw, 1.125rem); 
+                font-weight: 600; 
+            }}
+            
+            /* Enhanced body text */
+            p, .stMarkdown p {{
+                font-family: 'Inter', 'Plus Jakarta Sans', system-ui, sans-serif;
+                font-weight: 400;
+                line-height: 1.7;
+                letter-spacing: -0.003em;
+                margin-bottom: 1em;
+                color: var(--text-primary);
+            }}
+            
+            /* Enhanced code and monospace */
+            code, pre, .stCode {{
+                font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', monospace;
+                font-feature-settings: "liga" 1, "calt" 1;
+                font-variant-ligatures: contextual;
             }}
 
             /* Sleek container styling */
@@ -323,24 +394,41 @@ class ThemeManager:
 
             .main-title {{
                 color: var(--primary);
-                font-size: clamp(2rem, 5vw, 3.5rem);
-                font-weight: 800;
+                font-family: 'Satoshi', 'Plus Jakarta Sans', system-ui, sans-serif;
+                font-size: clamp(2.25rem, 6vw, 4rem);
+                font-weight: 900;
                 margin-bottom: 1rem;
-                letter-spacing: -0.03em;
+                letter-spacing: -0.04em;
                 background: var(--primary-gradient);
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 background-clip: text;
                 text-shadow: var(--glow-primary);
-                line-height: 1.2;
+                line-height: 1.1;
+                text-rendering: optimizeLegibility;
+                font-feature-settings: "liga" 1, "kern" 1;
             }}
 
             .subtitle {{
                 color: var(--text-secondary);
-                font-size: 1.25rem;
+                font-family: 'Inter', 'Plus Jakarta Sans', system-ui, sans-serif;
+                font-size: clamp(1.125rem, 2.5vw, 1.375rem);
                 font-weight: 500;
-                letter-spacing: -0.01em;
+                letter-spacing: -0.015em;
                 opacity: 0.9;
+                line-height: 1.5;
+                max-width: 42em;
+                margin: 0 auto;
+            }}
+            
+            .brand-tagline {{
+                font-family: 'Inter', system-ui, sans-serif;
+                font-size: clamp(0.875rem, 1.5vw, 1rem);
+                font-weight: 600;
+                letter-spacing: 0.05em;
+                text-transform: uppercase;
+                opacity: 0.8;
+                margin-top: 0.5rem;
             }}
 
             /* Enhanced glass-effect cards */
@@ -380,22 +468,24 @@ class ThemeManager:
                 opacity: 1;
             }}
 
-            /* Premium button styling */
+            /* Premium button styling with enhanced typography */
             .stButton > button {{
                 background: var(--primary-gradient) !important;
                 color: white !important;
                 border: none !important;
                 border-radius: 14px !important;
                 padding: 1rem 2rem !important;
+                font-family: 'Satoshi', 'Plus Jakarta Sans', system-ui, sans-serif !important;
                 font-weight: 700 !important;
-                font-size: 1rem !important;
-                letter-spacing: -0.01em !important;
+                font-size: clamp(0.875rem, 1.5vw, 1rem) !important;
+                letter-spacing: 0.025em !important;
                 transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
                 box-shadow: var(--shadow-secondary) !important;
                 position: relative !important;
                 overflow: hidden !important;
                 text-transform: uppercase !important;
                 min-height: 54px !important;
+                text-rendering: optimizeLegibility !important;
             }}
 
             .stButton > button::before {{
@@ -469,16 +559,19 @@ class ThemeManager:
             }}
 
             .stTabs [data-baseweb="tab"] {{
-                height: 40px;
+                height: 44px;
                 padding: 0 1.5rem;
                 background: transparent;
                 border-radius: 8px;
                 color: var(--text-secondary);
                 border: 0.5px solid var(--border-light);
-                font-weight: 500;
-                font-size: 0.9rem;
+                font-family: 'Satoshi', 'Plus Jakarta Sans', system-ui, sans-serif;
+                font-weight: 600;
+                font-size: clamp(0.875rem, 1.5vw, 0.95rem);
+                letter-spacing: -0.01em;
                 transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                 position: relative;
+                text-rendering: optimizeLegibility;
             }}
 
             .stTabs [aria-selected="true"] {{
@@ -532,16 +625,35 @@ class ThemeManager:
                 border-right: 1px solid var(--border-light) !important;
             }}
 
-            /* Sleek input styling */
+            /* Sleek input styling with enhanced typography */
             .stTextInput > div > div > input {{
                 background: var(--overlay-light) !important;
                 border: 0.5px solid var(--border-light) !important;
                 border-radius: 8px !important;
                 color: var(--text-primary) !important;
+                font-family: 'Inter', 'Plus Jakarta Sans', system-ui, sans-serif !important;
                 font-weight: 500 !important;
-                padding: 0.5rem 0.75rem !important;
+                font-size: 0.95rem !important;
+                letter-spacing: -0.005em !important;
+                padding: 0.75rem 1rem !important;
                 transition: all 0.3s ease !important;
                 backdrop-filter: blur(5px) !important;
+                line-height: 1.5 !important;
+            }}
+            
+            .stTextInput > div > div > input::placeholder {{
+                color: var(--text-secondary) !important;
+                opacity: 0.7 !important;
+                font-weight: 400 !important;
+            }}
+            
+            .stNumberInput > div > div > input,
+            .stDateInput > div > div > input,
+            .stTimeInput > div > div > input {{
+                font-family: 'Inter', 'Plus Jakarta Sans', system-ui, sans-serif !important;
+                font-weight: 500 !important;
+                font-size: 0.95rem !important;
+                letter-spacing: -0.005em !important;
             }}
 
             .stTextInput > div > div > input:focus {{
