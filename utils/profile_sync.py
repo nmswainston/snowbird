@@ -1,4 +1,3 @@
-
 """
 Profile synchronization utilities for the Snowbird app.
 Syncs local session state with Firebase user profiles.
@@ -6,9 +5,155 @@ Syncs local session state with Firebase user profiles.
 
 import streamlit as st
 from typing import Dict, Any, Optional
+from datetime import datetime, timedelta
+import threading
+import time
 from utils.firebase_auth import get_firebase_auth
 from utils.firebase_database import get_firebase_database
-from utils.logging_config import logger
+from utils.logger import logger
+
+class RealTimeSync:
+    """Handles real-time synchronization of user data"""
+
+    def __init__(self):
+        self.sync_thread = None
+        self.stop_sync = False
+        self.last_remote_update = None
+
+    def start_sync(self, uid: str, sync_interval: int = 10):
+        """Start real-time synchronization thread"""
+        if self.sync_thread and self.sync_thread.is_alive():
+            return
+
+        self.stop_sync = False
+        self.sync_thread = threading.Thread(
+            target=self._sync_worker,
+            args=(uid, sync_interval),
+            daemon=True
+        )
+        self.sync_thread.start()
+        logger.info(f"Started real-time sync for user {uid}")
+
+    def stop_sync_thread(self):
+        """Stop the synchronization thread"""
+        self.stop_sync = True
+        if self.sync_thread:
+            self.sync_thread.join(timeout=1)
+        logger.info("Stopped real-time sync")
+
+    def _sync_worker(self, uid: str, interval: int):
+        """Background worker for syncing data"""
+        db = get_firebase_database()
+
+        while not self.stop_sync:
+            try:
+                # Check for remote updates
+                profile = db.get_user_profile(uid)
+
+                if profile:
+                    remote_updated = profile.get('updated_at')
+
+                    if remote_updated and (
+                        not self.last_remote_update or 
+                        remote_updated > self.last_remote_update
+                    ):
+                        # Remote data is newer, update local session
+                        self._update_session_from_remote(profile)
+                        self.last_remote_update = remote_updated
+
+                        # Trigger UI refresh
+                        if 'sync_trigger' not in st.session_state:
+                            st.session_state.sync_trigger = 0
+                        st.session_state.sync_trigger += 1
+
+                time.sleep(interval)
+
+            except Exception as e:
+                logger.error(f"Sync worker error: {e}")
+                time.sleep(interval * 2)  # Wait longer on error
+
+    def _update_session_from_remote(self, profile: Dict[str, Any]):
+        """Update session state with remote profile data"""
+        try:
+            # Only update if the remote data is actually newer
+            if 'states' in profile:
+                st.session_state.states = profile['states']
+
+            if 'home_budgets' in profile:
+                st.session_state.home_budgets = profile['home_budgets']
+
+            if 'seasonal_cash_flow' in profile:
+                st.session_state.seasonal_cash_flow = profile['seasonal_cash_flow']
+
+            if 'preferences' in profile:
+                st.session_state.user_preferences = profile['preferences']
+
+            st.session_state.last_remote_sync = datetime.now()
+            logger.info("Updated session state from remote data")
+
+        except Exception as e:
+            logger.error(f"Failed to update session from remote: {e}")
+
+# Global sync instance
+real_time_sync = RealTimeSync()
+
+def sync_user_data(uid: str, data: Dict[str, Any]) -> bool:
+    """Sync user data to Firebase"""
+    try:
+        db = get_firebase_database()
+
+        # Add timestamp
+        data['updated_at'] = datetime.now()
+        data['synced_from'] = 'streamlit_session'
+
+        success = db.update_user_profile(uid, data)
+
+        if success:
+            logger.info(f"Successfully synced data for user {uid}")
+        else:
+            logger.error(f"Failed to sync data for user {uid}")
+
+        return success
+
+    except Exception as e:
+        logger.error(f"Sync error for user {uid}: {e}")
+        return False
+
+def watch_user_data_changes(uid: str):
+    """Start watching for real-time data changes"""
+    real_time_sync.start_sync(uid)
+
+def stop_watching_changes():
+    """Stop watching for data changes"""
+    real_time_sync.stop_sync_thread()
+
+def get_sync_status() -> Dict[str, Any]:
+    """Get current synchronization status"""
+    return {
+        'is_syncing': real_time_sync.sync_thread and real_time_sync.sync_thread.is_alive(),
+        'last_remote_sync': st.session_state.get('last_remote_sync'),
+        'last_local_sync': st.session_state.get('last_sync'),
+        'sync_trigger_count': st.session_state.get('sync_trigger', 0)
+    }
+
+def force_sync(uid: str) -> bool:
+    """Force an immediate sync of current session data"""
+    auth = get_firebase_auth()
+    user = auth.get_current_user()
+
+    if not user or user['uid'] != uid:
+        return False
+
+    # Collect current session data
+    sync_data = {
+        'states': st.session_state.get('states', {}),
+        'home_budgets': st.session_state.get('home_budgets', {}),
+        'seasonal_cash_flow': st.session_state.get('seasonal_cash_flow', {}),
+        'preferences': st.session_state.get('user_preferences', {}),
+        'last_activity': datetime.now()
+    }
+
+    return sync_user_data(uid, sync_data)
 
 class ProfileSync:
     """Profile synchronization manager"""

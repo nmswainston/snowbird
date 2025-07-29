@@ -27,8 +27,8 @@ initialize_session_state()
 def safe_main():
     """Safely run the main application with error handling"""
     try:
-        # Try to import and run main app
-        from main_app import main
+        # Try to import and run auth app
+        from auth_app import main
 
         # Load custom CSS
         load_custom_css()

@@ -1,184 +1,122 @@
-
-"""
-Professional loading states and micro-interactions for Snowbird
-"""
-
 import streamlit as st
 import time
-from typing import Optional, Callable, Any
+from typing import Optional
 
-def render_loading_spinner(message: str = "Loading...", duration: Optional[float] = None):
-    """Render a professional loading spinner with message"""
-    st.markdown(f"""
-    <div class="loading-container">
-        <div class="loading-spinner"></div>
-        <div class="loading-message">{message}</div>
-    </div>
-    
-    <style>
-    .loading-container {{
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem;
-        gap: 1rem;
-    }}
-    
-    .loading-spinner {{
-        width: 40px;
-        height: 40px;
-        border: 3px solid var(--border-light);
-        border-top: 3px solid var(--primary);
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        box-shadow: 0 0 20px rgba(14, 165, 233, 0.3);
-    }}
-    
-    .loading-message {{
-        color: var(--text-secondary);
-        font-weight: 500;
-        font-size: 0.95rem;
-        text-align: center;
-    }}
-    
-    @keyframes spin {{
-        0% {{ transform: rotate(0deg); }}
-        100% {{ transform: rotate(360deg); }}
-    }}
-    </style>
-    """, unsafe_allow_html=True)
-    
+def show_loading(message: str = "Loading...", duration: Optional[float] = None):
+    """Show a loading message with spinner"""
+    placeholder = st.empty()
+
+    with placeholder.container():
+        st.markdown(f"""
+        <div style="display: flex; align-items: center; padding: 1rem; 
+                    background-color: #f0f8ff; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+            <div style="margin-right: 10px;">🔄</div>
+            <div>{message}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
     if duration:
         time.sleep(duration)
+        placeholder.empty()
 
-def render_skeleton_loader(lines: int = 3, height: str = "20px"):
-    """Render skeleton loading placeholders"""
-    skeleton_html = ""
-    for i in range(lines):
-        width = "100%" if i < lines - 1 else "75%"
-        skeleton_html += f'<div class="skeleton-line" style="width: {width}; height: {height};"></div>'
-    
-    st.markdown(f"""
-    <div class="skeleton-container">
-        {skeleton_html}
+    return placeholder
+
+def show_success(message: str, duration: float = 2.0):
+    """Show a success message"""
+    placeholder = st.empty()
+
+    with placeholder.container():
+        st.markdown(f"""
+        <div style="display: flex; align-items: center; padding: 1rem; 
+                    background-color: #f0fdf4; border-radius: 8px; border-left: 4px solid #22c55e;">
+            <div style="margin-right: 10px;">✅</div>
+            <div style="color: #16a34a;">{message}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    time.sleep(duration)
+    placeholder.empty()
+
+def show_error(message: str, duration: float = 3.0):
+    """Show an error message"""
+    placeholder = st.empty()
+
+    with placeholder.container():
+        st.markdown(f"""
+        <div style="display: flex; align-items: center; padding: 1rem; 
+                    background-color: #fef2f2; border-radius: 8px; border-left: 4px solid #ef4444;">
+            <div style="margin-right: 10px;">❌</div>
+            <div style="color: #dc2626;">{message}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    time.sleep(duration)
+    placeholder.empty()
+
+def show_warning(message: str, duration: float = 2.5):
+    """Show a warning message"""
+    placeholder = st.empty()
+
+    with placeholder.container():
+        st.markdown(f"""
+        <div style="display: flex; align-items: center; padding: 1rem; 
+                    background-color: #fffbeb; border-radius: 8px; border-left: 4px solid #f59e0b;">
+            <div style="margin-right: 10px;">⚠️</div>
+            <div style="color: #d97706;">{message}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    time.sleep(duration)
+    placeholder.empty()
+
+def show_info(message: str, duration: float = 2.0):
+    """Show an info message"""
+    placeholder = st.empty()
+
+    with placeholder.container():
+        st.markdown(f"""
+        <div style="display: flex; align-items: center; padding: 1rem; 
+                    background-color: #f0f9ff; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+            <div style="margin-right: 10px;">ℹ️</div>
+            <div style="color: #0284c7;">{message}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+    time.sleep(duration)
+    placeholder.empty()
+
+def create_status_indicator(status: str, message: str = "") -> str:
+    """Create a status indicator HTML"""
+    status_configs = {
+        'online': {'color': '#22c55e', 'icon': '🟢', 'text': 'Online'},
+        'offline': {'color': '#ef4444', 'icon': '🔴', 'text': 'Offline'},
+        'syncing': {'color': '#f59e0b', 'icon': '🔄', 'text': 'Syncing'},
+        'error': {'color': '#ef4444', 'icon': '❌', 'text': 'Error'},
+        'warning': {'color': '#f59e0b', 'icon': '⚠️', 'text': 'Warning'}
+    }
+
+    config = status_configs.get(status, status_configs['offline'])
+    display_text = message or config['text']
+
+    return f"""
+    <div style="display: inline-flex; align-items: center; padding: 0.25rem 0.5rem; 
+                background-color: {config['color']}20; border-radius: 12px; 
+                border: 1px solid {config['color']}40;">
+        <span style="margin-right: 4px;">{config['icon']}</span>
+        <span style="color: {config['color']}; font-size: 0.875rem;">{display_text}</span>
     </div>
-    
-    <style>
-    .skeleton-container {{
-        padding: 1rem;
-        gap: 0.75rem;
-        display: flex;
-        flex-direction: column;
-    }}
-    
-    .skeleton-line {{
-        background: linear-gradient(90deg, var(--border-light) 25%, var(--surface) 50%, var(--border-light) 75%);
-        background-size: 200% 100%;
-        border-radius: 4px;
-        animation: shimmer 1.5s infinite;
-    }}
-    
-    @keyframes shimmer {{
-        0% {{ background-position: -200% 0; }}
-        100% {{ background-position: 200% 0; }}
-    }}
-    </style>
-    """, unsafe_allow_html=True)
+    """
 
-def with_loading_state(func: Callable, loading_message: str = "Processing..."):
-    """Decorator to add loading state to functions"""
-    def wrapper(*args, **kwargs):
-        with st.spinner(loading_message):
-            return func(*args, **kwargs)
-    return wrapper
+def show_connection_status():
+    """Show real-time connection status"""
+    from utils.profile_sync import get_sync_status
 
-def render_progress_card(title: str, current: int, total: int, description: str = ""):
-    """Render a professional progress card"""
-    percentage = (current / total) * 100 if total > 0 else 0
-    
-    st.markdown(f"""
-    <div class="progress-card">
-        <div class="progress-header">
-            <h4 class="progress-title">{title}</h4>
-            <span class="progress-percentage">{percentage:.1f}%</span>
-        </div>
-        <div class="progress-bar-container">
-            <div class="progress-bar" style="width: {percentage}%;"></div>
-        </div>
-        <div class="progress-details">
-            <span class="progress-current">{current} of {total}</span>
-            {f'<span class="progress-description">{description}</span>' if description else ''}
-        </div>
-    </div>
-    
-    <style>
-    .progress-card {{
-        background: var(--overlay-light);
-        backdrop-filter: blur(10px);
-        border: 1px solid var(--border-light);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin: 1rem 0;
-        transition: all 0.3s ease;
-    }}
-    
-    .progress-card:hover {{
-        transform: translateY(-2px);
-        box-shadow: var(--shadow-secondary);
-    }}
-    
-    .progress-header {{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 1rem;
-    }}
-    
-    .progress-title {{
-        margin: 0;
-        color: var(--text-primary);
-        font-size: 1.1rem;
-        font-weight: 600;
-    }}
-    
-    .progress-percentage {{
-        color: var(--primary);
-        font-weight: 700;
-        font-size: 1.2rem;
-    }}
-    
-    .progress-bar-container {{
-        background: var(--border-light);
-        border-radius: 8px;
-        height: 8px;
-        overflow: hidden;
-        margin-bottom: 0.75rem;
-    }}
-    
-    .progress-bar {{
-        background: var(--primary-gradient);
-        height: 100%;
-        border-radius: 8px;
-        transition: width 0.6s ease;
-        box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
-    }}
-    
-    .progress-details {{
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 0.9rem;
-    }}
-    
-    .progress-current {{
-        color: var(--text-secondary);
-        font-weight: 500;
-    }}
-    
-    .progress-description {{
-        color: var(--text-secondary);
-        font-style: italic;
-    }}
-    </style>
-    """, unsafe_allow_html=True)
+    status = get_sync_status()
+
+    if status['is_syncing']:
+        st.markdown(create_status_indicator('syncing', 'Real-time sync active'), unsafe_allow_html=True)
+    else:
+        st.markdown(create_status_indicator('offline', 'Sync inactive'), unsafe_allow_html=True)
+
+    if status['last_remote_sync']:
+        st.caption(f"Last synced: {status['last_remote_sync'].strftime('%I:%M:%S %p')}")

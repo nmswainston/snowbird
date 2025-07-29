@@ -12,7 +12,8 @@ from firebase_admin import credentials, firestore, auth
 from typing import Dict, Any, Optional
 import pyrebase
 
-from utils.logging_config import logger
+from utils.config import settings
+from utils.logger import logger
 
 class FirebaseConfig:
     """Firebase configuration and connection manager"""

@@ -8,7 +8,8 @@ import streamlit as st
 from typing import Dict, Any
 from utils.firebase_auth import get_firebase_auth
 from utils.firebase_database import get_firebase_database
-from utils.logging_config import logger
+from utils.logger import logger
+from components.loading_states import show_loading, show_success, show_error
 
 def render_login_form():
     """Render the login form"""
@@ -28,20 +29,21 @@ def render_login_form():
     
     if login_submitted:
         if email and password:
-            auth = get_firebase_auth()
-            result = auth.login_user(email, password)
-            
-            if result["success"]:
-                # Update last login in database
-                db = get_firebase_database()
-                db.update_last_login(result["user"]["uid"])
+            with st.spinner("Logging in..."):
+                auth = get_firebase_auth()
+                result = auth.login_user(email, password)
                 
-                st.success("✅ Login successful!")
-                st.rerun()
-            else:
-                st.error(f"❌ Login failed: {result.get('error', 'Unknown error')}")
+                if result["success"]:
+                    # Update last login in database
+                    db = get_firebase_database()
+                    db.update_last_login(result["user"]["uid"])
+                    
+                    show_success("✅ Login successful!")
+                    st.rerun()
+                else:
+                    show_error(f"❌ Login failed: {result.get('error', 'Unknown error')}")
         else:
-            st.error("Please enter both email and password")
+            show_error("Please enter both email and password")
 
 def render_registration_form():
     """Render the registration form"""
@@ -69,23 +71,24 @@ def render_registration_form():
         elif len(password) < 6:
             st.error("Password must be at least 6 characters long")
         else:
-            auth = get_firebase_auth()
-            result = auth.register_user(email, password, display_name)
-            
-            if result["success"]:
-                # Create user profile in database
-                db = get_firebase_database()
-                db.create_user_profile(
-                    result["user"]["uid"], 
-                    email, 
-                    display_name or email.split('@')[0]
-                )
+            with st.spinner("Creating account..."):
+                auth = get_firebase_auth()
+                result = auth.register_user(email, password, display_name)
                 
-                st.success("✅ Account created successfully!")
-                st.session_state.show_register = False
-                st.rerun()
-            else:
-                st.error(f"❌ Registration failed: {result.get('error', 'Unknown error')}")
+                if result["success"]:
+                    # Create user profile in database
+                    db = get_firebase_database()
+                    db.create_user_profile(
+                        result["user"]["uid"], 
+                        email, 
+                        display_name or email.split('@')[0]
+                    )
+                    
+                    show_success("✅ Account created successfully!")
+                    st.session_state.show_register = False
+                    st.rerun()
+                else:
+                    show_error(f"❌ Registration failed: {result.get('error', 'Unknown error')}")
 
 def render_auth_page():
     """Render the main authentication page"""
