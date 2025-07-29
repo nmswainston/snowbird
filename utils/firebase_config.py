@@ -27,38 +27,59 @@ class FirebaseConfig:
     def initialize_firebase(self):
         """Initialize Firebase Admin SDK and Pyrebase"""
         try:
+            # Check if Firebase secrets are configured
+            service_account_info = getattr(settings, 'FIREBASE_SERVICE_ACCOUNT', None)
+            firebase_config_info = getattr(settings, 'FIREBASE_CONFIG', None)
+            
+            if not service_account_info or not firebase_config_info:
+                logger.error("Firebase configuration missing. Please check your Replit Secrets.")
+                return False
+            
             # Initialize Firebase Admin SDK if not already done
             if not firebase_admin._apps:
-                # Try to get service account from settings
-                service_account_info = settings.FIREBASE_SERVICE_ACCOUNT
-                
-                if service_account_info:
+                try:
                     # Convert to proper format if needed
+                    if isinstance(service_account_info, str):
+                        # If it's a JSON string, parse it
+                        service_account_info = json.loads(service_account_info)
+                    
                     if isinstance(service_account_info, dict):
                         cred = credentials.Certificate(service_account_info)
+                        self.app = firebase_admin.initialize_app(cred)
+                        logger.info("Firebase Admin SDK initialized successfully")
                     else:
-                        # If it's a JSON string, parse it
-                        cred = credentials.Certificate(json.loads(service_account_info))
-                    
-                    self.app = firebase_admin.initialize_app(cred)
-                    logger.info("Firebase Admin SDK initialized successfully")
-                else:
-                    logger.warning("Firebase service account not found in secrets")
+                        logger.error("Invalid Firebase service account format")
+                        return False
+                        
+                except json.JSONDecodeError as e:
+                    logger.error(f"Invalid JSON in FIREBASE_SERVICE_ACCOUNT: {e}")
+                    return False
+                except Exception as e:
+                    logger.error(f"Failed to initialize Firebase Admin SDK: {e}")
                     return False
             else:
                 self.app = firebase_admin.get_app()
             
             # Initialize Firestore
-            self.db = firestore.client()
+            try:
+                self.db = firestore.client()
+            except Exception as e:
+                logger.error(f"Failed to initialize Firestore: {e}")
+                return False
             
             # Initialize Pyrebase for client-side auth
-            firebase_config = settings.FIREBASE_CONFIG
-            if firebase_config:
-                self.firebase_app = pyrebase.initialize_app(firebase_config)
+            try:
+                if isinstance(firebase_config_info, str):
+                    firebase_config_info = json.loads(firebase_config_info)
+                
+                self.firebase_app = pyrebase.initialize_app(firebase_config_info)
                 self.auth_config = self.firebase_app.auth()
                 logger.info("Pyrebase initialized successfully")
-            else:
-                logger.warning("Firebase config not found in secrets")
+            except json.JSONDecodeError as e:
+                logger.error(f"Invalid JSON in FIREBASE_CONFIG: {e}")
+                return False
+            except Exception as e:
+                logger.error(f"Failed to initialize Pyrebase: {e}")
                 return False
                 
             return True

@@ -11,6 +11,196 @@ from utils.firebase_database import get_firebase_database
 from utils.logger import logger
 from components.loading_states import show_loading, show_success, show_error
 
+def check_firebase_setup():
+    """Check if Firebase is properly configured"""
+    try:
+        auth = get_firebase_auth()
+        if not auth.initialize():
+            st.error("🔥 **Firebase Setup Required**")
+            st.markdown("""
+            **Missing Firebase Configuration!** 
+            
+            To use authentication, you need to:
+            
+            1. **Add Firebase Secrets** in Replit:
+               - Go to **Tools** → **Secrets**
+               - Add `FIREBASE_SERVICE_ACCOUNT` (your service account JSON)
+               - Add `FIREBASE_CONFIG` (your web app config JSON)
+            
+            2. **Follow the setup guide**: Check `FIREBASE_SETUP.md` for detailed instructions
+            
+            3. **Need help?** The setup guide has step-by-step instructions for creating your Firebase project.
+            """)
+            
+            with st.expander("🔧 Quick Setup Guide"):
+                st.markdown("""
+                **Step 1: Create Firebase Project**
+                1. Go to [Firebase Console](https://console.firebase.google.com/)
+                2. Create new project: "snowbird-financial"
+                3. Enable Authentication (Email/Password)
+                4. Create Firestore database
+                
+                **Step 2: Get Configuration**
+                1. Project Settings → Service Accounts → Generate Key
+                2. Project Settings → General → Web App Config
+                
+                **Step 3: Add to Replit Secrets**
+                1. Copy the JSON configs to Replit Secrets
+                2. Restart the app
+                """)
+            
+            return False
+        return True
+    except Exception as e:
+        st.error(f"❌ Firebase initialization error: {e}")
+        return False
+
+def render_auth_page():
+    """Render the authentication page with Firebase setup check"""
+    
+    # Check Firebase setup first
+    if not check_firebase_setup():
+        return
+    
+    st.markdown("""
+    <div style="text-align: center; padding: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; margin-bottom: 2rem;">
+        <h1 style="color: white; margin: 0;">❄️ Welcome to Snowbird Financial 🏖️</h1>
+        <p style="color: rgba(255,255,255,0.9); margin: 0.5rem 0 0 0;">Your personalized seasonal lifestyle assistant</p>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # Create tabs for login and signup
+    tab1, tab2 = st.tabs(["🔑 Login", "✨ Sign Up"])
+    
+    with tab1:
+        render_login_form()
+    
+    with tab2:
+        render_signup_form()
+
+def render_login_form():
+    """Render the login form"""
+    st.markdown("### 🔑 Login to Your Account")
+    
+    with st.form("login_form"):
+        email = st.text_input("📧 Email", placeholder="your@email.com")
+        password = st.text_input("🔒 Password", type="password")
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            login_button = st.form_submit_button("🚪 Login", use_container_width=True)
+        with col2:
+            remember_me = st.checkbox("Remember me")
+        
+        if login_button:
+            if email and password:
+                with st.spinner("Logging you in..."):
+                    auth = get_firebase_auth()
+                    result = auth.login_user(email, password)
+                    
+                    if result["success"]:
+                        show_success("✅ Login successful! Redirecting...")
+                        st.rerun()
+                    else:
+                        error_msg = result.get("error", "Unknown error")
+                        if "INVALID_PASSWORD" in error_msg:
+                            show_error("❌ Invalid password. Please try again.")
+                        elif "EMAIL_NOT_FOUND" in error_msg:
+                            show_error("❌ Email not found. Please sign up first.")
+                        elif "TOO_MANY_ATTEMPTS_TRY_LATER" in error_msg:
+                            show_error("❌ Too many failed attempts. Please try again later.")
+                        else:
+                            show_error(f"❌ Login failed: {error_msg}")
+            else:
+                show_error("⚠️ Please enter both email and password.")
+
+def render_signup_form():
+    """Render the signup form"""
+    st.markdown("### ✨ Create Your Account")
+    
+    with st.form("signup_form"):
+        email = st.text_input("📧 Email", placeholder="your@email.com")
+        password = st.text_input("🔒 Password", type="password", help="Minimum 6 characters")
+        confirm_password = st.text_input("🔒 Confirm Password", type="password")
+        display_name = st.text_input("👤 Display Name (Optional)", placeholder="Your Name")
+        
+        agree_terms = st.checkbox("I agree to the terms of service and privacy policy")
+        
+        signup_button = st.form_submit_button("🎯 Create Account", use_container_width=True)
+        
+        if signup_button:
+            if not email or not password:
+                show_error("⚠️ Please enter both email and password.")
+            elif len(password) < 6:
+                show_error("⚠️ Password must be at least 6 characters long.")
+            elif password != confirm_password:
+                show_error("⚠️ Passwords do not match.")
+            elif not agree_terms:
+                show_error("⚠️ Please agree to the terms of service.")
+            else:
+                with st.spinner("Creating your account..."):
+                    auth = get_firebase_auth()
+                    result = auth.register_user(email, password, display_name)
+                    
+                    if result["success"]:
+                        show_success("✅ Account created successfully! Welcome to Snowbird!")
+                        st.rerun()
+                    else:
+                        error_msg = result.get("error", "Unknown error")
+                        if "EMAIL_EXISTS" in error_msg:
+                            show_error("❌ Email already exists. Please try logging in instead.")
+                        elif "WEAK_PASSWORD" in error_msg:
+                            show_error("❌ Password is too weak. Please choose a stronger password.")
+                        elif "INVALID_EMAIL" in error_msg:
+                            show_error("❌ Invalid email format. Please check your email.")
+                        else:
+                            show_error(f"❌ Registration failed: {error_msg}")
+
+def check_authentication():
+    """Check if user is authenticated and render auth page if not"""
+    auth = get_firebase_auth()
+    
+    # First check if Firebase is properly set up
+    if not check_firebase_setup():
+        st.stop()
+    
+    if not auth.is_authenticated():
+        render_auth_page()
+        st.stop()
+    
+    return auth.get_current_user()
+
+def render_logout_button():
+    """Render logout button in sidebar"""
+    if st.sidebar.button("🚪 Logout", use_container_width=True):
+        auth = get_firebase_auth()
+        if auth.logout_user():
+            show_success("✅ Logged out successfully!")
+            st.rerun()
+        else:
+            show_error("❌ Error logging out. Please try again.")
+
+def render_user_profile():
+    """Render user profile information"""
+    auth = get_firebase_auth()
+    user = auth.get_current_user()
+    
+    if user:
+        st.sidebar.markdown("### 👤 User Profile")
+        st.sidebar.write(f"📧 **Email:** {user.get('email', 'N/A')}")
+        if user.get('display_name'):
+            st.sidebar.write(f"👤 **Name:** {user.get('display_name')}")
+        
+        # User preferences
+        with st.sidebar.expander("⚙️ Settings"):
+            if st.button("🔄 Refresh Token"):
+                if auth.refresh_token():
+                    show_success("✅ Token refreshed!")
+                else:
+                    show_error("❌ Failed to refresh token.")
+        
+        render_logout_button()
+
 def render_login_form():
     """Render the login form"""
     st.markdown("### 🔐 Login to Your Account")
