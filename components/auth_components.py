@@ -194,6 +194,11 @@ def check_authentication():
     auth = get_firebase_auth()
     
     if not auth.is_authenticated():
+        # Clear any stale session data
+        for key in list(st.session_state.keys()):
+            if key.startswith(('user_', 'states', 'home_budgets', 'trip_plans', 'financial_notes')):
+                del st.session_state[key]
+        
         render_auth_page()
         st.stop()
     

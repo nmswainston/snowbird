@@ -48,10 +48,13 @@ class FirebaseDatabase:
                     'Supplemental Insurance': 200
                 },
                 'preferences': {
-                    'theme': 'default',
+                    'theme': 'light',
                     'notifications': True,
                     'auto_tracking': False
-                }
+                },
+                'trip_plans': [],
+                'financial_notes': [],
+                'saved_destinations': []
             }
             
             if additional_data:
@@ -167,6 +170,60 @@ class FirebaseDatabase:
         except Exception as e:
             logger.error(f"Failed to get user activities: {e}")
             return []
+    
+    def save_trip_plans(self, uid: str, trip_plans: List[Dict[str, Any]]) -> bool:
+        """Save user's trip plans"""
+        return self.update_user_profile(uid, {'trip_plans': trip_plans})
+    
+    def save_financial_notes(self, uid: str, notes: List[Dict[str, Any]]) -> bool:
+        """Save user's financial notes"""
+        return self.update_user_profile(uid, {'financial_notes': notes})
+    
+    def save_saved_destinations(self, uid: str, destinations: List[Dict[str, Any]]) -> bool:
+        """Save user's saved destinations"""
+        return self.update_user_profile(uid, {'saved_destinations': destinations})
+    
+    def get_trip_plans(self, uid: str) -> List[Dict[str, Any]]:
+        """Get user's trip plans"""
+        profile = self.get_user_profile(uid)
+        if profile:
+            return profile.get('trip_plans', [])
+        return []
+    
+    def get_financial_notes(self, uid: str) -> List[Dict[str, Any]]:
+        """Get user's financial notes"""
+        profile = self.get_user_profile(uid)
+        if profile:
+            return profile.get('financial_notes', [])
+        return []
+    
+    def get_saved_destinations(self, uid: str) -> List[Dict[str, Any]]:
+        """Get user's saved destinations"""
+        profile = self.get_user_profile(uid)
+        if profile:
+            return profile.get('saved_destinations', [])
+        return []
+    
+    def listen_to_user_changes(self, uid: str, callback):
+        """Listen for real-time changes to user data"""
+        try:
+            if not self.db:
+                if not self.initialize():
+                    return None
+            
+            # Create a listener for real-time updates
+            doc_ref = self.db.collection('users').document(uid)
+            
+            def on_snapshot(doc_snapshot, changes, read_time):
+                for doc in doc_snapshot:
+                    if doc.exists:
+                        callback(doc.to_dict())
+            
+            return doc_ref.on_snapshot(on_snapshot)
+            
+        except Exception as e:
+            logger.error(f"Failed to create listener: {e}")
+            return None
 
 # Global database instance
 firebase_db = FirebaseDatabase()
