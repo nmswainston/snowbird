@@ -549,12 +549,16 @@ def main():
             }
         user = st.session_state.user
         st.sidebar.success("🧪 Testing mode active - Auth bypassed")
+        
+        # Render dashboard for testing mode
+        render_dashboard()
+        
     else:
         # Check authentication normally
         try:
             user = check_authentication()
-
-        # User is authenticated, show personalized dashboard
+            
+            # User is authenticated, show personalized dashboard
             render_dashboard()
 
             # Background auto-sync every 30 seconds
@@ -566,23 +570,21 @@ def main():
                 sync_data_to_firebase()
                 st.session_state.last_auto_sync = current_time
 
-    # Note: st.stop() will halt execution here if user is not authenticated
-    # No need to catch it as an exception
-    except BaseException as e:
-        st.error(f"❌ Dashboard Error: {e}")
-        st.write("Please refresh the page or contact support.")
+        except Exception as e:
+            st.error(f"❌ Dashboard Error: {e}")
+            st.write("Please refresh the page or contact support.")
 
-        # Debug information
-        if st.session_state.get('debug_mode', False):
-            with st.expander("Debug Details"):
-                st.code(f"Error Type: {type(e).__name__}")
-                st.code(f"Error Message: {str(e)}")
+            # Debug information
+            if st.session_state.get('debug_mode', False):
+                with st.expander("Debug Details"):
+                    st.code(f"Error Type: {type(e).__name__}")
+                    st.code(f"Error Message: {str(e)}")
 
-        # Fallback logout option
-        if st.button("🔄 Reset Session"):
-            for key in list(st.session_state.keys()):
-                del st.session_state[key]
-            st.rerun()
+            # Fallback logout option
+            if st.button("🔄 Reset Session"):
+                for key in list(st.session_state.keys()):
+                    del st.session_state[key]
+                st.rerun()
 
 if __name__ == "__main__":
     main()
