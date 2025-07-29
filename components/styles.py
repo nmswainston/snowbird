@@ -575,4 +575,3 @@ def apply_basic_styles():
     </style>
     """, unsafe_allow_html=True)
 # Enhanced visual polish and branding are added to the CSS styles, focusing on improving the main header and overall visual presentation.
-</replit_final_file>
