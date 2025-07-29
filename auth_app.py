@@ -12,6 +12,7 @@ from utils.firebase_auth import get_firebase_auth
 from components.loading_states import show_loading, show_success, show_error
 from utils.profile_sync import sync_user_data, watch_user_data_changes
 import threading
+import os
 
 # Configure page
 st.set_page_config(
@@ -536,21 +537,34 @@ def main():
         st.session_state.financial_notes = []
         st.session_state.saved_destinations = []
 
-    # Check authentication
-    try:
-        user = check_authentication()
+    # Add testing mode toggle in sidebar
+    if st.sidebar.checkbox("🧪 Testing Mode (Skip Auth)", value=False):
+        # Create mock user for testing
+        if 'user' not in st.session_state:
+            st.session_state.user = {
+                'uid': 'test_user_123',
+                'email': 'test@example.com',
+                'token': 'mock_token',
+                'refresh_token': 'mock_refresh_token'
+            }
+        user = st.session_state.user
+        st.sidebar.success("🧪 Testing mode active - Auth bypassed")
+    else:
+        # Check authentication normally
+        try:
+            user = check_authentication()
 
         # User is authenticated, show personalized dashboard
-        render_dashboard()
+            render_dashboard()
 
-        # Background auto-sync every 30 seconds
-        if 'last_auto_sync' not in st.session_state:
-            st.session_state.last_auto_sync = datetime.now()
+            # Background auto-sync every 30 seconds
+            if 'last_auto_sync' not in st.session_state:
+                st.session_state.last_auto_sync = datetime.now()
 
-        current_time = datetime.now()
-        if (current_time - st.session_state.last_auto_sync).seconds > 30:
-            sync_data_to_firebase()
-            st.session_state.last_auto_sync = current_time
+            current_time = datetime.now()
+            if (current_time - st.session_state.last_auto_sync).seconds > 30:
+                sync_data_to_firebase()
+                st.session_state.last_auto_sync = current_time
 
     # Note: st.stop() will halt execution here if user is not authenticated
     # No need to catch it as an exception
