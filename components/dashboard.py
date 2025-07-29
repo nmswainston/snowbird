@@ -579,3 +579,22 @@ def render_metric_card(title, value, delta, icon):
         <div style="color: var(--text-secondary); font-size: 0.875rem;">{delta}</div>
     </div>
     """, unsafe_allow_html=True)
+
+def render_dashboard():
+    """Render the main dashboard with overview and quick actions"""
+    st.markdown('<h2><i data-lucide="home" class="icon"></i>Dashboard</h2>', unsafe_allow_html=True)
+
+    # Add daily state logger at the top
+    from components.daily_logger import render_quick_state_logger
+
+    # Prominent daily logging section
+    st.markdown("""
+    <div style="background: linear-gradient(135deg, #e8f5e8 0%, #f0f8ff 100%); 
+                padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; 
+                border-left: 4px solid #4CAF50;">
+    """, unsafe_allow_html=True)
+
+    st.markdown("**📍 Quick Daily Check-in**")
+    render_quick_state_logger()
+
+    st.markdown("</div>", unsafe_allow_html=True)

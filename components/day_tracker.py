@@ -4,11 +4,15 @@ from utils.data_models import SnowbirdData
 import pandas as pd
 
 def render_day_tracker():
-    """Render the day tracking interface with property-based state selection"""
+    """Render the day tracking interface with property-based state selection and Firebase integration"""
     st.markdown('<h2><i data-lucide="calendar" class="icon"></i>Daily Location Tracker</h2>', unsafe_allow_html=True)
 
-    # Initialize data manager
+    # Initialize data manager and Firebase
     data_manager = SnowbirdData()
+    
+    # Import Firebase database
+    from utils.firebase_database import get_firebase_database
+    firebase_db = get_firebase_database()
 
     # Quick Stats Row
     col1, col2, col3, col4 = st.columns(4)
@@ -37,61 +41,101 @@ def render_day_tracker():
 
     st.markdown("---")
 
-    # Quick Location Logger
-    st.subheader("📍 Quick Log Today's Location")
+    # Enhanced Quick Location Logger with Firebase
+    st.subheader("📍 Where are you today?")
+    
+    # Create a prominent daily logging section
+    with st.container():
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, #e3f2fd 0%, #f8f9ff 100%); 
+                    padding: 1.5rem; border-radius: 10px; margin-bottom: 1rem; border: 2px solid #e1f5fe;">
+        """, unsafe_allow_html=True)
+        
+        quick_col1, quick_col2, quick_col3 = st.columns([3, 2, 2])
 
-    quick_col1, quick_col2, quick_col3 = st.columns([2, 2, 1])
+        with quick_col1:
+            # Get available states from properties and existing states
+            available_states = set(st.session_state.states.keys())
 
-    with quick_col1:
-        # Get available states from properties and existing states
-        available_states = set(st.session_state.states.keys())
+            # Add states from user properties if they exist
+            if 'user_properties' in st.session_state:
+                for prop_name, prop_details in st.session_state.user_properties.items():
+                    available_states.add(prop_details['state'])
 
-        # Add states from user properties if they exist
-        if 'user_properties' in st.session_state:
-            for prop_name, prop_details in st.session_state.user_properties.items():
-                available_states.add(prop_details['state'])
+            # Ensure we have at least the default states
+            if not available_states:
+                available_states = {"Arizona", "Minnesota", "Florida", "Texas", "California", "Other"}
 
-        # Ensure we have at least the default states
-        if not available_states:
-            available_states = {"Arizona", "Minnesota"}
+            available_states = sorted(list(available_states))
 
-        available_states = sorted(list(available_states))
-
-        selected_state = st.selectbox(
-            "Select State",
-            options=available_states,
-            key="quick_state_selector"
-        )
-
-    with quick_col2:
-        # Show properties in selected state
-        properties_in_state = []
-        if 'user_properties' in st.session_state:
-            properties_in_state = [
-                prop_name for prop_name, prop_details in st.session_state.user_properties.items()
-                if prop_details['state'] == selected_state
-            ]
-
-        if properties_in_state:
-            selected_property = st.selectbox(
-                "Property (Optional)",
-                options=["Not Specified"] + properties_in_state,
-                key="quick_property_selector"
+            selected_state = st.selectbox(
+                "Where are you today?",
+                options=available_states,
+                key="daily_state_selector",
+                help="Select your current state for today's log entry"
             )
-        else:
-            selected_property = "Not Specified"
-            st.info(f"No properties configured in {selected_state}")
 
-    with quick_col3:
-        if st.button("📅 Log Today", type="primary", use_container_width=True):
-            success, message = data_manager.add_day_log(selected_state)
-            if success:
-                st.success(message)
-                if selected_property != "Not Specified":
-                    st.info(f"🏠 Logged at: {selected_property}")
+        with quick_col2:
+            # Show properties in selected state
+            properties_in_state = []
+            if 'user_properties' in st.session_state:
+                properties_in_state = [
+                    prop_name for prop_name, prop_details in st.session_state.user_properties.items()
+                    if prop_details['state'] == selected_state
+                ]
+
+            if properties_in_state:
+                selected_property = st.selectbox(
+                    "Property (Optional)",
+                    options=["Not Specified"] + properties_in_state,
+                    key="daily_property_selector"
+                )
             else:
-                st.warning(message)
-            st.rerun()
+                selected_property = "Not Specified"
+                if selected_state in ["Arizona", "Minnesota"]:
+                    st.caption(f"No properties configured in {selected_state}")
+
+        with quick_col3:
+            st.write("")  # Add some spacing
+            if st.button("📅 Log Today's Location", type="primary", use_container_width=True):
+                # Save to local session state
+                success, message = data_manager.add_day_log(selected_state)
+                
+                if success:
+                    # Save to Firebase if user is authenticated
+                    if 'user' in st.session_state and st.session_state.user:
+                        try:
+                            # Save location data to Firebase
+                            firebase_db.save_location_data(
+                                st.session_state.user['uid'], 
+                                st.session_state.states
+                            )
+                            
+                            # Log activity for analytics
+                            firebase_db.log_activity(
+                                st.session_state.user['uid'],
+                                'location_logged',
+                                {
+                                    'state': selected_state,
+                                    'property': selected_property if selected_property != "Not Specified" else None,
+                                    'date': datetime.date.today().isoformat()
+                                }
+                            )
+                            
+                            st.success(f"✅ {message} - Saved to cloud!")
+                        except Exception as e:
+                            st.success(f"✅ {message} - Local save only")
+                            st.warning("⚠️ Cloud sync failed, but data saved locally")
+                    else:
+                        st.success(f"✅ {message}")
+                    
+                    if selected_property != "Not Specified":
+                        st.info(f"🏠 Logged at: {selected_property}")
+                else:
+                    st.warning(message)
+                st.rerun()
+        
+        st.markdown("</div>", unsafe_allow_html=True)
 
     # Property Quick Actions
     if 'user_properties' in st.session_state and st.session_state.user_properties:

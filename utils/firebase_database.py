@@ -117,7 +117,18 @@ class FirebaseDatabase:
     
     def save_location_data(self, uid: str, states: Dict[str, int]) -> bool:
         """Save user's location tracking data"""
-        return self.update_user_profile(uid, {'states': states})
+        try:
+            # Also save day_log if it exists in session state
+            import streamlit as st
+            update_data = {'states': states}
+            
+            if 'day_log' in st.session_state:
+                update_data['day_log'] = st.session_state.day_log
+            
+            return self.update_user_profile(uid, update_data)
+        except Exception as e:
+            logger.error(f"Failed to save location data: {e}")
+            return self.update_user_profile(uid, {'states': states})
     
     def save_budget_data(self, uid: str, budgets: Dict[str, Dict]) -> bool:
         """Save user's budget data"""
