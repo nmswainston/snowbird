@@ -240,12 +240,12 @@ class ThemeManager:
             @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Manrope:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Satoshi:wght@300;400;500;600;700;800;900&display=swap');
             
             /* Fallback for Satoshi font */
-            @font-face {
+            @font-face {{
                 font-family: 'Satoshi-Fallback';
                 src: local('Inter'), local('system-ui'), local('-apple-system');
                 font-weight: 100 900;
                 font-style: normal;
-            }
+            }}
 
             /* Enhanced CSS Variables */
             :root {{
