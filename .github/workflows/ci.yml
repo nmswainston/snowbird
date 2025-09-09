@@ -112,6 +112,17 @@ jobs:
           echo "🔒 Security scans completed"
           echo "🎯 Deployment would trigger Replit's deployment system"
 
+- name: Upload test artifacts
+  uses: actions/upload-artifact@v4
+  if: always()
+  with:
+    name: test-reports-${{ matrix.python-version }}
+    path: |
+      coverage.xml
+      htmlcov/
+      bandit-report.json
+      safety-report.json
+
   deploy_production:
     runs-on: ubuntu-latest
     needs: deploy_staging
