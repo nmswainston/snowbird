@@ -1,70 +1,59 @@
 # Snowbird
 
-A companion app for snowbirds — helping seasonal travelers manage their away-from-home life.
+A companion app for seasonal travelers — helping snowbirds manage life between two homes.
 
-## Overview
+## Problem
 
-Snowbird is a Python-based web application designed for seasonal travelers (snowbirds) who split their time between two locations. It helps users manage the logistics of being away — tracking tasks, reminders, contacts, and key information for life on the road or in a second home.
+Snowbirds — people who spend part of the year in a warmer location — juggle the logistics of two homes, two sets of contacts, seasonal tasks, and travel planning with no tools built specifically for their lifestyle.
+
+## Solution
+
+Snowbird is a web app built with Python and Streamlit that gives seasonal travelers a central hub for tracking tasks, reminders, key contacts, and home management info for both locations.
+
+## Screenshots
+
+> *Add 2–4 screenshots here*
 
 ## Tech Stack
 
 - Python
 - Streamlit
-- Firebase (authentication & data)
-- GitHub Actions (CI/CD)
+- Firebase
+- GitHub Actions
 
-## Getting Started
+## Features
 
-### Prerequisites
+- Task and reminder tracking for both home locations
+- Firebase authentication for secure access
+- Multi-language support via translation files
+- GitHub Actions CI/CD pipeline
+- Comprehensive test suite
+- Detailed setup and contribution documentation
 
-- Python 3.9+
-- pip
-- A Firebase project ([setup guide](FIREBASE_SETUP.md))
-
-### Installation
+## Installation
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### Environment Setup
-
-Copy the example env file and fill in your Firebase credentials:
+Configure Firebase credentials (see [FIREBASE_SETUP.md](FIREBASE_SETUP.md)):
 
 ```bash
 cp .env.example .env
-```
-
-See [FIREBASE_SETUP.md](FIREBASE_SETUP.md) for Firebase configuration steps.
-
-### Running
-
-```bash
 streamlit run api.py
 ```
 
-## Project Structure
+## Lessons Learned
 
-```
-api.py              # Main Streamlit app entry point
-auth_app.py         # Authentication logic
-config.py           # App configuration
-components/         # UI components
-utils/              # Helper utilities
-static/             # Static assets
-tests/              # Test suite
-translations/       # i18n files
-docs/               # Documentation
-.github/workflows/  # CI/CD pipelines
-```
+- Streamlit is remarkably fast for building functional web UIs in Python without frontend overhead
+- Firebase Authentication handles the hard parts of auth — worth using even for small projects
+- Building with real users in mind (snowbirds are a specific, underserved group) makes design decisions clearer
 
-## Contributing
+## Future Improvements
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.
-
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md) for version history.
+- Mobile app for on-the-go access
+- Weather integration for both home locations
+- Community features for snowbird communities and parks
 
 ---
 
